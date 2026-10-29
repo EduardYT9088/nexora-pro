@@ -1,1 +1,404 @@
+name: Construir APK de Nexora Pro
 
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Crear el proyecto Android
+        shell: bash
+        run: |
+          set -e
+          mkdir -p proyecto && cd proyecto
+          cat > settings.gradle.kts <<'NXEOF'
+          pluginManagement {
+              repositories { google(); mavenCentral(); gradlePluginPortal() }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories { google(); mavenCentral() }
+          }
+          rootProject.name = "NexoraPro"
+          include(":app")
+          NXEOF
+          cat > build.gradle.kts <<'NXEOF'
+          plugins {
+              id("com.android.application") version "8.5.2" apply false
+              id("org.jetbrains.kotlin.android") version "1.9.24" apply false
+          }
+          NXEOF
+          cat > gradle.properties <<'NXEOF'
+          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+          android.useAndroidX=true
+          kotlin.code.style=official
+          android.nonTransitiveRClass=true
+          NXEOF
+          mkdir -p app
+          cat > app/build.gradle.kts <<'NXEOF'
+          plugins {
+              id("com.android.application")
+              id("org.jetbrains.kotlin.android")
+          }
+
+          android {
+              namespace = "com.nexora.pro"
+              compileSdk = 34
+
+              defaultConfig {
+                  applicationId = "com.nexora.pro"
+                  minSdk = 26
+                  targetSdk = 34
+                  versionCode = 1
+                  versionName = "1.0.0"
+              }
+
+              buildTypes {
+                  release {
+                      isMinifyEnabled = true
+                      isShrinkResources = true
+                      proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+                      // Para pruebas rápidas firma con la clave de depuración.
+                      // Antes de publicar en Play Store crea tu propia clave (Build > Generate Signed App Bundle / APK).
+                      signingConfig = signingConfigs.getByName("debug")
+                  }
+              }
+              compileOptions {
+                  sourceCompatibility = JavaVersion.VERSION_17
+                  targetCompatibility = JavaVersion.VERSION_17
+              }
+              kotlinOptions { jvmTarget = "17" }
+          }
+
+          dependencies {
+              implementation("androidx.core:core-ktx:1.13.1")
+              implementation("androidx.activity:activity-ktx:1.9.1")
+              implementation("androidx.webkit:webkit:1.11.0")
+          }
+          NXEOF
+          mkdir -p app
+          cat > app/proguard-rules.pro <<'NXEOF'
+          -keepclassmembers class com.nexora.pro.MainActivity$* { *; }
+          -keepattributes JavascriptInterface
+          NXEOF
+          mkdir -p app/src/main
+          cat > app/src/main/AndroidManifest.xml <<'NXEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+              <!-- Solo para cargar las fuentes de Google; la app funciona sin conexión. -->
+              <uses-permission android:name="android.permission.INTERNET" />
+              <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+              <application
+                  android:allowBackup="true"
+                  android:icon="@mipmap/ic_launcher"
+                  android:roundIcon="@mipmap/ic_launcher"
+                  android:label="@string/app_name"
+                  android:theme="@style/Theme.Nexora"
+                  android:hardwareAccelerated="true"
+                  android:supportsRtl="true">
+
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true"
+                      android:launchMode="singleTask"
+                      android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode"
+                      android:windowSoftInputMode="adjustResize">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          NXEOF
+          mkdir -p app/src/main/java/com/nexora/pro
+          cat > app/src/main/java/com/nexora/pro/MainActivity.kt <<'NXEOF'
+          package com.nexora.pro
+
+          import android.annotation.SuppressLint
+          import android.content.Intent
+          import android.content.pm.ActivityInfo
+          import android.graphics.Color
+          import android.net.Uri
+          import android.os.Bundle
+          import android.view.View
+          import android.view.ViewGroup
+          import android.view.WindowManager
+          import android.webkit.ValueCallback
+          import android.webkit.WebChromeClient
+          import android.webkit.WebResourceRequest
+          import android.webkit.WebResourceResponse
+          import android.webkit.WebSettings
+          import android.webkit.WebView
+          import android.webkit.WebViewClient
+          import android.widget.FrameLayout
+          import androidx.activity.ComponentActivity
+          import androidx.activity.OnBackPressedCallback
+          import androidx.activity.result.contract.ActivityResultContracts
+          import androidx.core.view.WindowCompat
+          import androidx.core.view.WindowInsetsCompat
+          import androidx.core.view.WindowInsetsControllerCompat
+          import androidx.webkit.WebViewAssetLoader
+
+          class MainActivity : ComponentActivity() {
+
+              private lateinit var root: FrameLayout
+              private lateinit var webView: WebView
+
+              private var filePathCallback: ValueCallback<Array<Uri>>? = null
+              private var customView: View? = null
+              private var customViewCallback: WebChromeClient.CustomViewCallback? = null
+
+              // Sirve los archivos de /assets desde un origen https seguro (localStorage, audio y blobs funcionan bien).
+              private val assetLoader by lazy {
+                  WebViewAssetLoader.Builder()
+                      .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
+                      .build()
+              }
+
+              // Selector de archivos del sistema (audio y video, selección múltiple).
+              private val pickFiles = registerForActivityResult(
+                  ActivityResultContracts.StartActivityForResult()
+              ) { result ->
+                  val data = result.data
+                  val uris: Array<Uri>? = when {
+                      result.resultCode != RESULT_OK || data == null -> null
+                      data.clipData != null -> {
+                          val clip = data.clipData!!
+                          Array(clip.itemCount) { clip.getItemAt(it).uri }
+                      }
+                      data.data != null -> arrayOf(data.data!!)
+                      else -> null
+                  }
+                  filePathCallback?.onReceiveValue(uris)
+                  filePathCallback = null
+              }
+
+              @SuppressLint("SetJavaScriptEnabled")
+              override fun onCreate(savedInstanceState: Bundle?) {
+                  super.onCreate(savedInstanceState)
+
+                  root = FrameLayout(this).apply { setBackgroundColor(Color.parseColor("#120F2A")) }
+                  webView = WebView(this).apply {
+                      setBackgroundColor(Color.parseColor("#120F2A"))
+                      layoutParams = FrameLayout.LayoutParams(
+                          ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+                      )
+                  }
+                  root.addView(webView)
+                  setContentView(root)
+
+                  with(webView.settings) {
+                      javaScriptEnabled = true
+                      domStorageEnabled = true
+                      databaseEnabled = true
+                      mediaPlaybackRequiresUserGesture = false
+                      allowFileAccess = false
+                      allowContentAccess = true
+                      cacheMode = WebSettings.LOAD_DEFAULT
+                      loadWithOverviewMode = true
+                      useWideViewPort = true
+                      setSupportZoom(false)
+                  }
+
+                  webView.webViewClient = object : WebViewClient() {
+                      override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? =
+                          assetLoader.shouldInterceptRequest(request.url)
+
+                      override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                          val url = request.url
+                          // Los enlaces externos se abren en el navegador.
+                          return if (url.host == "appassets.androidplatform.net") false else {
+                              runCatching { startActivity(Intent(Intent.ACTION_VIEW, url)) }
+                              true
+                          }
+                      }
+                  }
+
+                  webView.webChromeClient = object : WebChromeClient() {
+                      override fun onShowFileChooser(
+                          view: WebView,
+                          callback: ValueCallback<Array<Uri>>,
+                          params: FileChooserParams
+                      ): Boolean {
+                          filePathCallback?.onReceiveValue(null)
+                          filePathCallback = callback
+                          val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                              addCategory(Intent.CATEGORY_OPENABLE)
+                              type = "*/*"
+                              putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("audio/*", "video/*"))
+                              putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                          }
+                          return try {
+                              pickFiles.launch(Intent.createChooser(intent, "Elegir archivos"))
+                              true
+                          } catch (e: Exception) {
+                              filePathCallback = null
+                              false
+                          }
+                      }
+
+                      // Pantalla completa de video en horizontal.
+                      override fun onShowCustomView(view: View, callback: CustomViewCallback) {
+                          if (customView != null) { callback.onCustomViewHidden(); return }
+                          customView = view
+                          customViewCallback = callback
+                          root.addView(view, FrameLayout.LayoutParams(
+                              ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+                          webView.visibility = View.GONE
+                          requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                          window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                          WindowInsetsControllerCompat(window, root).apply {
+                              hide(WindowInsetsCompat.Type.systemBars())
+                              systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                          }
+                      }
+
+                      override fun onHideCustomView() {
+                          val v = customView ?: return
+                          root.removeView(v)
+                          customView = null
+                          webView.visibility = View.VISIBLE
+                          requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                          window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                          WindowInsetsControllerCompat(window, root).show(WindowInsetsCompat.Type.systemBars())
+                          customViewCallback?.onCustomViewHidden()
+                          customViewCallback = null
+                      }
+                  }
+
+                  // Botón atrás: primero cierra lo que esté abierto dentro de la app.
+                  onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+                      override fun handleOnBackPressed() {
+                          if (customView != null) {
+                              webView.webChromeClient?.onHideCustomView(); return
+                          }
+                          webView.evaluateJavascript("(window.nxBack && window.nxBack()) ? 'y' : 'n'") { r ->
+                              if (r?.contains("y") != true) {
+                                  // Envía la app al fondo en lugar de cerrarla, así la música sigue sonando.
+                                  moveTaskToBack(true)
+                              }
+                          }
+                      }
+                  })
+
+                  WindowCompat.setDecorFitsSystemWindows(window, true)
+
+                  if (savedInstanceState != null) webView.restoreState(savedInstanceState)
+                  else webView.loadUrl("https://appassets.androidplatform.net/assets/index.html")
+              }
+
+              override fun onSaveInstanceState(outState: Bundle) {
+                  super.onSaveInstanceState(outState)
+                  webView.saveState(outState)
+              }
+
+              // No se llama a webView.onPause() para que la música siga sonando en segundo plano.
+
+              override fun onDestroy() {
+                  root.removeAllViews()
+                  webView.destroy()
+                  super.onDestroy()
+              }
+          }
+          NXEOF
+          mkdir -p app/src/main/res/values
+          cat > app/src/main/res/values/strings.xml <<'NXEOF'
+          <resources>
+              <string name="app_name">Nexora Pro</string>
+          </resources>
+          NXEOF
+          mkdir -p app/src/main/res/values
+          cat > app/src/main/res/values/colors.xml <<'NXEOF'
+          <resources>
+              <color name="nexora_bg">#120F2A</color>
+              <color name="nexora_accent">#6C4CF5</color>
+              <color name="nexora_accent2">#12B5CB</color>
+          </resources>
+          NXEOF
+          mkdir -p app/src/main/res/values
+          cat > app/src/main/res/values/themes.xml <<'NXEOF'
+          <resources>
+              <style name="Theme.Nexora" parent="android:Theme.Material.NoActionBar">
+                  <item name="android:windowBackground">@color/nexora_bg</item>
+                  <item name="android:statusBarColor">@color/nexora_bg</item>
+                  <item name="android:navigationBarColor">@color/nexora_bg</item>
+                  <item name="android:colorAccent">@color/nexora_accent</item>
+                  <item name="android:windowLightStatusBar">false</item>
+              </style>
+          </resources>
+          NXEOF
+          mkdir -p app/src/main/res/drawable
+          cat > app/src/main/res/drawable/ic_launcher_background.xml <<'NXEOF'
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:aapt="http://schemas.android.com/aapt"
+              android:width="108dp" android:height="108dp"
+              android:viewportWidth="108" android:viewportHeight="108">
+              <path android:pathData="M0,0h108v108h-108z">
+                  <aapt:attr name="android:fillColor">
+                      <gradient android:type="linear"
+                          android:startX="0" android:startY="0"
+                          android:endX="108" android:endY="108"
+                          android:startColor="#6C4CF5" android:endColor="#12B5CB" />
+                  </aapt:attr>
+              </path>
+          </vector>
+          NXEOF
+          mkdir -p app/src/main/res/drawable
+          cat > app/src/main/res/drawable/ic_launcher_foreground.xml <<'NXEOF'
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="108dp" android:height="108dp"
+              android:viewportWidth="108" android:viewportHeight="108">
+              <path android:pathData="M40,70V38l28,32V38"
+                  android:strokeColor="#FFFFFF" android:strokeWidth="7"
+                  android:strokeLineCap="round" android:strokeLineJoin="round"
+                  android:fillColor="#00000000" />
+          </vector>
+          NXEOF
+          mkdir -p app/src/main/res/mipmap-anydpi-v26
+          cat > app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml <<'NXEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@drawable/ic_launcher_background" />
+              <foreground android:drawable="@drawable/ic_launcher_foreground" />
+              <monochrome android:drawable="@drawable/ic_launcher_foreground" />
+          </adaptive-icon>
+          NXEOF
+          mkdir -p app/src/main/assets
+          cp ../index.html app/src/main/assets/index.html
+
+      - name: Instalar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Instalar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Compilar APK
+        working-directory: proyecto
+        run: gradle assembleRelease --no-daemon
+
+      - name: Renombrar APK
+        run: cp proyecto/app/build/outputs/apk/release/app-release.apk NexoraPro.apk
+
+      - name: Publicar APK para descargar
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Nexora Pro 1.0.${{ github.run_number }}
+          files: NexoraPro.apk
+          
