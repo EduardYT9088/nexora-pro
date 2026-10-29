@@ -55,10 +55,19 @@ jobs:
 
               defaultConfig {
                   applicationId = "com.nexora.pro"
-                  minSdk = 26
+                  minSdk = 29
                   targetSdk = 34
-                  versionCode = 1
-                  versionName = "1.0.0"
+                  versionCode = 2
+                  versionName = "1.1.0"
+              }
+
+              signingConfigs {
+                  create("nexora") {
+                      storeFile = file("nexora.jks")
+                      storePassword = "nexora123"
+                      keyAlias = "nexora"
+                      keyPassword = "nexora123"
+                  }
               }
 
               buildTypes {
@@ -66,9 +75,8 @@ jobs:
                       isMinifyEnabled = true
                       isShrinkResources = true
                       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-                      // Para pruebas rápidas firma con la clave de depuración.
-                      // Antes de publicar en Play Store crea tu propia clave (Build > Generate Signed App Bundle / APK).
-                      signingConfig = signingConfigs.getByName("debug")
+                      // Firma fija: permite actualizar la app sin desinstalarla.
+                      signingConfig = signingConfigs.getByName("nexora")
                   }
               }
               compileOptions {
@@ -76,17 +84,17 @@ jobs:
                   targetCompatibility = JavaVersion.VERSION_17
               }
               kotlinOptions { jvmTarget = "17" }
-          }
-
-          dependencies {
-              implementation("androidx.core:core-ktx:1.13.1")
-              implementation("androidx.activity:activity-ktx:1.9.1")
-              implementation("androidx.webkit:webkit:1.11.0")
+              lint {
+                  checkReleaseBuilds = false
+                  abortOnError = false
+              }
           }
           NXEOF
-          mkdir -p app
           cat > app/proguard-rules.pro <<'NXEOF'
-          -keepclassmembers class com.nexora.pro.MainActivity$* { *; }
+          # Métodos que la interfaz llama desde JavaScript
+          -keepclassmembers class * {
+              @android.webkit.JavascriptInterface <methods>;
+          }
           -keepattributes JavascriptInterface
           NXEOF
           mkdir -p app/src/main
@@ -94,9 +102,18 @@ jobs:
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-              <!-- Solo para cargar las fuentes de Google; la app funciona sin conexión. -->
-              <uses-permission android:name="android.permission.INTERNET" />
+              <!-- Leer la música y los videos del teléfono -->
+              <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+              <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+              <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+              <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+              <!-- Controles en la notificación y música en segundo plano -->
+              <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
               <uses-permission android:name="android.permission.WAKE_LOCK" />
+              <!-- Solo para las fuentes tipográficas; la app funciona sin conexión -->
+              <uses-permission android:name="android.permission.INTERNET" />
 
               <application
                   android:allowBackup="true"
@@ -118,22 +135,181 @@ jobs:
                           <category android:name="android.intent.category.LAUNCHER" />
                       </intent-filter>
                   </activity>
+
+                  <service
+                      android:name=".PlaybackService"
+                      android:exported="false"
+                      android:foregroundServiceType="mediaPlayback" />
               </application>
           </manifest>
           NXEOF
           mkdir -p app/src/main/java/com/nexora/pro
+          cat > app/src/main/java/com/nexora/pro/LocalServer.kt <<'NXEOF'
+          package com.nexora.pro
+
+          import android.content.ContentUris
+          import android.content.Context
+          import android.graphics.Bitmap
+          import android.net.Uri
+          import android.os.ParcelFileDescriptor
+          import android.provider.MediaStore
+          import android.util.LruCache
+          import android.util.Size
+          import android.webkit.WebResourceRequest
+          import android.webkit.WebResourceResponse
+          import java.io.ByteArrayInputStream
+          import java.io.ByteArrayOutputStream
+          import java.io.InputStream
+
+          /**
+           * Sirve la interfaz (assets), los archivos de música/video del teléfono y sus portadas
+           * desde https://appassets.androidplatform.net, con soporte de rangos para poder adelantar.
+           */
+          class LocalServer(private val ctx: Context) {
+
+              private val thumbs = object : LruCache<String, ByteArray>(16 * 1024 * 1024) {
+                  override fun sizeOf(key: String, value: ByteArray) = value.size
+              }
+
+              fun handle(req: WebResourceRequest): WebResourceResponse? {
+                  val path = req.url.path ?: return notFound()
+                  return try {
+                      when {
+                          path.startsWith("/assets/") -> asset(path.removePrefix("/assets/"))
+                          path.startsWith("/media/") -> media(path, req.requestHeaders)
+                          path.startsWith("/thumb/") -> thumb(path, req.url.getQueryParameter("s"))
+                          else -> notFound()
+                      }
+                  } catch (e: Exception) {
+                      notFound()
+                  }
+              }
+
+              private fun contentUri(path: String): Pair<Uri, String> {
+                  val parts = path.trim('/').split('/')
+                  val type = parts[1]
+                  val id = parts[2].toLong()
+                  val base = if (type == "video") MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                             else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                  return ContentUris.withAppendedId(base, id) to type
+              }
+
+              private fun asset(name: String): WebResourceResponse {
+                  val mime = when (name.substringAfterLast('.', "").lowercase()) {
+                      "html" -> "text/html"
+                      "js" -> "application/javascript"
+                      "css" -> "text/css"
+                      "svg" -> "image/svg+xml"
+                      "png" -> "image/png"
+                      "json" -> "application/json"
+                      else -> "application/octet-stream"
+                  }
+                  return WebResourceResponse(mime, "utf-8", ctx.assets.open(name))
+              }
+
+              private fun media(path: String, reqHeaders: Map<String, String>?): WebResourceResponse {
+                  val (uri, type) = contentUri(path)
+                  val pfd = ctx.contentResolver.openFileDescriptor(uri, "r") ?: return notFound()
+                  val total = pfd.statSize
+                  val mime = ctx.contentResolver.getType(uri) ?: if (type == "video") "video/mp4" else "audio/mpeg"
+                  val input = ParcelFileDescriptor.AutoCloseInputStream(pfd)
+                  val headers = mutableMapOf(
+                      "Accept-Ranges" to "bytes",
+                      "Access-Control-Allow-Origin" to "*",
+                      "Cache-Control" to "no-store"
+                  )
+                  val range = reqHeaders?.entries?.firstOrNull { it.key.equals("Range", ignoreCase = true) }?.value
+                  if (range != null && total > 0) {
+                      val m = Regex("bytes=(\\d*)-(\\d*)").find(range)
+                      val a = m?.groupValues?.get(1).orEmpty()
+                      val b = m?.groupValues?.get(2).orEmpty()
+                      var start: Long
+                      var end: Long
+                      if (a.isEmpty() && b.isNotEmpty()) {
+                          start = maxOf(0L, total - b.toLong()); end = total - 1
+                      } else {
+                          start = a.toLongOrNull() ?: 0L
+                          end = b.toLongOrNull() ?: (total - 1)
+                      }
+                      end = minOf(end, total - 1)
+                      if (start >= total || start > end) {
+                          input.close()
+                          headers["Content-Range"] = "bytes */$total"
+                          return WebResourceResponse(mime, null, 416, "Range Not Satisfiable", headers, ByteArrayInputStream(ByteArray(0)))
+                      }
+                      var skipped = 0L
+                      while (skipped < start) {
+                          val s = input.skip(start - skipped)
+                          if (s <= 0) break
+                          skipped += s
+                      }
+                      val len = end - start + 1
+                      headers["Content-Range"] = "bytes $start-$end/$total"
+                      headers["Content-Length"] = len.toString()
+                      return WebResourceResponse(mime, null, 206, "Partial Content", headers, LimitedInputStream(input, len))
+                  }
+                  if (total > 0) headers["Content-Length"] = total.toString()
+                  return WebResourceResponse(mime, null, 200, "OK", headers, input)
+              }
+
+              private fun thumb(path: String, sizeParam: String?): WebResourceResponse {
+                  val px = sizeParam?.toIntOrNull()?.coerceIn(96, 1024) ?: 320
+                  val key = "$path@$px"
+                  val bytes = thumbs.get(key) ?: run {
+                      val (uri, _) = contentUri(path)
+                      val bmp = ctx.contentResolver.loadThumbnail(uri, Size(px, px), null)
+                      val out = ByteArrayOutputStream()
+                      bmp.compress(Bitmap.CompressFormat.JPEG, 84, out)
+                      bmp.recycle()
+                      out.toByteArray().also { thumbs.put(key, it) }
+                  }
+                  return WebResourceResponse("image/jpeg", null, 200, "OK",
+                      mapOf("Cache-Control" to "max-age=86400"), ByteArrayInputStream(bytes))
+              }
+
+              private fun notFound() =
+                  WebResourceResponse("text/plain", "utf-8", 404, "Not Found", emptyMap(), ByteArrayInputStream(ByteArray(0)))
+          }
+
+          class LimitedInputStream(private val inner: InputStream, private var left: Long) : InputStream() {
+              override fun read(): Int {
+                  if (left <= 0) return -1
+                  val r = inner.read()
+                  if (r >= 0) left--
+                  return r
+              }
+
+              override fun read(b: ByteArray, off: Int, len: Int): Int {
+                  if (left <= 0) return -1
+                  val n = inner.read(b, off, minOf(len.toLong(), left).toInt())
+                  if (n > 0) left -= n
+                  return n
+              }
+
+              override fun available(): Int = minOf(inner.available().toLong(), left).toInt()
+              override fun close() = inner.close()
+          }
+          NXEOF
           cat > app/src/main/java/com/nexora/pro/MainActivity.kt <<'NXEOF'
           package com.nexora.pro
 
+          import android.Manifest
           import android.annotation.SuppressLint
+          import android.app.Activity
           import android.content.Intent
           import android.content.pm.ActivityInfo
+          import android.content.pm.PackageManager
           import android.graphics.Color
           import android.net.Uri
+          import android.os.Build
           import android.os.Bundle
+          import android.provider.Settings
           import android.view.View
           import android.view.ViewGroup
+          import android.view.WindowInsets
+          import android.view.WindowInsetsController
           import android.view.WindowManager
+          import android.webkit.JavascriptInterface
           import android.webkit.ValueCallback
           import android.webkit.WebChromeClient
           import android.webkit.WebResourceRequest
@@ -142,55 +318,36 @@ jobs:
           import android.webkit.WebView
           import android.webkit.WebViewClient
           import android.widget.FrameLayout
-          import androidx.activity.ComponentActivity
-          import androidx.activity.OnBackPressedCallback
-          import androidx.activity.result.contract.ActivityResultContracts
-          import androidx.core.view.WindowCompat
-          import androidx.core.view.WindowInsetsCompat
-          import androidx.core.view.WindowInsetsControllerCompat
-          import androidx.webkit.WebViewAssetLoader
+          import org.json.JSONObject
 
-          class MainActivity : ComponentActivity() {
+          class MainActivity : Activity() {
+
+              companion object {
+                  const val HOST = "appassets.androidplatform.net"
+                  const val START_URL = "https://$HOST/assets/index.html"
+                  private const val REQ_FILES = 10
+                  private const val REQ_MEDIA = 11
+                  private const val REQ_NOTIF = 12
+                  private const val PERM_VISUAL_SELECTED = "android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
+              }
 
               private lateinit var root: FrameLayout
               private lateinit var webView: WebView
+              private lateinit var server: LocalServer
 
               private var filePathCallback: ValueCallback<Array<Uri>>? = null
               private var customView: View? = null
               private var customViewCallback: WebChromeClient.CustomViewCallback? = null
 
-              // Sirve los archivos de /assets desde un origen https seguro (localStorage, audio y blobs funcionan bien).
-              private val assetLoader by lazy {
-                  WebViewAssetLoader.Builder()
-                      .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
-                      .build()
-              }
-
-              // Selector de archivos del sistema (audio y video, selección múltiple).
-              private val pickFiles = registerForActivityResult(
-                  ActivityResultContracts.StartActivityForResult()
-              ) { result ->
-                  val data = result.data
-                  val uris: Array<Uri>? = when {
-                      result.resultCode != RESULT_OK || data == null -> null
-                      data.clipData != null -> {
-                          val clip = data.clipData!!
-                          Array(clip.itemCount) { clip.getItemAt(it).uri }
-                      }
-                      data.data != null -> arrayOf(data.data!!)
-                      else -> null
-                  }
-                  filePathCallback?.onReceiveValue(uris)
-                  filePathCallback = null
-              }
-
-              @SuppressLint("SetJavaScriptEnabled")
+              @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
               override fun onCreate(savedInstanceState: Bundle?) {
                   super.onCreate(savedInstanceState)
+                  server = LocalServer(applicationContext)
 
-                  root = FrameLayout(this).apply { setBackgroundColor(Color.parseColor("#120F2A")) }
+                  val bg = Color.parseColor("#120F2A")
+                  root = FrameLayout(this).apply { setBackgroundColor(bg) }
                   webView = WebView(this).apply {
-                      setBackgroundColor(Color.parseColor("#120F2A"))
+                      setBackgroundColor(bg)
                       layoutParams = FrameLayout.LayoutParams(
                           ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
                       )
@@ -201,35 +358,30 @@ jobs:
                   with(webView.settings) {
                       javaScriptEnabled = true
                       domStorageEnabled = true
-                      databaseEnabled = true
                       mediaPlaybackRequiresUserGesture = false
                       allowFileAccess = false
-                      allowContentAccess = true
+                      allowContentAccess = false
                       cacheMode = WebSettings.LOAD_DEFAULT
-                      loadWithOverviewMode = true
-                      useWideViewPort = true
                       setSupportZoom(false)
                   }
+                  // Evita que Android detenga la música cuando la app está en segundo plano.
+                  webView.setRendererPriorityPolicy(WebView.RENDERER_PRIORITY_IMPORTANT, false)
+                  webView.addJavascriptInterface(Bridge(), "Nexora")
 
                   webView.webViewClient = object : WebViewClient() {
                       override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? =
-                          assetLoader.shouldInterceptRequest(request.url)
+                          if (request.url.host == HOST) server.handle(request) else null
 
                       override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                          val url = request.url
-                          // Los enlaces externos se abren en el navegador.
-                          return if (url.host == "appassets.androidplatform.net") false else {
-                              runCatching { startActivity(Intent(Intent.ACTION_VIEW, url)) }
-                              true
-                          }
+                          if (request.url.host == HOST) return false
+                          runCatching { startActivity(Intent(Intent.ACTION_VIEW, request.url)) }
+                          return true
                       }
                   }
 
                   webView.webChromeClient = object : WebChromeClient() {
                       override fun onShowFileChooser(
-                          view: WebView,
-                          callback: ValueCallback<Array<Uri>>,
-                          params: FileChooserParams
+                          view: WebView, callback: ValueCallback<Array<Uri>>, params: FileChooserParams
                       ): Boolean {
                           filePathCallback?.onReceiveValue(null)
                           filePathCallback = callback
@@ -240,7 +392,8 @@ jobs:
                               putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
                           }
                           return try {
-                              pickFiles.launch(Intent.createChooser(intent, "Elegir archivos"))
+                              @Suppress("DEPRECATION")
+                              startActivityForResult(Intent.createChooser(intent, "Elegir archivos"), REQ_FILES)
                               true
                           } catch (e: Exception) {
                               filePathCallback = null
@@ -248,7 +401,6 @@ jobs:
                           }
                       }
 
-                      // Pantalla completa de video en horizontal.
                       override fun onShowCustomView(view: View, callback: CustomViewCallback) {
                           if (customView != null) { callback.onCustomViewHidden(); return }
                           customView = view
@@ -258,9 +410,9 @@ jobs:
                           webView.visibility = View.GONE
                           requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
                           window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                          WindowInsetsControllerCompat(window, root).apply {
-                              hide(WindowInsetsCompat.Type.systemBars())
-                              systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                          window.insetsController?.let {
+                              it.hide(WindowInsets.Type.systemBars())
+                              it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                           }
                       }
 
@@ -271,134 +423,4 @@ jobs:
                           webView.visibility = View.VISIBLE
                           requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
                           window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                          WindowInsetsControllerCompat(window, root).show(WindowInsetsCompat.Type.systemBars())
-                          customViewCallback?.onCustomViewHidden()
-                          customViewCallback = null
-                      }
-                  }
-
-                  // Botón atrás: primero cierra lo que esté abierto dentro de la app.
-                  onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-                      override fun handleOnBackPressed() {
-                          if (customView != null) {
-                              webView.webChromeClient?.onHideCustomView(); return
-                          }
-                          webView.evaluateJavascript("(window.nxBack && window.nxBack()) ? 'y' : 'n'") { r ->
-                              if (r?.contains("y") != true) {
-                                  // Envía la app al fondo en lugar de cerrarla, así la música sigue sonando.
-                                  moveTaskToBack(true)
-                              }
-                          }
-                      }
-                  })
-
-                  WindowCompat.setDecorFitsSystemWindows(window, true)
-
-                  if (savedInstanceState != null) webView.restoreState(savedInstanceState)
-                  else webView.loadUrl("https://appassets.androidplatform.net/assets/index.html")
-              }
-
-              override fun onSaveInstanceState(outState: Bundle) {
-                  super.onSaveInstanceState(outState)
-                  webView.saveState(outState)
-              }
-
-              // No se llama a webView.onPause() para que la música siga sonando en segundo plano.
-
-              override fun onDestroy() {
-                  root.removeAllViews()
-                  webView.destroy()
-                  super.onDestroy()
-              }
-          }
-          NXEOF
-          mkdir -p app/src/main/res/values
-          cat > app/src/main/res/values/strings.xml <<'NXEOF'
-          <resources>
-              <string name="app_name">Nexora Pro</string>
-          </resources>
-          NXEOF
-          mkdir -p app/src/main/res/values
-          cat > app/src/main/res/values/colors.xml <<'NXEOF'
-          <resources>
-              <color name="nexora_bg">#120F2A</color>
-              <color name="nexora_accent">#6C4CF5</color>
-              <color name="nexora_accent2">#12B5CB</color>
-          </resources>
-          NXEOF
-          mkdir -p app/src/main/res/values
-          cat > app/src/main/res/values/themes.xml <<'NXEOF'
-          <resources>
-              <style name="Theme.Nexora" parent="android:Theme.Material.NoActionBar">
-                  <item name="android:windowBackground">@color/nexora_bg</item>
-                  <item name="android:statusBarColor">@color/nexora_bg</item>
-                  <item name="android:navigationBarColor">@color/nexora_bg</item>
-                  <item name="android:colorAccent">@color/nexora_accent</item>
-                  <item name="android:windowLightStatusBar">false</item>
-              </style>
-          </resources>
-          NXEOF
-          mkdir -p app/src/main/res/drawable
-          cat > app/src/main/res/drawable/ic_launcher_background.xml <<'NXEOF'
-          <vector xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:aapt="http://schemas.android.com/aapt"
-              android:width="108dp" android:height="108dp"
-              android:viewportWidth="108" android:viewportHeight="108">
-              <path android:pathData="M0,0h108v108h-108z">
-                  <aapt:attr name="android:fillColor">
-                      <gradient android:type="linear"
-                          android:startX="0" android:startY="0"
-                          android:endX="108" android:endY="108"
-                          android:startColor="#6C4CF5" android:endColor="#12B5CB" />
-                  </aapt:attr>
-              </path>
-          </vector>
-          NXEOF
-          mkdir -p app/src/main/res/drawable
-          cat > app/src/main/res/drawable/ic_launcher_foreground.xml <<'NXEOF'
-          <vector xmlns:android="http://schemas.android.com/apk/res/android"
-              android:width="108dp" android:height="108dp"
-              android:viewportWidth="108" android:viewportHeight="108">
-              <path android:pathData="M40,70V38l28,32V38"
-                  android:strokeColor="#FFFFFF" android:strokeWidth="7"
-                  android:strokeLineCap="round" android:strokeLineJoin="round"
-                  android:fillColor="#00000000" />
-          </vector>
-          NXEOF
-          mkdir -p app/src/main/res/mipmap-anydpi-v26
-          cat > app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml <<'NXEOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-              <background android:drawable="@drawable/ic_launcher_background" />
-              <foreground android:drawable="@drawable/ic_launcher_foreground" />
-              <monochrome android:drawable="@drawable/ic_launcher_foreground" />
-          </adaptive-icon>
-          NXEOF
-          mkdir -p app/src/main/assets
-          cp ../index.html app/src/main/assets/index.html
-
-      - name: Instalar Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Instalar Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.7'
-
-      - name: Compilar APK
-        working-directory: proyecto
-        run: gradle assembleRelease --no-daemon
-
-      - name: Renombrar APK
-        run: cp proyecto/app/build/outputs/apk/release/app-release.apk NexoraPro.apk
-
-      - name: Publicar APK para descargar
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: Nexora Pro 1.0.${{ github.run_number }}
-          files: NexoraPro.apk
-          
+         
