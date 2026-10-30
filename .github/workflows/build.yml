@@ -57,8 +57,8 @@ jobs:
                   applicationId = "com.nexora.pro"
                   minSdk = 29
                   targetSdk = 34
-                  versionCode = 10
-                  versionName = "1.5.0"
+                  versionCode = 11
+                  versionName = "1.5.1"
               }
 
               signingConfigs {
@@ -112,7 +112,7 @@ jobs:
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
               <uses-permission android:name="android.permission.WAKE_LOCK" />
-              <!-- Solo para las fuentes tipográficas; la app funciona sin conexión -->
+              <!-- Necesario para el servidor local 127.0.0.1 que entrega la música al reproductor; la app no usa internet -->
               <uses-permission android:name="android.permission.INTERNET" />
 
               <application
@@ -764,7 +764,7 @@ jobs:
                   @JavascriptInterface fun naFx(bass: Int, surround: Int, clarity: Int, norm: Boolean) = runOnUiThread { nat.setFx(bass, surround, clarity, norm) }
 
                   @JavascriptInterface
-                  fun version(): String = "1.5.0"
+                  fun version(): String = "1.5.1"
               }
 
               override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
