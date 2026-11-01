@@ -479,6 +479,39 @@ body.has-bg .page::before{content:"";position:fixed;inset:0;z-index:-1;backgroun
 /* velocidad x2 al mantener presionado */
 .vp-fast{position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + 74px);transform:translateX(-50%);z-index:5;display:none;align-items:center;gap:6px;background:rgba(0,0,0,.6);color:#fff;font-weight:800;padding:8px 16px;border-radius:18px;font-size:15px;pointer-events:none}
 .vp-fast.on{display:flex}
+
+/* ====== Reproductor de música: diseño propio de Nexora ====== */
+#player{background:#0D0B1F;overflow-x:hidden}
+.pl-bg{position:absolute;inset:-60px;background-size:cover;background-position:center;filter:blur(44px) saturate(1.5) brightness(.55);transform:scale(1.15);z-index:0;transition:background-image .4s}
+.pl-shade{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(13,11,31,.25) 0%,rgba(13,11,31,.35) 45%,rgba(13,11,31,.85) 100%)}
+#player>*:not(.pl-bg):not(.pl-shade){position:relative;z-index:1}
+.pl-top .icon-btn{background:rgba(255,255,255,.12);border-radius:16px;width:46px;height:46px}
+.pl-top .lbl{background:rgba(255,255,255,.12);padding:7px 14px;border-radius:14px;font-weight:700;font-size:13px;opacity:1}
+.art-stage{position:relative;width:min(70vw,300px);aspect-ratio:1;transform:translateX(-7%)}
+.art-stage .orb{width:100%;position:relative;z-index:1;border-radius:32px;box-shadow:0 30px 60px -18px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.08)}
+.disc{position:absolute;top:5%;right:-22%;width:90%;aspect-ratio:1;border-radius:50%;z-index:0;
+  background:radial-gradient(circle,var(--accent2) 0 7%,#0b0b12 7.5% 9%,var(--accent) 9.5% 22%,#0b0b12 22.5% 100%);
+  box-shadow:0 18px 40px -12px rgba(0,0,0,.8);animation:spin 5s linear infinite;animation-play-state:paused}
+.disc::before{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-radial-gradient(circle,rgba(255,255,255,.05) 0 1px,transparent 1px 4px)}
+.disc::after{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 30deg,transparent 0 12%,rgba(255,255,255,.14) 16%,transparent 22% 62%,rgba(255,255,255,.1) 66%,transparent 72%)}
+#player.playing .disc{animation-play-state:running}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pl-info h2{font-size:1.55rem}
+.pl-info p{opacity:.75;font-weight:600}
+#plFav{background:rgba(255,255,255,.12);border-radius:16px;width:48px;height:48px}
+#player .seek input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--accent2) 0,var(--accent) var(--p,0%),rgba(255,255,255,.18) var(--p,0%))}
+#player .seek input[type=range]::-webkit-slider-thumb{width:18px;height:18px;margin-top:-6px;box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 35%,transparent)}
+.play-big{width:82px;height:82px;border-radius:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 16px 34px -12px var(--accent)}
+.play-big svg{width:34px;height:34px}
+.ctrls .md{width:56px;height:56px;border-radius:18px;background:rgba(255,255,255,.08)}
+.ctrls .sm.on svg{color:var(--accent2)}
+.pl-bottom{display:grid!important;grid-template-columns:repeat(4,1fr);gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:8px}
+.pl-bottom .chip{height:auto;flex-direction:column;gap:5px;padding:10px 4px;border-radius:18px;background:transparent;font-size:11.5px;font-weight:700;justify-content:center}
+.pl-bottom .chip svg{width:22px;height:22px}
+.pl-bottom .chip.on{background:rgba(255,255,255,.14);color:#fff}
+.pl-bottom .chip.on svg{color:var(--accent2)}
+.vm-card .th.sq{width:86px;aspect-ratio:1;display:grid;place-items:center;color:#fff;font-family:Sora,sans-serif;font-weight:800;font-size:28px;position:relative}
+.vm-card .th.sq img{position:absolute;inset:0}
 </style>
 </head>
 <body>
@@ -520,12 +553,13 @@ body.has-bg .page::before{content:"";position:fixed;inset:0;z-index:-1;backgroun
 
 <!-- full player -->
 <section class="sheet-full" id="player" aria-label="Reproductor">
+  <div class="pl-bg" id="plBg"></div><div class="pl-shade"></div>
   <div class="pl-top">
     <button class="icon-btn" id="plClose" aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></button>
     <span class="lbl" id="plSource">Reproduciendo</span>
     <button class="icon-btn" id="plMore" aria-label="Más opciones"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
   </div>
-  <div class="orb-wrap"><div class="orb" id="orb"><img class="cov" id="orbImg" alt="" hidden><canvas id="viz"></canvas><span class="initial" id="orbInit"></span></div></div>
+  <div class="orb-wrap"><div class="art-stage"><div class="disc" aria-hidden="true"></div><div class="orb" id="orb"><img class="cov" id="orbImg" alt="" hidden><canvas id="viz"></canvas><span class="initial" id="orbInit"></span></div></div></div>
   <div class="pl-info">
     <div class="meta"><h2 id="plT"></h2><p id="plS"></p></div>
     <button class="icon-btn" id="plFav" aria-label="Favorito"></button>
@@ -542,10 +576,10 @@ body.has-bg .page::before{content:"";position:fixed;inset:0;z-index:-1;backgroun
     <button class="icon-btn sm" id="bRepeat" aria-label="Repetir"></button>
   </div>
   <div class="pl-bottom">
-    <button class="chip ic" id="bEq" aria-label="Ecualizador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 4v16M12 4v16M18 4v16"/><circle cx="6" cy="14" r="2.3" fill="currentColor"/><circle cx="12" cy="8" r="2.3" fill="currentColor"/><circle cx="18" cy="15" r="2.3" fill="currentColor"/></svg></button>
+    <button class="chip" id="bEq" aria-label="Ecualizador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 4v16M12 4v16M18 4v16"/><circle cx="6" cy="14" r="2.3" fill="currentColor"/><circle cx="12" cy="8" r="2.3" fill="currentColor"/><circle cx="18" cy="15" r="2.3" fill="currentColor"/></svg><span>Ecualizador</span></button>
     <button class="chip" id="bSpeed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 18a9 9 0 1 1 16 0M12 13l4-4"/></svg><span id="speedLbl">1x</span></button>
     <button class="chip" id="bSleep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg><span id="sleepLbl">Dormir</span></button>
-    <button class="chip ic" id="bQueue" aria-label="Cola"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h12M4 12h12M4 18h8M18 15v6l4-3z"/></svg></button>
+    <button class="chip" id="bQueue" aria-label="Cola"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h12M4 12h12M4 18h8M18 15v6l4-3z"/></svg><span>Cola</span></button>
   </div>
 </section>
 
@@ -1067,6 +1101,7 @@ audio.addEventListener('timeupdate',()=>{
 });
 
 function fillPlayState(){
+  $('player').classList.toggle('playing', !audio.paused);
   const p = !audio.paused;
   $('bPlay').innerHTML = p?I.pause:I.play; $('bPlay').setAttribute('aria-label',p?'Pausar':'Reproducir');
   $('miniPlay').innerHTML = p?I.pause:I.play; $('miniPlay').setAttribute('aria-label',p?'Pausar':'Reproducir');
@@ -1076,13 +1111,15 @@ function fillPlayer(){
   $('plT').textContent=current.title; $('plS').textContent=current.artist;
   $('orb').style.background = grad(current.title);
   $('orbInit').textContent = (current.title.trim()[0]||'♪').toUpperCase();
-  const oi=$('orbImg'), big=current.art?current.art.replace(/\?.*$/,'')+'?s=720':'';
+  const sized=(u,n)=>!u?'':/^data:/.test(u)?u:u.replace(/\?.*$/,'')+'?s='+n;
+  const oi=$('orbImg'), big=sized(current.art,720);
   $('orb').classList.remove('has-art'); oi.hidden=true;
   if(big){ oi.onload=()=>{ oi.hidden=false; $('orb').classList.add('has-art'); }; oi.onerror=()=>{ oi.hidden=true; $('orb').classList.remove('has-art'); }; if(oi.getAttribute('src')!==big) oi.src=big; else if(oi.complete&&oi.naturalWidth) oi.onload(); }
   else oi.removeAttribute('src');
   const h = hash(current.title)%360;
   $('player').style.setProperty('--pbg',`hsl(${h} 45% 16%)`);
-  $('plSource').textContent = openPlaylist ? 'Desde playlist' : 'Reproduciendo';
+  $('plSource').textContent = queue.length>1 ? `Reproduciendo · ${qi+1}/${queue.length}` : 'Reproduciendo';
+  $('plBg').style.backgroundImage = current.art ? `url('${sized(current.art,320)}')` : grad(current.title);
   $('plFav').innerHTML = favKeys.has(current.key)?I.heartF:I.heart;
   $('bShuffle').classList.toggle('on',S.shuffle);
   $('bRepeat').innerHTML = S.repeat===2?I.rep1:I.rep0; $('bRepeat').classList.toggle('on',S.repeat>0);
@@ -1106,6 +1143,7 @@ function draw(){
   requestAnimationFrame(draw);
   if(!$('player').classList.contains('on')) return;
   const w=cv.clientWidth, h=cv.clientHeight, dpr=devicePixelRatio||1;
+  if(w<20 || h<20) return;
   if(cv.width!==w*dpr){ cv.width=w*dpr; cv.height=h*dpr; }
   g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
   let data = new Uint8Array(64);
@@ -1418,21 +1456,40 @@ $('coverIn').onchange = e => {
   img.src=url;
 };
 function itemMenu(it){
-  openSheet(`<h3 style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(it.title)}</h3>
-    ${opt('fav', favKeys.has(it.key)?'Quitar de favoritos':'Agregar a favoritos', I.star)}
-    ${opt('pl','Agregar a playlist',I.list)}
-    ${it.type==='audio'?opt('cover', covers[it.key]?'Cambiar portada':'Poner portada', IC_COVER):''}
-    ${covers[it.key]?opt('uncover','Quitar portada',I.restore):''}
-    ${it.type==='audio'?opt('next','Reproducir a continuación',I.music):''}
-    ${opt('hide','Ocultar',I.eye)}
-    ${opt('del','Eliminar de la biblioteca',I.trash,false,'danger')}`, v=>{
+  const isA = it.type==='audio', fav=favKeys.has(it.key), r=msRef(it);
+  const ext=((it.name||'').match(/\.([a-z0-9]{2,4})$/i)||[])[1];
+  const tags=[ext?ext.toUpperCase():'', fmt(it.duration), it.size>1?(it.size/1048576).toFixed(1)+' MB':''].filter(Boolean).map(t=>`<span>${t}</span>`).join('');
+  const pic = isA ? it.art : it.thumb;
+  const q=(v,l,ic,cls='')=>`<button data-v="${v}" class="${cls}">${ic}<span>${l}</span></button>`;
+  const row=(v,l,ic,val)=>`<button class="vm-set" data-v="${v}">${ic}<span class="grow">${l}</span>${val?`<span class="pill">${val}</span>`:''}</button>`;
+  openSheet(`<div class="vm-card">${pic?`<div class="bg" style="background-image:url('${pic}')"></div>`:''}<div class="in">
+      <div class="th ${isA?'sq':''}" style="${isA?`background:${grad(it.title)}`:''}">${isA?letterOf(it):''}${pic?`<img src="${pic}" alt="" onerror="this.remove()">`:''}</div>
+      <div class="tx"><b>${esc(it.title)}</b>${isA&&it.artist?`<div style="opacity:.8;font-size:13px;margin-top:3px">${esc(it.artist)}</div>`:''}<div class="vm-tags">${tags}</div></div></div></div>
+    <div class="vm-quick">
+      ${q('fav','Favorito',fav?I.heartF.replace(/width="26" height="26"/,''):I.star,fav?'on':'')}
+      ${q('pl','Playlist',I.list)}
+      ${isA?q('next','A continuación',IC_NEXT):q('play','Reproducir',I.play)}
+      ${r?q('share','Compartir',IC_SHARE):q('info','Info',I.info)}
+    </div>
+    <div class="vm-sec">Más opciones</div>
+    ${isA?row('cover', covers[it.key]?'Cambiar portada':'Poner portada', IC_COVER, 'Galería'):''}
+    ${covers[it.key]?row('uncover','Quitar portada',I.restore,''):''}
+    ${r?row('rename','Renombrar',PENCIL,''):''}
+    ${row('info','Información',I.info,'')}
+    <div class="vm-bottom"><button data-v="hide">${I.eye}<span>Ocultar</span></button><button data-v="del">${I.restore}<span>Quitar de la lista</span></button></div>
+    ${r?`<div class="vm-bottom" style="grid-template-columns:1fr;padding-top:0"><button data-v="trash" class="danger">${I.trash}<span>${isA?'Borrar canción':'Borrar video'}</span></button></div>`:''}`, v=>{
       if(v==='fav') toggleFav(it);
       if(v==='pl'){ setTimeout(()=>plPicker(it),250); }
+      if(v==='play'){ if(it.type==='video') openVideo(it); else playItem(it); }
+      if(v==='share'){ native('share', JSON.stringify([r])); }
+      if(v==='rename'){ setTimeout(()=>renameSheet(it),250); }
       if(v==='cover'){ coverTarget=it; $('coverIn').click(); }
-      if(v==='uncover'){ delete covers[it.key]; store.set('covers',covers); const r=msRef(it); it.art = r?`${location.origin}/thumb/audio/${r.id}`:null; render(); if(current&&current.key===it.key) fillPlayer(); toast('Portada quitada'); }
+      if(v==='uncover'){ delete covers[it.key]; store.set('covers',covers); it.art = r?`${location.origin}/thumb/audio/${r.id}`:null; render(); if(current&&current.key===it.key) fillPlayer(); toast('Portada quitada'); }
       if(v==='next'){ if(!queue.length){ playItem(it); } else { queue.splice(qi+1,0,it); toast('Se reproducirá a continuación'); } }
       if(v==='hide'){ hiddenKeys.add(it.key); store.set('hidden',[...hiddenKeys]); toast('Archivo oculto. Lo encuentras en Ajustes.'); render(); }
       if(v==='del'){ it.deleted=true; if(current&&current.key===it.key){ audio.pause(); current=null; nativeMedia(); $('player').classList.remove('on'); } toast('Movido a Eliminado recientemente'); render(); }
+      if(v==='trash') setTimeout(()=>confirmDelete([it]),250);
+      if(v==='info') setTimeout(()=>openSheet(`<h3>Información</h3><div style="padding:0 18px 12px;line-height:1.8;color:var(--muted)"><b style="color:var(--text)">${esc(it.name||it.title)}</b>${isA&&it.artist?`<br>${esc(it.artist)}`:''}<br>Duración: ${fmt(it.duration)}<br>Tamaño: ${it.size>1?(it.size/1048576).toFixed(1)+' MB':'—'}<br>Carpeta: ${esc(it.folder||'—')}</div>${opt('ok','Cerrar')}`,()=>{}),260);
     });
 }
 function plPicker(target){
@@ -2259,6 +2316,14 @@ I18N_P.it=[
  [/^Descargando… (\d+)%$/, (m,n)=>`Download… ${n}%`]
 ];
 
+Object.assign(I18N.en,{"Más opciones": "More options", "Galería": "Gallery", "Quitar de la lista": "Remove from list", "Borrar canción": "Delete song", "Playlist": "Playlist", "Cola": "Queue", "Ecualizador": "Equalizer", "Dormir": "Sleep", "Favorito": "Favorite", "A continuación": "Play next", "Reproducir": "Play", "Compartir": "Share", "Info": "Info", "Renombrar": "Rename"});
+Object.assign(I18N.pt,{"Más opciones": "Mais opções", "Galería": "Galeria", "Quitar de la lista": "Remover da lista", "Borrar canción": "Apagar música", "Playlist": "Playlist", "Cola": "Fila", "Ecualizador": "Equalizador", "Dormir": "Dormir", "Favorito": "Favorito", "A continuación": "A seguir", "Reproducir": "Tocar", "Compartir": "Compartilhar", "Info": "Info", "Renombrar": "Renomear"});
+Object.assign(I18N.fr,{"Más opciones": "Plus d’options", "Galería": "Galerie", "Quitar de la lista": "Retirer de la liste", "Borrar canción": "Supprimer la chanson", "Playlist": "Playlist", "Cola": "File", "Ecualizador": "Égaliseur", "Dormir": "Sommeil", "Favorito": "Favori", "A continuación": "Ensuite", "Reproducir": "Lire", "Compartir": "Partager", "Info": "Infos", "Renombrar": "Renommer"});
+Object.assign(I18N.it,{"Más opciones": "Altre opzioni", "Galería": "Galleria", "Quitar de la lista": "Rimuovi dalla lista", "Borrar canción": "Elimina brano", "Playlist": "Playlist", "Cola": "Coda", "Ecualizador": "Equalizzatore", "Dormir": "Timer", "Favorito": "Preferito", "A continuación": "Dopo", "Reproducir": "Riproduci", "Compartir": "Condividi", "Info": "Info", "Renombrar": "Rinomina"});
+I18N_P.en.push([/^Reproduciendo · (\d+)\/(\d+)$/, (m,a,b)=>`Now playing · ${a}/${b}`]);
+I18N_P.pt.push([/^Reproduciendo · (\d+)\/(\d+)$/, (m,a,b)=>`Tocando · ${a}/${b}`]);
+I18N_P.fr.push([/^Reproduciendo · (\d+)\/(\d+)$/, (m,a,b)=>`En lecture · ${a}/${b}`]);
+I18N_P.it.push([/^Reproduciendo · (\d+)\/(\d+)$/, (m,a,b)=>`In riproduzione · ${a}/${b}`]);
 const GREET = {en:['Good morning','Good afternoon','Good evening'], pt:['Bom dia','Boa tarde','Boa noite'], fr:['Bonjour','Bon après-midi','Bonsoir'], it:['Buongiorno','Buon pomeriggio','Buonasera']};
 ['en','pt','fr','it'].forEach(l=>{ const es=['Buenos días','Buenas tardes','Buenas noches']; es.forEach((g,i)=>{ I18N[l][g+' 👋']=GREET[l][i]+' 👋'; }); });
 function trText(src){
