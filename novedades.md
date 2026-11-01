@@ -1,10 +1,9 @@
-Versión: 1.6.2
-- Nuevo menú de video con diseño propio de Nexora: accesos rápidos, modo de reproducción, ajustar escala y mejorar imagen
+Versión: 1.6.3
+- Nuevo diseño propio de Nexora en toda la app y en Ajustes
+- 18 colores nuevos y la opción de elegir tu propio color
+- Fondo personalizado con una foto de tu galería
+- Mantén presionado el video para verlo a velocidad 2x
+- Donaciones por PayPal en Ajustes
+- Nuevos idiomas: Français e Italiano
+- El modo "Solo audio" de los videos sigue sonando con la pantalla apagada
 - Ventana flotante con botones para retroceder, pausar y adelantar
-- Renombrar, ocultar y borrar desde el reproductor de video
-- Zoom con dos dedos en los videos
-- Los videos continúan donde los dejaste
-- Aviso de confirmación al restablecer estadísticas
-- Más portadas de canciones y opción para poner tu propia portada
-- Abre canciones y videos desde Nexora Download
-- Actualizaciones dentro de la app
