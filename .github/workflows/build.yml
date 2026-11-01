@@ -567,6 +567,36 @@ jobs:
 
               @Volatile private var boostLevel = 100
               @Volatile private var boostKeys = true
+              private var pipPlaying = true
+              private var pipW = 16
+              private var pipH = 9
+              private val pipReceiver = object : android.content.BroadcastReceiver() {
+                  override fun onReceive(c: android.content.Context?, i: Intent?) {
+                      val a = i?.getStringExtra("a") ?: return
+                      js("window.nxPipAction && nxPipAction('$a')")
+                  }
+              }
+
+              /** Ventana flotante con botones propios de Nexora: −10 s, reproducir/pausa y +10 s. */
+              private fun pipParams(w: Int, h: Int): android.app.PictureInPictureParams {
+                  var rw = if (w > 0) w else 16; var rh = if (h > 0) h else 9
+                  val r = rw.toDouble() / rh
+                  if (r > 2.39) { rw = 239; rh = 100 } else if (r < 1 / 2.39) { rw = 100; rh = 239 }
+                  fun act(icon: Int, label: String, a: String, code: Int): android.app.RemoteAction {
+                      val pi = android.app.PendingIntent.getBroadcast(this, code,
+                          Intent("com.nexora.pro.PIP").setPackage(packageName).putExtra("a", a),
+                          android.app.PendingIntent.FLAG_IMMUTABLE or android.app.PendingIntent.FLAG_UPDATE_CURRENT)
+                      return android.app.RemoteAction(android.graphics.drawable.Icon.createWithResource(this, icon), label, label, pi)
+                  }
+                  val actions = listOf(
+                      act(R.drawable.ic_n_rew10, "Atrás 10 s", "rew", 31),
+                      if (pipPlaying) act(R.drawable.ic_n_pause, "Pausar", "toggle", 32) else act(R.drawable.ic_n_play, "Reproducir", "toggle", 33),
+                      act(R.drawable.ic_n_fwd10, "Adelante 10 s", "fwd", 34))
+                  return android.app.PictureInPictureParams.Builder()
+                      .setAspectRatio(android.util.Rational(rw, rh))
+                      .setActions(actions).build()
+              }
+
               private var pendingExternal: String? = null
               private var pageReady = false
               private var resumedNow = false
@@ -677,6 +707,10 @@ jobs:
                           customViewCallback = null
                       }
                   }
+
+                  val pf = android.content.IntentFilter("com.nexora.pro.PIP")
+                  if (Build.VERSION.SDK_INT >= 33) registerReceiver(pipReceiver, pf, android.content.Context.RECEIVER_NOT_EXPORTED)
+                  else registerReceiver(pipReceiver, pf)
 
                   Updater.listener = { state, pct -> js("window.nxUpd && nxUpd('$state', $pct)") }
 
@@ -847,15 +881,19 @@ jobs:
                           runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
                   }
 
+                  /** Actualiza los botones de la ventana flotante según si el video se reproduce. */
+                  @JavascriptInterface
+                  fun pipState(playing: Boolean) = runOnUiThread {
+                      pipPlaying = playing
+                      if (isInPictureInPictureMode) runCatching { setPictureInPictureParams(pipParams(pipW, pipH)) }
+                  }
+
                   /** Ventana flotante (imagen en imagen) para los videos. */
                   @JavascriptInterface
                   fun enterPip(w: Int, h: Int) = runOnUiThread {
                       runCatching {
-                          var rw = if (w > 0) w else 16; var rh = if (h > 0) h else 9
-                          val r = rw.toDouble() / rh
-                          if (r > 2.39) { rw = 239; rh = 100 } else if (r < 1 / 2.39) { rw = 100; rh = 239 }
-                          enterPictureInPictureMode(android.app.PictureInPictureParams.Builder()
-                              .setAspectRatio(android.util.Rational(rw, rh)).build())
+                          pipW = w; pipH = h
+                          enterPictureInPictureMode(pipParams(w, h))
                       }.onFailure { js("window.nxToast && nxToast('Tu teléfono no permite ventana flotante')") }
                   }
               }
@@ -969,6 +1007,7 @@ jobs:
               override fun onDestroy() {
                   PlaybackService.listener = null
                   Updater.listener = null
+                  runCatching { unregisterReceiver(pipReceiver) }
                   nat.release()
                   if (isFinishing) stopService(Intent(this, PlaybackService::class.java))
                   root.removeAllViews()
@@ -1832,6 +1871,13 @@ jobs:
               </group>
           </vector>
           NXEOF
+          cat > app/src/main/res/drawable/ic_n_fwd10.xml <<'NXEOF'
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="24dp" android:height="24dp"
+              android:viewportWidth="24" android:viewportHeight="24">
+              <path android:fillColor="#FFFFFFFF" android:pathData="M2.5,5.5v13l9,-6.5zM12.5,5.5v13l9,-6.5z" />
+          </vector>
+          NXEOF
           cat > app/src/main/res/drawable/ic_n_next.xml <<'NXEOF'
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="24dp" android:height="24dp"
@@ -1858,6 +1904,13 @@ jobs:
               android:width="24dp" android:height="24dp"
               android:viewportWidth="24" android:viewportHeight="24">
               <path android:fillColor="#FFFFFFFF" android:pathData="M19,5.5v13l-9,-6.5zM9,5.5v13H6v-13z" />
+          </vector>
+          NXEOF
+          cat > app/src/main/res/drawable/ic_n_rew10.xml <<'NXEOF'
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="24dp" android:height="24dp"
+              android:viewportWidth="24" android:viewportHeight="24">
+              <path android:fillColor="#FFFFFFFF" android:pathData="M11.5,5.5v13l-9,-6.5zM21.5,5.5v13l-9,-6.5z" />
           </vector>
           NXEOF
           cat > app/src/main/res/drawable/ic_stat_nexora.xml <<'NXEOF'
