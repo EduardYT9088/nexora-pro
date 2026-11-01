@@ -1,0 +1,7 @@
+- Ventana flotante para ver videos mientras usas otras apps
+- Nuevo menú de video: modo de reproducción, ajustar escala y mejorar imagen
+- Zoom con dos dedos en los videos
+- Los videos continúan donde los dejaste
+- Pon tu propia portada a las canciones
+- Abre canciones y videos desde Nexora Download
+- Actualizaciones dentro de la app

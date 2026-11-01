@@ -214,6 +214,32 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:0;border-radiu
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 96px);transform:translate(-50%,20px);background:var(--text);color:var(--bg);padding:12px 18px;border-radius:14px;font-weight:600;font-size:14px;opacity:0;transition:.25s;z-index:40;pointer-events:none;max-width:90%}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .hidden-input{display:none}
+/* ventana flotante: solo el video */
+body.pip .vp-layer,body.pip .vp-scrim,body.pip .vp-pill,body.pip .vp-unlock,body.pip .vp-seekfx,body.pip .sheet,body.pip .scrim,body.pip .toast,body.pip .banner{display:none!important}
+/* encabezado del menú de video */
+.vm-head{display:flex;align-items:center;gap:14px;padding:4px 16px 12px}
+.vm-head .th{width:112px;aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:var(--surface2);flex:none}
+.vm-head .th img{width:100%;height:100%;object-fit:cover}
+.vm-head .tx{flex:1;min-width:0}
+.vm-head .tx b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:15.5px;line-height:1.3}
+.vm-head .tx small{color:var(--muted);font-size:13px}
+.opt .val{color:var(--muted);font-weight:500;font-size:14px;margin-left:8px;white-space:nowrap}
+.sheet hr{border:0;border-top:1px solid var(--line);margin:6px 16px}
+/* actualización obligatoria */
+.upd{position:fixed;inset:0;z-index:90;background:var(--bg);display:none;flex-direction:column;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 40px) 26px calc(env(safe-area-inset-bottom,0px) + 26px);overflow-y:auto}
+.upd.on{display:flex}
+.upd img{width:96px;height:96px;border-radius:24px;box-shadow:0 18px 40px -12px rgba(108,76,245,.6)}
+.upd h1{font-family:Sora,Manrope,sans-serif;font-size:1.6rem;margin:22px 0 4px;text-align:center}
+.upd .ver{display:inline-block;background:var(--accent);color:var(--onaccent);font-weight:800;padding:4px 14px;border-radius:14px;margin:6px 0 16px}
+.upd .box{width:100%;max-width:440px;background:var(--surface);border-radius:20px;padding:16px 18px;margin-bottom:20px}
+.upd .box b{display:block;margin-bottom:8px}
+.upd ul{margin:0;padding-left:20px;line-height:1.6;color:var(--text)}
+.upd p{color:var(--muted);text-align:center;max-width:36ch;line-height:1.5;margin:0 0 18px}
+.upd .acts{width:100%;max-width:440px;display:flex;flex-direction:column;gap:10px;margin-top:auto}
+.upd .pbar{width:100%;max-width:440px;height:10px;border-radius:5px;background:var(--surface2);overflow:hidden;display:none;margin-bottom:8px}
+.upd .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .2s}
+.upd .pmsg{font-size:14px;color:var(--muted);min-height:20px;text-align:center;margin-bottom:8px}
+.upd .acts .btn{justify-content:center;height:52px;border-radius:26px;font-size:16px}
 /* página de privacidad dentro de la app */
 .privpage{position:fixed;inset:0;z-index:80;background:var(--bg);display:none;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
 .privpage.on{display:flex}
@@ -451,6 +477,8 @@ body.selecting .sel-actions{display:flex}
 <section class="page" id="sub" aria-label="Ajustes"><div class="page-in" id="subIn"></div></section>
 <div class="volhud" id="volhud" aria-live="polite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><div class="bar"><i id="volFill"></i></div><b id="volPct">100%</b></div>
 <section class="privpage" id="privPage" aria-label="Política de privacidad"><div class="bar"><button class="icon-btn" id="privClose" aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button><b>Privacidad</b></div><iframe id="privFrame" title="Política de privacidad"></iframe></section>
+<section class="upd" id="upd" aria-live="polite"></section>
+<input class="hidden-input" type="file" id="coverIn" accept="image/*">
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div id="sheetBody"></div></div>
 <div class="toast" id="toast" role="status"></div>
@@ -520,7 +548,7 @@ const wantNative = url => !!(window.Nexora && S.mixAudio && /\/media\/(audio|vid
 const NATIVE = typeof window.Nexora !== 'undefined';
 if(NATIVE){ audioEl.crossOrigin = 'anonymous'; video.crossOrigin = 'anonymous'; }
 const native = (fn,...a) => { try{ if(NATIVE && Nexora[fn]) return Nexora[fn](...a); }catch(e){} };
-const DEF = {fx:{bass:0,surround:0,clarity:0,norm:false}, boost:100, boostKeys:true, mixAudio:false, gapless:false, crossfade:false, cfSec:5, hideVoice:true, lang:'es'};
+const DEF = {vmode:'all', vscale:'fit', venh:0, covers:null, fx:{bass:0,surround:0,clarity:0,norm:false}, boost:100, boostKeys:true, mixAudio:false, gapless:false, crossfade:false, cfSec:5, hideVoice:true, lang:'es'};
 
 /* ---------- icons ---------- */
 const I = {
@@ -560,6 +588,7 @@ const ACCENTS = [['#6C4CF5','#12B5CB'],['#E2366F','#FF9A3D'],['#0E9F6E','#7BD3A8
 const S = Object.assign({accent:0,theme:'auto',sortV:'recent',sortA:'recent',playMs:0,shuffle:false,repeat:0,speed:1,lang:'es'}, store.get('settings',{}));
 for(const k in DEF) if(S[k]===undefined) S[k]=DEF[k];
 const shownKeys = new Set(store.get('shown',[]));
+const covers = store.get('covers',{});
 const save = () => store.set('settings',S);
 const playlists = store.get('playlists',[]); // [{id,name,keys:[]}]
 const favKeys = new Set(store.get('favs',[]));
@@ -1039,7 +1068,8 @@ function loadVideo(it){
   const resume = vpos[it.key];
   video._resume = resume ? resume.t : 0;
   $('vpT').textContent=it.title;
-  video.src=it.url; video.playbackRate=S.speed; video.loop=!!S.vloop;
+  video.src=it.url; video.playbackRate=S.speed; video.loop=S.vmode==='one';
+  applyScale(); applyEnh();
   $('vpSpeedLbl').textContent=S.speed+'x';
   video.play().catch(()=>{});
   plays[it.key]=(plays[it.key]||0)+1; store.set('plays',plays);
@@ -1053,7 +1083,7 @@ function closeVideo(){
   if(!VP.classList.contains('on')) return;
   savePos(); render();
   video.pause(); video.removeAttribute('src'); video.load();
-  VP.classList.remove('on','locked','show-unlock','hide-ui','fill'); vLock=false; resetZoom();
+  VP.classList.remove('on','locked','show-unlock','hide-ui'); vLock=false; resetZoom();
   rotated=false; native('setOrientation','auto');
   native('keepScreenOn', false);
 }
@@ -1065,7 +1095,32 @@ function showUi(){
 function pill(text, lockIcon=true){ const p=$('vpPill'); p.querySelector('span').textContent=text; p.querySelector('i').style.display=lockIcon?'':'none'; p.classList.add('on'); clearTimeout(pill._t); pill._t=setTimeout(()=>p.classList.remove('on'),1400); }
 const vPP = () => { $('vpPP').innerHTML = video.paused ? I.play.replace('currentColor','#fff') : I.pause.replace('currentColor','#fff'); };
 ['play','pause'].forEach(e=>video.addEventListener(e,()=>{ vPP(); if(!vLock) showUi(); }));
-video.addEventListener('ended',()=>{ if(video._item){ delete vpos[video._item.key]; store.set('vpos',vpos); } if(!video.loop && vIdx<vList.length-1) stepVideo(1); else showUi(); });
+video.addEventListener('ended',()=>{
+  if(video._item){ delete vpos[video._item.key]; store.set('vpos',vpos); }
+  const m=S.vmode;
+  if(m==='one') return;
+  if(m==='shuffle' && vList.length>1){ let n; do{ n=Math.floor(Math.random()*vList.length); }while(n===vIdx); vIdx=n; loadVideo(vList[n]); return; }
+  if(vIdx<vList.length-1){ stepVideo(1); return; }
+  if(m==='all' && vList.length>1){ vIdx=0; loadVideo(vList[0]); return; }
+  showUi();
+});
+const VMODES={all:'Repetir todas', one:'Repetir una', order:'En orden', shuffle:'Aleatorio'};
+const VSCALES={fit:'Mejor ajuste', fill:'Llenar pantalla', stretch:'Estirar', r169:'16:9', r43:'4:3', orig:'Tamaño original'};
+const VENH=['Apagado','Suave','Vívido'];
+function applyScale(){
+  const v=video, sc=S.vscale;
+  v.style.width=''; v.style.height=''; v.style.left=''; v.style.top=''; v.style.objectFit='';
+  if(sc==='fill') v.style.objectFit='cover';
+  else if(sc==='stretch') v.style.objectFit='fill';
+  else if(sc==='orig') v.style.objectFit='none';
+  else if(sc==='r169' || sc==='r43'){
+    const ar = sc==='r169' ? 16/9 : 4/3, W=VP.clientWidth||window.innerWidth, H=VP.clientHeight||window.innerHeight;
+    let w=W, h=W/ar; if(h>H){ h=H; w=H*ar; }
+    Object.assign(v.style,{width:w+'px',height:h+'px',left:((W-w)/2)+'px',top:((H-h)/2)+'px',objectFit:'fill'});
+  }
+}
+function applyEnh(){ video.style.filter = ['', 'contrast(1.06) saturate(1.12) brightness(1.02)', 'contrast(1.12) saturate(1.32) brightness(1.03)'][S.venh|0] || ''; }
+window.addEventListener('resize',()=>{ if(VP.classList.contains('on')) applyScale(); });
 video.addEventListener('loadedmetadata',()=>{
   $('vDur').textContent=fmt(video.duration);
   const r=video._resume; video._resume=0;
@@ -1125,21 +1180,47 @@ $('vpList').onclick = () => {
   openSheet(`<h3>Videos (${vList.length})</h3>${vList.map((it,i)=>`<button class="vlist-item ${i===vIdx?'cur':''}" data-v="${i}"><div class="th">${it.thumb?`<img src="${it.thumb}" alt="" loading="lazy" onerror="this.remove()">`:''}</div><div style="min-width:0"><div class="t">${esc(it.title)}</div><div class="m">${[resLabel(it.height),fmt(it.duration)].filter(Boolean).join(' | ')}</div></div></button>`).join('')}`, v=>{ vIdx=+v; loadVideo(vList[vIdx]); });
   setTimeout(()=>{ const c=$('sheet').querySelector('.vlist-item.cur'); c&&c.scrollIntoView({block:'center'}); },60);
 };
+const IC_PIP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><rect x="11" y="11" width="8" height="6" rx="1.5" fill="currentColor"/></svg>';
+const IC_SCALE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 13v3h3M16 11V8h-3"/></svg>';
+const IC_SPARK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>';
+const optV = (v,label,icon,val,cls='') => `<button class="opt ${cls}" data-v="${esc(v)}">${icon}<span class="grow">${label}</span><span class="val">${val}</span></button>`;
+function pickSheet(title, map, cur, cb){
+  openSheet(`<h3>${title}</h3>${Object.entries(map).map(([k,l])=>opt(k,l,'',String(cur)===String(k))).join('')}`, v=>{ cb(v); });
+}
+function startPip(){
+  if(!NATIVE){ if(video.requestPictureInPicture) video.requestPictureInPicture().catch(()=>toast('Ventana flotante no disponible aquí')); else toast('Ventana flotante no disponible aquí'); return; }
+  native('enterPip', video.videoWidth|0, video.videoHeight|0);
+}
+window.nxPip = on => { document.body.classList.toggle('pip', !!on); if(on){ resetZoom(); VP.classList.add('hide-ui'); } else showUi(); };
+window.nxPipClosed = () => { if(VP.classList.contains('on')) video.pause(); };
 $('vpMore').onclick = () => {
   clearTimeout(uiTimer);
   const it=video._item||{};
-  openSheet(`<h3 style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(it.title||'Video')}</h3>
-    ${opt('loop', 'Repetir este video', I.rep0, !!S.vloop)}
-    ${opt('boost', `Amplificador de volumen · ${S.boost}%`, I.head)}
+  const meta=[resLabel(video.videoHeight&&video.videoWidth?Math.min(video.videoWidth,video.videoHeight):it.height), fmt(video.duration||it.duration)].filter(Boolean).join(' | ');
+  const canEdit = !!items.find(i=>i.key===it.key);
+  openSheet(`<div class="vm-head"><div class="th">${it.thumb?`<img src="${it.thumb}" alt="">`:''}</div><div class="tx"><b>${esc(it.title||'Video')}</b><small>${meta}</small></div>${canEdit?`<button class="more" data-v="rename" aria-label="Renombrar">${PENCIL}</button>`:''}</div>
+    ${canEdit && msRef(it)?opt('share','Compartir',IC_SHARE):''}
+    ${opt('pip','Ventana flotante',IC_PIP)}
+    <hr>
+    ${optV('mode','Modo de reproducción',I.rep0,VMODES[S.vmode])}
+    ${optV('scale','Ajustar escala',IC_SCALE,VSCALES[S.vscale])}
+    ${optV('enh','Mejorar imagen',IC_SPARK,VENH[S.venh|0])}
+    ${optV('boost','Amplificador de volumen',I.head,S.boost+'%')}
     ${zS>1.001?opt('zoom','Restablecer zoom',I.restore):''}
-    ${opt('fill', VP.classList.contains('fill')?'Ajustar a la pantalla':'Llenar la pantalla', I.video)}
-    ${opt('fav', favKeys.has(it.key)?'Quitar de favoritos':'Agregar a favoritos', I.star)}
-    ${opt('info','Información',I.info)}`, v=>{
+    ${canEdit?opt('fav', favKeys.has(it.key)?'Quitar de favoritos':'Agregar a favoritos', I.star):''}
+    ${opt('info','Información',I.info)}
+    ${canEdit?`<hr>${opt('hide','Ocultar',I.eye)}${opt('del','Borrar',I.trash,false,'danger')}`:''}`, v=>{
+      if(v==='rename'){ setTimeout(()=>renameSheet(it),250); return; }
+      if(v==='share'){ native('share', JSON.stringify([msRef(it)])); return; }
+      if(v==='pip'){ setTimeout(startPip,200); return; }
+      if(v==='mode'){ setTimeout(()=>pickSheet('Modo de reproducción',VMODES,S.vmode,k=>{ S.vmode=k; save(); video.loop=k==='one'; toast(VMODES[k]); }),250); return; }
+      if(v==='scale'){ setTimeout(()=>pickSheet('Ajustar escala',VSCALES,S.vscale,k=>{ S.vscale=k; save(); resetZoom(); applyScale(); }),250); return; }
+      if(v==='enh'){ setTimeout(()=>pickSheet('Mejorar imagen',Object.fromEntries(VENH.map((l,i)=>[i,l])),S.venh|0,k=>{ S.venh=+k; save(); applyEnh(); }),250); return; }
       if(v==='boost'){ setTimeout(boostSheet,260); return; }
       if(v==='zoom'){ resetZoom(true); return; }
-      if(v==='loop'){ S.vloop=!S.vloop; save(); video.loop=S.vloop; toast(S.vloop?'Repetir video activado':'Repetir video desactivado'); }
-      if(v==='fill'){ VP.classList.toggle('fill'); resetZoom(); }
       if(v==='fav' && it.key) toggleFav(it);
+      if(v==='hide'){ hiddenKeys.add(it.key); store.set('hidden',[...hiddenKeys]); closeVideo(); render(); toast('Archivo oculto. Lo encuentras en Ajustes.'); }
+      if(v==='del') setTimeout(()=>confirmDelete([it]),250);
       if(v==='info') setTimeout(()=>openSheet(`<h3>Información</h3><div style="padding:0 18px 12px;line-height:1.8;color:var(--muted)"><b style="color:var(--text)">${esc(it.name||it.title)}</b><br>Duración: ${fmt(video.duration||it.duration)}<br>Resolución: ${video.videoWidth?video.videoWidth+' × '+video.videoHeight:resLabel(it.height)||'—'}<br>Tamaño: ${it.size?(it.size/1048576).toFixed(1)+' MB':'—'}<br>Carpeta: ${esc(it.folder||'—')}</div>${opt('ok','Cerrar')}`,()=>{}),260);
     });
 };
@@ -1176,15 +1257,38 @@ function queueSheet(){
   if(!queue.length){ toast('La cola está vacía'); return; }
   openSheet(`<h3>A continuación</h3>${queue.map((it,i)=>opt(i,`${esc(it.title)}<div style="font-size:13px;color:var(--muted);font-weight:500;margin-top:2px">${esc(it.artist)}</div>`,'',i===qi)).join('')}`, v=>{ qi=+v; loadAudio(queue[qi]); });
 }
+const IC_COVER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>';
+let coverTarget=null;
+$('coverIn').onchange = e => {
+  const f=e.target.files&&e.target.files[0]; e.target.value=''; const it=coverTarget; coverTarget=null;
+  if(!f || !it) return;
+  const url=URL.createObjectURL(f), img=new Image();
+  img.onload=()=>{
+    const S2=320, c=document.createElement('canvas'); c.width=S2; c.height=S2;
+    const k=Math.max(S2/img.width,S2/img.height), w=img.width*k, h=img.height*k;
+    c.getContext('2d').drawImage(img,(S2-w)/2,(S2-h)/2,w,h); URL.revokeObjectURL(url);
+    const data=c.toDataURL('image/jpeg',.82);
+    covers[it.key]=data;
+    try{ store.set('covers',covers); localStorage.getItem('nx_covers'); }catch(err){}
+    if(JSON.stringify(store.get('covers',{})[it.key]||'')==='""'){ delete covers[it.key]; toast('No hay espacio para más portadas'); return; }
+    it.art=data; render(); if(current&&current.key===it.key) fillPlayer(); toast('Portada guardada');
+  };
+  img.onerror=()=>{ URL.revokeObjectURL(url); toast('No se pudo abrir esa imagen'); };
+  img.src=url;
+};
 function itemMenu(it){
   openSheet(`<h3 style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(it.title)}</h3>
     ${opt('fav', favKeys.has(it.key)?'Quitar de favoritos':'Agregar a favoritos', I.star)}
     ${opt('pl','Agregar a playlist',I.list)}
+    ${it.type==='audio'?opt('cover', covers[it.key]?'Cambiar portada':'Poner portada', IC_COVER):''}
+    ${covers[it.key]?opt('uncover','Quitar portada',I.restore):''}
     ${it.type==='audio'?opt('next','Reproducir a continuación',I.music):''}
     ${opt('hide','Ocultar',I.eye)}
     ${opt('del','Eliminar de la biblioteca',I.trash,false,'danger')}`, v=>{
       if(v==='fav') toggleFav(it);
       if(v==='pl'){ setTimeout(()=>plPicker(it),250); }
+      if(v==='cover'){ coverTarget=it; $('coverIn').click(); }
+      if(v==='uncover'){ delete covers[it.key]; store.set('covers',covers); const r=msRef(it); it.art = r?`${location.origin}/thumb/audio/${r.id}`:null; render(); if(current&&current.key===it.key) fillPlayer(); toast('Portada quitada'); }
       if(v==='next'){ if(!queue.length){ playItem(it); } else { queue.splice(qi+1,0,it); toast('Se reproducirá a continuación'); } }
       if(v==='hide'){ hiddenKeys.add(it.key); store.set('hidden',[...hiddenKeys]); toast('Archivo oculto. Lo encuentras en Ajustes.'); render(); }
       if(v==='del'){ it.deleted=true; if(current&&current.key===it.key){ audio.pause(); current=null; nativeMedia(); $('player').classList.remove('on'); } toast('Movido a Eliminado recientemente'); render(); }
@@ -1230,7 +1334,7 @@ function renderSettings(){
   $('setG1').innerHTML = setRow('accent',I.palette,'Color de acento',`<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--accent);vertical-align:-2px"></span>`) + setRow('theme',S.theme==='light'?I.sun:I.moon,'Tema',themeName) + setRow('sleep',I.moon,'Temporizador para dormir',sleepMode==='off'?'Apagado':sleepMode==='end'?'Al terminar':$('sleepLbl').textContent) + setRow('pro',I.gem,'Nexora Pro','Activado','pro');
   const hid2 = items.filter(i=>!i.deleted && isHidden(i)).length;
   $('setG2').innerHTML = setRow('hidden',I.eye,'Archivos ocultos',`${hid2} archivo${hid2!==1?'s':''}`) + setRow('deleted',I.trash,'Eliminado recientemente') + setRow('playback',I.head,'Ajustes de reproducción') + setRow('fx',I.music,'Mejoras de sonido', fxActive()?'Activadas':'Calidad original') + setRow('boost',I.music,'Amplificador de volumen',S.boost+'%') + setRow('speed',I.head,'Velocidad predeterminada',S.speed+'x') + setRow('lang',I.globe,'Idioma',LANGS[S.lang]||'Español');
-  $('setG3').innerHTML = (NATIVE ? setRow('rescan',I.music,'Buscar música de nuevo', scanning?'Buscando…':'') + setRow('perms',I.gem,'Permisos de la app') : '') + setRow('reset',I.restore,'Restablecer estadísticas') + setRow('about',I.info,'Acerca de','v1.6.1');
+  $('setG3').innerHTML = (NATIVE ? setRow('rescan',I.music,'Buscar música de nuevo', scanning?'Buscando…':'') + setRow('perms',I.gem,'Permisos de la app') : '') + setRow('reset',I.restore,'Restablecer estadísticas') + setRow('about',I.info,'Acerca de','v'+(native('version')||'1.7'));
 }
 $('setG1').parentElement.addEventListener('click', e=>{
   const b=e.target.closest('[data-set]'); if(!b) return; const k=b.dataset.set;
@@ -1245,10 +1349,13 @@ $('setG1').parentElement.addEventListener('click', e=>{
   if(k==='fx') fxSheet();
   if(k==='hidden') openSub('hidden');
   if(k==='deleted') openSub('deleted');
-  if(k==='reset'){ S.playMs=0; save(); for(const k in plays) delete plays[k]; store.set('plays',plays); renderSettings(); toast('Estadísticas restablecidas'); }
+  if(k==='reset') openSheet(`<h3>¿Restablecer estadísticas?</h3><p style="margin:0 18px 16px;color:var(--muted);line-height:1.5">Se borrará tu tiempo total de reproducción y el conteo de canciones más reproducidas. Esta acción no se puede deshacer.</p><div style="padding:0 18px;display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" data-v="no">Cancelar</button><button class="btn" data-v="yes" style="background:var(--danger)">Aceptar</button></div>`, v=>{
+    if(v!=='yes') return;
+    S.playMs=0; save(); for(const x in plays) delete plays[x]; store.set('plays',plays); renderSettings(); toast('Estadísticas restablecidas');
+  });
   if(k==='rescan'){ startScan(false); renderSettings(); }
   if(k==='perms') Nexora.openAppSettings();
-  if(k==='about') openSheet(`<h3>Nexora Pro Reproductor Música</h3><p style="margin:0 18px 16px;color:var(--muted);line-height:1.55">Reproductor de música y video para archivos locales. Tus archivos se reproducen en tu dispositivo y no se suben a ningún servidor.<br><br>Versión 1.6.1<br><br><b style="color:var(--text)">© 2026 Nexora · Eduard Gamer</b><br>Todos los derechos reservados.<br><br><a href="https://eduardyt9088.github.io/nexora-pro/privacidad.html" data-priv="1" style="color:var(--accent);font-weight:700">Política de privacidad</a></p>${opt('ok','Cerrar')}`, ()=>{});
+  if(k==='about') openSheet(`<h3>Nexora Pro Reproductor Música</h3><p style="margin:0 18px 16px;color:var(--muted);line-height:1.55">Reproductor de música y video para archivos locales. Tus archivos se reproducen en tu dispositivo y no se suben a ningún servidor.<br><br>Versión ${native('version')||'1.7'}<br><br><b style="color:var(--text)">© 2026 Nexora · Eduard Gamer</b><br>Todos los derechos reservados.<br><br><a href="https://eduardyt9088.github.io/nexora-pro/privacidad.html" data-priv="1" style="color:var(--accent);font-weight:700">Política de privacidad</a></p>${opt('ok','Cerrar')}`, ()=>{});
 });
 $('bSettings').onclick = () => { save(); renderSettings(); $('settings').classList.add('on'); };
 $('setBack').onclick = () => $('settings').classList.remove('on');
@@ -1326,7 +1433,7 @@ window.nxOnScan = list => {
     const media = `${mbase}/media/${m.type}/${m.id}`, th = `${base}/thumb/${m.type}/${m.id}`;
     return {key, name:m.name||title, title, artist: m.type==='audio'?artist:'', type:m.type, url:media, size:m.size||0,
       duration:(m.duration||0)/1000, height:Math.min(m.width||0,m.height||0)||m.height||0, folder:m.folder||'Almacenamiento interno',
-      added:(m.added||0)*1000, thumb: m.type==='video'?th:null, art: m.type==='audio'?th:null, deleted: old?old.deleted:false};
+      added:(m.added||0)*1000, thumb: m.type==='video'?th:null, art: m.type==='audio'?(covers[key]||th):null, deleted: old?old.deleted:false};
   });
   items = [...mapped, ...items.filter(i=>!i.key.startsWith('ms:'))];
   if(current){ const c=items.find(i=>i.key===current.key); if(c) current=c; }
@@ -1504,6 +1611,7 @@ window.nxOnTrash = ok => {
   if(ok){
     const keys=new Set(pendingDel.map(i=>i.key));
     if(current && keys.has(current.key)){ audio.pause(); current=null; nativeMedia(); $('player').classList.remove('on'); }
+    if(video._item && keys.has(video._item.key)) closeVideo();
     items = items.filter(i=>!keys.has(i.key));
     toast(`${keys.size} archivo${keys.size===1?' movido':'s movidos'} a la papelera`);
     exitSel(); startScan(true);
@@ -1807,6 +1915,10 @@ pt: {
  'Todas':'Todas','Toca un archivo para mostrarlo de nuevo.':'Toque em um arquivo para mostrá-lo de novo.'
 }};
 I18N.en['A continuación'] = 'Play next';
+Object.assign(I18N.en,{'Ventana flotante':'Floating window','Modo de reproducción':'Playback mode','Ajustar escala':'Scale','Mejorar imagen':'Enhance picture','Repetir todas':'Repeat all','Repetir una':'Repeat one','En orden':'In order','Mejor ajuste':'Best fit','Llenar pantalla':'Fill screen','Estirar':'Stretch','Tamaño original':'Original size','Suave':'Soft','Vívido':'Vivid','Tu teléfono no permite ventana flotante':'Your phone doesn’t support floating windows','Ventana flotante no disponible aquí':'Floating window not available here','¿Restablecer estadísticas?':'Reset statistics?','Se borrará tu tiempo total de reproducción y el conteo de canciones más reproducidas. Esta acción no se puede deshacer.':'Your total playback time and most-played counts will be erased. This can’t be undone.','Aceptar':'OK','Poner portada':'Set cover','Cambiar portada':'Change cover','Quitar portada':'Remove cover','Portada guardada':'Cover saved','Portada quitada':'Cover removed','No hay espacio para más portadas':'No space for more covers','No se pudo abrir esa imagen':'Couldn’t open that image','Actualización obligatoria':'Required update','Nueva versión disponible':'New version available','Para seguir usando Nexora Pro necesitas instalar la nueva versión.':'To keep using Nexora Pro you need to install the new version.','Hay una nueva versión de Nexora Pro con mejoras para ti.':'There’s a new version of Nexora Pro with improvements for you.','Novedades de esta versión':'What’s new','Actualizar ahora':'Update now','Más tarde':'Later','Descarga el APK e instálalo encima':'Download the APK and install it over this one'});
+Object.assign(I18N.pt,{'Ventana flotante':'Janela flutuante','Modo de reproducción':'Modo de reprodução','Ajustar escala':'Ajustar escala','Mejorar imagen':'Melhorar imagem','Repetir todas':'Repetir todas','Repetir una':'Repetir uma','En orden':'Em ordem','Mejor ajuste':'Melhor ajuste','Llenar pantalla':'Preencher tela','Estirar':'Esticar','Tamaño original':'Tamanho original','Suave':'Suave','Vívido':'Vívido','Tu teléfono no permite ventana flotante':'Seu celular não permite janela flutuante','Ventana flotante no disponible aquí':'Janela flutuante não disponível aqui','¿Restablecer estadísticas?':'Redefinir estatísticas?','Se borrará tu tiempo total de reproducción y el conteo de canciones más reproducidas. Esta acción no se puede deshacer.':'Seu tempo total de reprodução e a contagem das mais tocadas serão apagados. Isso não pode ser desfeito.','Aceptar':'Aceitar','Poner portada':'Colocar capa','Cambiar portada':'Trocar capa','Quitar portada':'Remover capa','Portada guardada':'Capa salva','Portada quitada':'Capa removida','No hay espacio para más portadas':'Sem espaço para mais capas','No se pudo abrir esa imagen':'Não foi possível abrir essa imagem','Actualización obligatoria':'Atualização obrigatória','Nueva versión disponible':'Nova versão disponível','Para seguir usando Nexora Pro necesitas instalar la nueva versión.':'Para continuar usando o Nexora Pro, instale a nova versão.','Hay una nueva versión de Nexora Pro con mejoras para ti.':'Há uma nova versão do Nexora Pro com melhorias para você.','Novedades de esta versión':'Novidades desta versão','Actualizar ahora':'Atualizar agora','Más tarde':'Mais tarde','Descarga el APK e instálalo encima':'Baixe o APK e instale por cima'});
+Object.assign(I18N.en,{'Preparando descarga…':'Preparing download…','Activa “Permitir de esta fuente” para Nexora Pro, regresa y toca Actualizar ahora.':'Turn on “Allow from this source” for Nexora Pro, come back and tap Update now.','Instalando… confirma en la ventana de Android.':'Installing… confirm in the Android window.','¡Actualización instalada!':'Update installed!','No se pudo actualizar. Revisa tu internet e inténtalo de nuevo.':'Couldn’t update. Check your internet and try again.'});
+Object.assign(I18N.pt,{'Preparando descarga…':'Preparando download…','Activa “Permitir de esta fuente” para Nexora Pro, regresa y toca Actualizar ahora.':'Ative “Permitir desta fonte” para o Nexora Pro, volte e toque em Atualizar agora.','Instalando… confirma en la ventana de Android.':'Instalando… confirme na janela do Android.','¡Actualización instalada!':'Atualização instalada!','No se pudo actualizar. Revisa tu internet e inténtalo de nuevo.':'Não foi possível atualizar. Verifique sua internet e tente de novo.'});
 Object.assign(I18N.en,{'Privacidad':'Privacy','Restablecer zoom':'Reset zoom','Política de privacidad':'Privacy policy','Todos los derechos reservados.':'All rights reserved.'});
 Object.assign(I18N.pt,{'Privacidad':'Privacidade','Restablecer zoom':'Redefinir zoom','Política de privacidad':'Política de privacidade','Todos los derechos reservados.':'Todos os direitos reservados.'});
 Object.assign(I18N.en,{'Mejoras de sonido':'Sound enhancements','Graves profundos':'Deep bass','Más cuerpo y potencia en los bajos.':'More body and punch in the low end.','Claridad':'Clarity','Voces e instrumentos más nítidos y brillantes.':'Sharper, brighter vocals and instruments.','Sonido envolvente 3D':'3D surround sound','Sonido más amplio, ideal con audífonos.':'Wider sound, great with headphones.','Tus canciones se reproducen en su calidad original. Estas mejoras ajustan el sonido a tu gusto.':'Your songs play at their original quality. These enhancements tune the sound to your taste.','Normalizar volumen':'Normalize volume','Iguala el volumen entre canciones muy bajas y muy altas.':'Evens out volume between very quiet and very loud songs.','Calidad máxima (sin mejoras)':'Maximum quality (no enhancements)','Calidad original, sin procesar':'Original quality, unprocessed','Activadas':'On','Calidad original':'Original quality'});
@@ -1870,6 +1982,8 @@ pt: [
  [/^Opciones de (.+)$/, (m,t)=>`Opções de ${t}`]
 ]};
 I18N_P.en.push([/^Continuando desde (.+)$/, (m,t)=>`Resuming from ${t}`]); I18N_P.pt.push([/^Continuando desde (.+)$/, (m,t)=>`Continuando de ${t}`]);
+I18N_P.en.push([/^Tu versión: v(.*)$/, (m,v)=>`Your version: v${v}`]); I18N_P.pt.push([/^Tu versión: v(.*)$/, (m,v)=>`Sua versão: v${v}`]);
+I18N_P.en.push([/^Descargando… (\d+)%$/, (m,n)=>`Downloading… ${n}%`]); I18N_P.pt.push([/^Descargando… (\d+)%$/, (m,n)=>`Baixando… ${n}%`]);
 function trText(src){
   const L=S.lang; if(L==='es' || !I18N[L]) return null;
   const t=src.trim(); if(!t || t.length>400) return null;
@@ -1969,8 +2083,54 @@ $('vpTap').addEventListener('touchend', e=>{
   if(e.touches.length===0) panZ=null;
 });
 
+/* ---------- Archivos que llegan desde otras apps (Nexora Download, etc.) ---------- */
+window.nxOpenExternal = f => {
+  if(!f || !f.url) return;
+  const title=(f.title||'Archivo').replace(/\.[^.]+$/,'');
+  const it={key:'ext:'+f.url, name:f.title, title, artist:'', type:f.type==='video'?'video':'audio', url:f.url, size:0, duration:0, height:0, folder:'Nexora Download', added:Date.now(), thumb:null, art:null, deleted:false};
+  onb('off'); closePriv(); closeSheet(); $('settings').classList.remove('on'); $('sub').classList.remove('on');
+  if(it.type==='video'){ closeVideo(); openVideo(it,[it]); }
+  else { closeVideo(); playItem(it,[it]); $('player').classList.add('on'); }
+};
+
+/* ---------- 4) Actualizaciones obligatorias ---------- */
+const UPDATE_REPO='EduardYT9088/nexora-pro';
+window.nxOnUpdate = info => {
+  try{
+    const mine = +(native('versionCode')||0);
+    if(!info || !info.code || !mine || +info.code<=mine) return;
+    if(!info.obligatoria && store.get('skipUpd',0)===+info.code) return;
+    const nov=(info.novedades||[]).map(n=>`<li>${esc(n)}</li>`).join('');
+    $('upd').innerHTML = `<img src="${$('onb')&&document.querySelector('.top img')?document.querySelector('.top img').src:''}" alt="">
+      <h1>${info.obligatoria?'Actualización obligatoria':'Nueva versión disponible'}</h1>
+      <span class="ver">v${esc(info.version||'')}</span>
+      <p>${info.obligatoria?'Para seguir usando Nexora Pro necesitas instalar la nueva versión.':'Hay una nueva versión de Nexora Pro con mejoras para ti.'}</p>
+      ${nov?`<div class="box"><b>Novedades de esta versión</b><ul>${nov}</ul></div>`:''}
+      <p style="font-size:13px">Tu versión: v${esc(native('version')||'')}</p>
+      <div class="acts"><div class="pbar" id="updBar"><i></i></div><div class="pmsg" id="updMsg"></div><button class="btn" id="updGo">Actualizar ahora</button>${info.obligatoria?'':'<button class="btn ghost" id="updLater">Más tarde</button>'}</div>`;
+    $('upd').classList.add('on'); $('upd').dataset.forced = info.obligatoria?'1':'';
+    $('updGo').onclick = () => {
+      const apk = info.apk || `https://github.com/${UPDATE_REPO}/releases/latest/download/NexoraPro.apk`;
+      if(NATIVE && Nexora.downloadUpdate){ $('updGo').disabled=true; $('updMsg').textContent='Preparando descarga…'; native('downloadUpdate', apk); }
+      else native('openUrl', apk);
+    };
+    const l=$('updLater'); if(l) l.onclick = () => { store.set('skipUpd',+info.code); $('upd').classList.remove('on'); };
+  }catch(e){}
+};
+if(NATIVE) setTimeout(()=>native('checkUpdate', UPDATE_REPO), 1500);
+
+window.nxUpd = (st, pct) => {
+  const bar=$('updBar'), msg=$('updMsg'), go=$('updGo'); if(!bar) return;
+  if(st==='perm'){ go.disabled=false; msg.textContent='Activa “Permitir de esta fuente” para Nexora Pro, regresa y toca Actualizar ahora.'; }
+  if(st==='progress'){ bar.style.display='block'; bar.firstChild.style.width=pct+'%'; msg.textContent=`Descargando… ${pct}%`; }
+  if(st==='installing'){ bar.style.display='block'; bar.firstChild.style.width='100%'; msg.textContent='Instalando… confirma en la ventana de Android.'; }
+  if(st==='done'){ msg.textContent='¡Actualización instalada!'; }
+  if(st==='error'){ go.disabled=false; bar.style.display='none'; msg.textContent='No se pudo actualizar. Revisa tu internet e inténtalo de nuevo.'; }
+};
+
 /* Botón atrás de Android: devuelve true si cerró algo */
 window.nxBack = () => {
+  if($('upd').classList.contains('on')){ if($('upd').dataset.forced) return false; $('upd').classList.remove('on'); return true; }
   if($('privPage').classList.contains('on')){ closePriv(); return true; }
   if($('sheet').classList.contains('on')){ closeSheet(); return true; }
   if(sel){ exitSel(); return true; }
