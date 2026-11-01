@@ -218,6 +218,28 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:0;border-radiu
 body.pip .vp-layer,body.pip .vp-scrim,body.pip .vp-pill,body.pip .vp-unlock,body.pip .vp-seekfx,body.pip .sheet,body.pip .scrim,body.pip .toast,body.pip .banner{display:none!important}
 /* encabezado del menú de video */
 .vm-head{display:flex;align-items:center;gap:14px;padding:4px 16px 12px}
+.vm-card{margin:2px 14px 14px;border-radius:22px;overflow:hidden;position:relative;background:var(--surface2)}
+.vm-card .bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(18px) brightness(.55);transform:scale(1.3)}
+.vm-card .in{position:relative;display:flex;gap:14px;align-items:center;padding:14px}
+.vm-card .th{width:104px;aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:rgba(0,0,0,.3);flex:none;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.vm-card .th img{width:100%;height:100%;object-fit:cover}
+.vm-card .tx{flex:1;min-width:0;color:#fff}
+.vm-card .tx b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-family:Sora,Manrope,sans-serif;font-size:15px;line-height:1.3}
+.vm-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.vm-tags span{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:10px;background:rgba(255,255,255,.18);color:#fff}
+.vm-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 14px 14px}
+.vm-quick button{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 4px;border-radius:18px;background:var(--surface2);font-size:12px;font-weight:700;color:var(--text)}
+.vm-quick button svg{width:24px;height:24px;color:var(--accent)}
+.vm-quick button.on svg{color:#FF5C8A}
+.vm-sec{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:4px 20px 6px}
+.vm-set{display:flex;align-items:center;gap:12px;width:100%;padding:12px 18px;text-align:left;font-weight:600;font-size:15px}
+.vm-set>svg{width:22px;height:22px;color:var(--muted);flex:none}
+.vm-set .grow{flex:1}
+.vm-set .pill{font-size:12.5px;font-weight:800;padding:5px 11px;border-radius:12px;background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent);white-space:nowrap}
+.vm-bottom{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px 4px}
+.vm-bottom button{display:flex;align-items:center;justify-content:center;gap:8px;height:48px;border-radius:16px;background:var(--surface2);font-weight:700}
+.vm-bottom button svg{width:20px;height:20px}
+.vm-bottom button.danger{background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger)}
 .vm-head .th{width:112px;aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:var(--surface2);flex:none}
 .vm-head .th img{width:100%;height:100%;object-fit:cover}
 .vm-head .tx{flex:1;min-width:0}
@@ -1193,41 +1215,55 @@ function pickSheet(title, map, cur, cb){
 }
 function startPip(){
   if(!NATIVE){ if(video.requestPictureInPicture) video.requestPictureInPicture().catch(()=>toast('Ventana flotante no disponible aquí')); else toast('Ventana flotante no disponible aquí'); return; }
-  native('enterPip', video.videoWidth|0, video.videoHeight|0);
+  native('enterPip', video.videoWidth|0, video.videoHeight|0); native('pipState', !video.paused);
 }
 window.nxPip = on => { document.body.classList.toggle('pip', !!on); if(on){ resetZoom(); VP.classList.add('hide-ui'); } else showUi(); };
 window.nxPipClosed = () => { if(VP.classList.contains('on')) video.pause(); };
 $('vpMore').onclick = () => {
   clearTimeout(uiTimer);
   const it=video._item||{};
-  const meta=[resLabel(video.videoHeight&&video.videoWidth?Math.min(video.videoWidth,video.videoHeight):it.height), fmt(video.duration||it.duration)].filter(Boolean).join(' | ');
-  const canEdit = !!items.find(i=>i.key===it.key);
-  openSheet(`<div class="vm-head"><div class="th">${it.thumb?`<img src="${it.thumb}" alt="">`:''}</div><div class="tx"><b>${esc(it.title||'Video')}</b><small>${meta}</small></div>${canEdit?`<button class="more" data-v="rename" aria-label="Renombrar">${PENCIL}</button>`:''}</div>
-    ${canEdit && msRef(it)?opt('share','Compartir',IC_SHARE):''}
-    ${opt('pip','Ventana flotante',IC_PIP)}
-    <hr>
-    ${optV('mode','Modo de reproducción',I.rep0,VMODES[S.vmode])}
-    ${optV('scale','Ajustar escala',IC_SCALE,VSCALES[S.vscale])}
-    ${optV('enh','Mejorar imagen',IC_SPARK,VENH[S.venh|0])}
-    ${optV('boost','Amplificador de volumen',I.head,S.boost+'%')}
-    ${zS>1.001?opt('zoom','Restablecer zoom',I.restore):''}
-    ${canEdit?opt('fav', favKeys.has(it.key)?'Quitar de favoritos':'Agregar a favoritos', I.star):''}
-    ${opt('info','Información',I.info)}
-    ${canEdit?`<hr>${opt('hide','Ocultar',I.eye)}${opt('del','Borrar',I.trash,false,'danger')}`:''}`, v=>{
+  const res=resLabel(video.videoHeight&&video.videoWidth?Math.min(video.videoWidth,video.videoHeight):it.height);
+  const tags=[res, fmt(video.duration||it.duration), it.size?(it.size/1048576).toFixed(1)+' MB':''].filter(Boolean).map(t=>`<span>${t}</span>`).join('');
+  const canEdit = !!items.find(i=>i.key===it.key), fav=favKeys.has(it.key);
+  const q=(v,l,ic,cls='')=>`<button data-v="${v}" class="${cls}">${ic}<span>${l}</span></button>`;
+  const row=(v,l,ic,val)=>`<button class="vm-set" data-v="${v}">${ic}<span class="grow">${l}</span><span class="pill">${val}</span></button>`;
+  openSheet(`<div class="vm-card">${it.thumb?`<div class="bg" style="background-image:url('${it.thumb}')"></div>`:''}<div class="in"><div class="th">${it.thumb?`<img src="${it.thumb}" alt="" onerror="this.remove()">`:''}</div><div class="tx"><b>${esc(it.title||'Video')}</b><div class="vm-tags">${tags}</div></div></div></div>
+    <div class="vm-quick">
+      ${q('pip','Flotante',IC_PIP)}
+      ${canEdit && msRef(it)?q('share','Compartir',IC_SHARE):q('audio','Solo audio',I.head)}
+      ${canEdit?q('rename','Renombrar',PENCIL):q('info','Info',I.info)}
+      ${canEdit?q('fav',fav?'Favorito':'Favorito',fav?I.heartF.replace(/width="26" height="26"/,''):I.star, fav?'on':''):q('zoomr','Zoom 100%',I.restore)}
+    </div>
+    <div class="vm-sec">Reproducción</div>
+    ${row('mode','Modo de reproducción',I.rep0,VMODES[S.vmode])}
+    ${row('scale','Ajustar escala',IC_SCALE,VSCALES[S.vscale])}
+    ${row('enh','Mejorar imagen',IC_SPARK,VENH[S.venh|0])}
+    ${row('boost','Amplificador de volumen',I.head,S.boost+'%')}
+    ${zS>1.001?row('zoom','Zoom',I.restore,Math.round(zS*100)+'%'):''}
+    ${canEdit?`<div class="vm-bottom"><button data-v="info">${I.info}<span>Información</span></button><button data-v="hide">${I.eye}<span>Ocultar</span></button></div><div class="vm-bottom" style="grid-template-columns:1fr;padding-top:0"><button data-v="del" class="danger">${I.trash}<span>Borrar video</span></button></div>`:''}`, v=>{
       if(v==='rename'){ setTimeout(()=>renameSheet(it),250); return; }
       if(v==='share'){ native('share', JSON.stringify([msRef(it)])); return; }
+      if(v==='audio'){ $('vpAudio').click(); return; }
       if(v==='pip'){ setTimeout(startPip,200); return; }
       if(v==='mode'){ setTimeout(()=>pickSheet('Modo de reproducción',VMODES,S.vmode,k=>{ S.vmode=k; save(); video.loop=k==='one'; toast(VMODES[k]); }),250); return; }
       if(v==='scale'){ setTimeout(()=>pickSheet('Ajustar escala',VSCALES,S.vscale,k=>{ S.vscale=k; save(); resetZoom(); applyScale(); }),250); return; }
       if(v==='enh'){ setTimeout(()=>pickSheet('Mejorar imagen',Object.fromEntries(VENH.map((l,i)=>[i,l])),S.venh|0,k=>{ S.venh=+k; save(); applyEnh(); }),250); return; }
       if(v==='boost'){ setTimeout(boostSheet,260); return; }
-      if(v==='zoom'){ resetZoom(true); return; }
+      if(v==='zoom' || v==='zoomr'){ resetZoom(true); return; }
       if(v==='fav' && it.key) toggleFav(it);
       if(v==='hide'){ hiddenKeys.add(it.key); store.set('hidden',[...hiddenKeys]); closeVideo(); render(); toast('Archivo oculto. Lo encuentras en Ajustes.'); }
       if(v==='del') setTimeout(()=>confirmDelete([it]),250);
       if(v==='info') setTimeout(()=>openSheet(`<h3>Información</h3><div style="padding:0 18px 12px;line-height:1.8;color:var(--muted)"><b style="color:var(--text)">${esc(it.name||it.title)}</b><br>Duración: ${fmt(video.duration||it.duration)}<br>Resolución: ${video.videoWidth?video.videoWidth+' × '+video.videoHeight:resLabel(it.height)||'—'}<br>Tamaño: ${it.size?(it.size/1048576).toFixed(1)+' MB':'—'}<br>Carpeta: ${esc(it.folder||'—')}</div>${opt('ok','Cerrar')}`,()=>{}),260);
     });
 };
+/* Botones propios dentro de la ventana flotante: −10 s, reproducir/pausa, +10 s */
+window.nxPipAction = a => {
+  if(!VP.classList.contains('on')) return;
+  if(a==='toggle') video.paused ? video.play().catch(()=>{}) : video.pause();
+  if(a==='rew') video.currentTime=Math.max(0,video.currentTime-10);
+  if(a==='fwd') video.currentTime=Math.min(video.duration||0,video.currentTime+10);
+};
+['play','pause'].forEach(e=>video.addEventListener(e,()=>{ if(document.body.classList.contains('pip')) native('pipState', !video.paused); }));
 $('vpAudio').onclick = () => {
   const it=video._item, t=video.currentTime; closeVideo();
   const a = {...it, type:'audio'}; queue=[a]; qi=0; current=a; ensureAudioGraph();
@@ -1925,6 +1961,8 @@ Object.assign(I18N.en,{'Preparando descarga…':'Preparing download…','Activa 
 Object.assign(I18N.pt,{'Preparando descarga…':'Preparando download…','Activa “Permitir de esta fuente” para Nexora Pro, regresa y toca Actualizar ahora.':'Ative “Permitir desta fonte” para o Nexora Pro, volte e toque em Atualizar agora.','Instalando… confirma en la ventana de Android.':'Instalando… confirme na janela do Android.','¡Actualización instalada!':'Atualização instalada!','No se pudo actualizar. Revisa tu internet e inténtalo de nuevo.':'Não foi possível atualizar. Verifique sua internet e tente de novo.'});
 Object.assign(I18N.en,{'Descargar desde la página web':'Download from the website','Mejoras y correcciones.':'Improvements and fixes.'});
 Object.assign(I18N.pt,{'Descargar desde la página web':'Baixar pelo site','Mejoras y correcciones.':'Melhorias e correções.'});
+Object.assign(I18N.en,{'Flotante':'Float','Solo audio':'Audio only','Info':'Info','Zoom 100%':'Zoom 100%','Reproducción':'Playback','Borrar video':'Delete video','Zoom':'Zoom'});
+Object.assign(I18N.pt,{'Flotante':'Flutuante','Solo audio':'Só áudio','Info':'Info','Reproducción':'Reprodução','Borrar video':'Apagar vídeo'});
 Object.assign(I18N.en,{'Privacidad':'Privacy','Restablecer zoom':'Reset zoom','Política de privacidad':'Privacy policy','Todos los derechos reservados.':'All rights reserved.'});
 Object.assign(I18N.pt,{'Privacidad':'Privacidade','Restablecer zoom':'Redefinir zoom','Política de privacidad':'Política de privacidade','Todos los derechos reservados.':'Todos os direitos reservados.'});
 Object.assign(I18N.en,{'Mejoras de sonido':'Sound enhancements','Graves profundos':'Deep bass','Más cuerpo y potencia en los bajos.':'More body and punch in the low end.','Claridad':'Clarity','Voces e instrumentos más nítidos y brillantes.':'Sharper, brighter vocals and instruments.','Sonido envolvente 3D':'3D surround sound','Sonido más amplio, ideal con audífonos.':'Wider sound, great with headphones.','Tus canciones se reproducen en su calidad original. Estas mejoras ajustan el sonido a tu gusto.':'Your songs play at their original quality. These enhancements tune the sound to your taste.','Normalizar volumen':'Normalize volume','Iguala el volumen entre canciones muy bajas y muy altas.':'Evens out volume between very quiet and very loud songs.','Calidad máxima (sin mejoras)':'Maximum quality (no enhancements)','Calidad original, sin procesar':'Original quality, unprocessed','Activadas':'On','Calidad original':'Original quality'});
