@@ -1,11 +1,9 @@
-Versión: 1.6.4
-- Nuevo reproductor de música con diseño propio: fondo con la portada, disco que gira y botones nuevos
-- Nuevo menú de canciones con accesos rápidos
-- Nuevo diseño propio de Nexora en toda la app y en Ajustes
-- 18 colores nuevos y la opción de elegir tu propio color
-- Fondo personalizado con una foto de tu galería
+Versión: 1.6.5
+- Copia de seguridad: guarda tus playlists, favoritos, portadas y ajustes, y restáuralos en otro teléfono
+- 8 temas nuevos: Medianoche, Océano, Bosque, Atardecer, Café, Nórdico, Crema y Cielo
+- Nuevos idiomas: Deutsch y Bahasa Indonesia (ya son 7)
+- Ajustes ahora usa tu fondo personalizado sin que se vea la lista detrás
+- Nuevo reproductor de música con diseño propio y disco que gira
+- Nuevo diseño propio de Nexora en toda la app
 - Mantén presionado el video para verlo a velocidad 2x
 - Donaciones por PayPal en Ajustes
-- Nuevos idiomas: Français e Italiano
-- El modo "Solo audio" de los videos sigue sonando con la pantalla apagada
-- Las portadas que pones tú ahora también se ven en el reproductor grande
