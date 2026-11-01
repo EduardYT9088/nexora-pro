@@ -230,8 +230,12 @@ body.pip .vp-layer,body.pip .vp-scrim,body.pip .vp-pill,body.pip .vp-unlock,body
 .upd.on{display:flex}
 .upd img{width:96px;height:96px;border-radius:24px;box-shadow:0 18px 40px -12px rgba(108,76,245,.6)}
 .upd h1{font-family:Sora,Manrope,sans-serif;font-size:1.6rem;margin:22px 0 4px;text-align:center}
-.upd .ver{display:inline-block;background:var(--accent);color:var(--onaccent);font-weight:800;padding:4px 14px;border-radius:14px;margin:6px 0 16px}
-.upd .box{width:100%;max-width:440px;background:var(--surface);border-radius:20px;padding:16px 18px;margin-bottom:20px}
+.upd .ver{font-family:Sora,Manrope,sans-serif;font-weight:800;font-size:clamp(52px,17vw,76px);line-height:1.05;letter-spacing:-.02em;background:linear-gradient(90deg,var(--accent2),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent;margin:10px 0 6px}
+.upd .mine{color:var(--muted);font-size:16px;margin-bottom:22px}
+.upd .web{background:none;color:var(--accent2);font-weight:800;font-size:16px;height:44px}
+.upd .acts .btn svg{width:22px;height:22px}
+.upd .box{width:100%;max-width:440px;background:var(--surface);border-radius:22px;padding:18px 20px;margin-bottom:20px}
+.upd .box li{margin-bottom:6px}
 .upd .box b{display:block;margin-bottom:8px}
 .upd ul{margin:0;padding-left:20px;line-height:1.6;color:var(--text)}
 .upd p{color:var(--muted);text-align:center;max-width:36ch;line-height:1.5;margin:0 0 18px}
@@ -1919,6 +1923,8 @@ Object.assign(I18N.en,{'Ventana flotante':'Floating window','Modo de reproducci�
 Object.assign(I18N.pt,{'Ventana flotante':'Janela flutuante','Modo de reproducción':'Modo de reprodução','Ajustar escala':'Ajustar escala','Mejorar imagen':'Melhorar imagem','Repetir todas':'Repetir todas','Repetir una':'Repetir uma','En orden':'Em ordem','Mejor ajuste':'Melhor ajuste','Llenar pantalla':'Preencher tela','Estirar':'Esticar','Tamaño original':'Tamanho original','Suave':'Suave','Vívido':'Vívido','Tu teléfono no permite ventana flotante':'Seu celular não permite janela flutuante','Ventana flotante no disponible aquí':'Janela flutuante não disponível aqui','¿Restablecer estadísticas?':'Redefinir estatísticas?','Se borrará tu tiempo total de reproducción y el conteo de canciones más reproducidas. Esta acción no se puede deshacer.':'Seu tempo total de reprodução e a contagem das mais tocadas serão apagados. Isso não pode ser desfeito.','Aceptar':'Aceitar','Poner portada':'Colocar capa','Cambiar portada':'Trocar capa','Quitar portada':'Remover capa','Portada guardada':'Capa salva','Portada quitada':'Capa removida','No hay espacio para más portadas':'Sem espaço para mais capas','No se pudo abrir esa imagen':'Não foi possível abrir essa imagem','Actualización obligatoria':'Atualização obrigatória','Nueva versión disponible':'Nova versão disponível','Para seguir usando Nexora Pro necesitas instalar la nueva versión.':'Para continuar usando o Nexora Pro, instale a nova versão.','Hay una nueva versión de Nexora Pro con mejoras para ti.':'Há uma nova versão do Nexora Pro com melhorias para você.','Novedades de esta versión':'Novidades desta versão','Actualizar ahora':'Atualizar agora','Más tarde':'Mais tarde','Descarga el APK e instálalo encima':'Baixe o APK e instale por cima'});
 Object.assign(I18N.en,{'Preparando descarga…':'Preparing download…','Activa “Permitir de esta fuente” para Nexora Pro, regresa y toca Actualizar ahora.':'Turn on “Allow from this source” for Nexora Pro, come back and tap Update now.','Instalando… confirma en la ventana de Android.':'Installing… confirm in the Android window.','¡Actualización instalada!':'Update installed!','No se pudo actualizar. Revisa tu internet e inténtalo de nuevo.':'Couldn’t update. Check your internet and try again.'});
 Object.assign(I18N.pt,{'Preparando descarga…':'Preparando download…','Activa “Permitir de esta fuente” para Nexora Pro, regresa y toca Actualizar ahora.':'Ative “Permitir desta fonte” para o Nexora Pro, volte e toque em Atualizar agora.','Instalando… confirma en la ventana de Android.':'Instalando… confirme na janela do Android.','¡Actualización instalada!':'Atualização instalada!','No se pudo actualizar. Revisa tu internet e inténtalo de nuevo.':'Não foi possível atualizar. Verifique sua internet e tente de novo.'});
+Object.assign(I18N.en,{'Descargar desde la página web':'Download from the website','Mejoras y correcciones.':'Improvements and fixes.'});
+Object.assign(I18N.pt,{'Descargar desde la página web':'Baixar pelo site','Mejoras y correcciones.':'Melhorias e correções.'});
 Object.assign(I18N.en,{'Privacidad':'Privacy','Restablecer zoom':'Reset zoom','Política de privacidad':'Privacy policy','Todos los derechos reservados.':'All rights reserved.'});
 Object.assign(I18N.pt,{'Privacidad':'Privacidade','Restablecer zoom':'Redefinir zoom','Política de privacidad':'Política de privacidade','Todos los derechos reservados.':'Todos os direitos reservados.'});
 Object.assign(I18N.en,{'Mejoras de sonido':'Sound enhancements','Graves profundos':'Deep bass','Más cuerpo y potencia en los bajos.':'More body and punch in the low end.','Claridad':'Clarity','Voces e instrumentos más nítidos y brillantes.':'Sharper, brighter vocals and instruments.','Sonido envolvente 3D':'3D surround sound','Sonido más amplio, ideal con audífonos.':'Wider sound, great with headphones.','Tus canciones se reproducen en su calidad original. Estas mejoras ajustan el sonido a tu gusto.':'Your songs play at their original quality. These enhancements tune the sound to your taste.','Normalizar volumen':'Normalize volume','Iguala el volumen entre canciones muy bajas y muy altas.':'Evens out volume between very quiet and very loud songs.','Calidad máxima (sin mejoras)':'Maximum quality (no enhancements)','Calidad original, sin procesar':'Original quality, unprocessed','Activadas':'On','Calidad original':'Original quality'});
@@ -1982,7 +1988,7 @@ pt: [
  [/^Opciones de (.+)$/, (m,t)=>`Opções de ${t}`]
 ]};
 I18N_P.en.push([/^Continuando desde (.+)$/, (m,t)=>`Resuming from ${t}`]); I18N_P.pt.push([/^Continuando desde (.+)$/, (m,t)=>`Continuando de ${t}`]);
-I18N_P.en.push([/^Tu versión: v(.*)$/, (m,v)=>`Your version: v${v}`]); I18N_P.pt.push([/^Tu versión: v(.*)$/, (m,v)=>`Sua versão: v${v}`]);
+I18N_P.en.push([/^Tu versión: [vV](.*)$/, (m,v)=>`Your version: V${v}`]); I18N_P.pt.push([/^Tu versión: [vV](.*)$/, (m,v)=>`Sua versão: V${v}`]);
 I18N_P.en.push([/^Descargando… (\d+)%$/, (m,n)=>`Downloading… ${n}%`]); I18N_P.pt.push([/^Descargando… (\d+)%$/, (m,n)=>`Baixando… ${n}%`]);
 function trText(src){
   const L=S.lang; if(L==='es' || !I18N[L]) return null;
@@ -2101,13 +2107,14 @@ window.nxOnUpdate = info => {
     if(!info || !info.code || !mine || +info.code<=mine) return;
     if(!info.obligatoria && store.get('skipUpd',0)===+info.code) return;
     const nov=(info.novedades||[]).map(n=>`<li>${esc(n)}</li>`).join('');
-    $('upd').innerHTML = `<img src="${$('onb')&&document.querySelector('.top img')?document.querySelector('.top img').src:''}" alt="">
+    const IC_DL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>';
+    $('upd').innerHTML = `<img src="${document.querySelector('.top img')?document.querySelector('.top img').src:''}" alt="">
       <h1>${info.obligatoria?'Actualización obligatoria':'Nueva versión disponible'}</h1>
-      <span class="ver">v${esc(info.version||'')}</span>
-      <p>${info.obligatoria?'Para seguir usando Nexora Pro necesitas instalar la nueva versión.':'Hay una nueva versión de Nexora Pro con mejoras para ti.'}</p>
-      ${nov?`<div class="box"><b>Novedades de esta versión</b><ul>${nov}</ul></div>`:''}
-      <p style="font-size:13px">Tu versión: v${esc(native('version')||'')}</p>
-      <div class="acts"><div class="pbar" id="updBar"><i></i></div><div class="pmsg" id="updMsg"></div><button class="btn" id="updGo">Actualizar ahora</button>${info.obligatoria?'':'<button class="btn ghost" id="updLater">Más tarde</button>'}</div>`;
+      <div class="ver">V${esc(info.version||'')}</div>
+      <div class="mine">Tu versión: V${esc(native('version')||'')}</div>
+      <div class="box"><b>Novedades de esta versión</b>${nov?`<ul>${nov}</ul>`:'<p style="text-align:left;margin:0">Mejoras y correcciones.</p>'}</div>
+      <div class="acts"><div class="pbar" id="updBar"><i></i></div><div class="pmsg" id="updMsg"></div><button class="btn" id="updGo">${IC_DL}Actualizar ahora</button><button class="btn web" id="updWeb">Descargar desde la página web</button>${info.obligatoria?'':'<button class="btn ghost" id="updLater">Más tarde</button>'}</div>`;
+    $('updWeb').onclick = () => native('openUrl', `https://github.com/${UPDATE_REPO}/releases/latest`);
     $('upd').classList.add('on'); $('upd').dataset.forced = info.obligatoria?'1':'';
     $('updGo').onclick = () => {
       const apk = info.apk || `https://github.com/${UPDATE_REPO}/releases/latest/download/NexoraPro.apk`;
