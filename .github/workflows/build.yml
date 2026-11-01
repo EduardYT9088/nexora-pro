@@ -57,8 +57,8 @@ jobs:
                   applicationId = "com.nexora.pro"
                   minSdk = 29
                   targetSdk = 34
-                  versionCode = 13
-                  versionName = "1.6.1"
+                  versionCode = 20000
+                  versionName = "1.7.0"
               }
 
               signingConfigs {
@@ -114,6 +114,8 @@ jobs:
               <uses-permission android:name="android.permission.WAKE_LOCK" />
               <!-- Necesario para el servidor local 127.0.0.1 que entrega la música al reproductor; la app no usa internet -->
               <uses-permission android:name="android.permission.INTERNET" />
+              <!-- Instalar las actualizaciones de Nexora Pro dentro de la app (Android siempre pide confirmar) -->
+              <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
               <application
                   android:allowBackup="true"
@@ -129,13 +131,29 @@ jobs:
                       android:name=".MainActivity"
                       android:exported="true"
                       android:launchMode="singleTask"
+                      android:supportsPictureInPicture="true"
+                      android:resizeableActivity="true"
                       android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode"
                       android:windowSoftInputMode="adjustResize">
                       <intent-filter>
                           <action android:name="android.intent.action.MAIN" />
                           <category android:name="android.intent.category.LAUNCHER" />
                       </intent-filter>
+                      <!-- Abrir canciones y videos desde otras apps (Nexora Download, exploradores de archivos…) -->
+                      <intent-filter>
+                          <action android:name="android.intent.action.VIEW" />
+                          <category android:name="android.intent.category.DEFAULT" />
+                          <category android:name="android.intent.category.BROWSABLE" />
+                          <data android:scheme="content" />
+                          <data android:scheme="file" />
+                          <data android:mimeType="audio/*" />
+                          <data android:mimeType="video/*" />
+                      </intent-filter>
                   </activity>
+
+                  <receiver
+                      android:name=".InstallResultReceiver"
+                      android:exported="false" />
 
                   <service
                       android:name=".PlaybackService"
@@ -450,8 +468,24 @@ jobs:
                   val px = sizeParam?.toIntOrNull()?.coerceIn(96, 1024) ?: 320
                   val key = "$path@$px"
                   val bytes = thumbs.get(key) ?: run {
-                      val (uri, _) = contentUri(path)
-                      val bmp = ctx.contentResolver.loadThumbnail(uri, Size(px, px), null)
+                      val (uri, type) = contentUri(path)
+                      val bmp = try {
+                          ctx.contentResolver.loadThumbnail(uri, Size(px, px), null)
+                      } catch (e: Exception) {
+                          if (type != "audio") throw e
+                          // Algunas canciones (m4a, opus…) guardan la portada de otra forma: la leemos directo del archivo.
+                          val mmr = android.media.MediaMetadataRetriever()
+                          try {
+                              mmr.setDataSource(ctx, uri)
+                              val pic = mmr.embeddedPicture ?: throw e
+                              val opts = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                              android.graphics.BitmapFactory.decodeByteArray(pic, 0, pic.size, opts)
+                              var sample = 1
+                              while (opts.outWidth / (sample * 2) >= px && opts.outHeight / (sample * 2) >= px) sample *= 2
+                              android.graphics.BitmapFactory.decodeByteArray(pic, 0, pic.size,
+                                  android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }) ?: throw e
+                          } finally { runCatching { mmr.release() } }
+                      }
                       val out = ByteArrayOutputStream()
                       bmp.compress(Bitmap.CompressFormat.JPEG, 84, out)
                       bmp.recycle()
@@ -533,6 +567,9 @@ jobs:
 
               @Volatile private var boostLevel = 100
               @Volatile private var boostKeys = true
+              private var pendingExternal: String? = null
+              private var pageReady = false
+              private var resumedNow = false
               private var filePathCallback: ValueCallback<Array<Uri>>? = null
               private var customView: View? = null
               private var customViewCallback: WebChromeClient.CustomViewCallback? = null
@@ -575,6 +612,11 @@ jobs:
                       override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? =
                           if (request.url.host == HOST) server.handle(request) else null
 
+                      override fun onPageFinished(view: WebView, url: String?) {
+                          pageReady = true
+                          pendingExternal?.let { j -> pendingExternal = null; js("window.nxOpenExternal && nxOpenExternal($j)") }
+                      }
+
                       override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                           if (request.url.host == HOST) return false
                           runCatching { startActivity(Intent(Intent.ACTION_VIEW, request.url)) }
@@ -588,11 +630,15 @@ jobs:
                       ): Boolean {
                           filePathCallback?.onReceiveValue(null)
                           filePathCallback = callback
+                          val wantsImage = params.acceptTypes?.any { it.startsWith("image") } == true
                           val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                               addCategory(Intent.CATEGORY_OPENABLE)
-                              type = "*/*"
-                              putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("audio/*", "video/*"))
-                              putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                              if (wantsImage) type = "image/*"
+                              else {
+                                  type = "*/*"
+                                  putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("audio/*", "video/*"))
+                                  putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                              }
                           }
                           return try {
                               @Suppress("DEPRECATION")
@@ -632,6 +678,8 @@ jobs:
                       }
                   }
 
+                  Updater.listener = { state, pct -> js("window.nxUpd && nxUpd('$state', $pct)") }
+
                   // Botones de la notificación y la pantalla de bloqueo -> reproductor.
                   PlaybackService.listener = { action ->
                       js("window.nxRemote && nxRemote(${JSONObject.quote(action)})")
@@ -639,6 +687,7 @@ jobs:
 
                   if (savedInstanceState != null) webView.restoreState(savedInstanceState)
                   else webView.loadUrl(START_URL)
+                  handleExternal(intent)
               }
 
               private fun js(code: String) = runOnUiThread { webView.evaluateJavascript(code, null) }
@@ -764,7 +813,51 @@ jobs:
                   @JavascriptInterface fun naFx(bass: Int, surround: Int, clarity: Int, norm: Boolean) = runOnUiThread { nat.setFx(bass, surround, clarity, norm) }
 
                   @JavascriptInterface
-                  fun version(): String = "1.6.1"
+                  fun version(): String = runCatching { packageManager.getPackageInfo(packageName, 0).versionName }.getOrNull() ?: ""
+
+                  @JavascriptInterface
+                  fun versionCode(): Long = runCatching { packageManager.getPackageInfo(packageName, 0).longVersionCode }.getOrDefault(0L)
+
+                  /** Busca si hay una versión nueva publicada en GitHub (solo descarga un pequeño archivo version.json). */
+                  @JavascriptInterface
+                  fun checkUpdate(repo: String) {
+                      if (!Regex("^[\\w.-]+/[\\w.-]+$").matches(repo)) return
+                      Thread {
+                          runCatching {
+                              val c = java.net.URL("https://github.com/$repo/releases/latest/download/version.json").openConnection() as java.net.HttpURLConnection
+                              c.connectTimeout = 8000; c.readTimeout = 8000; c.instanceFollowRedirects = true
+                              c.setRequestProperty("Cache-Control", "no-cache")
+                              if (c.responseCode == 200) {
+                                  val txt = c.inputStream.bufferedReader().use { it.readText() }
+                                  val o = JSONObject(txt)
+                                  js("window.nxOnUpdate && nxOnUpdate(${o})")
+                              }
+                              c.disconnect()
+                          }
+                      }.start()
+                  }
+
+                  /** Descarga e instala la nueva versión dentro de la app. */
+                  @JavascriptInterface
+                  fun downloadUpdate(url: String) = runOnUiThread { Updater.start(this@MainActivity, url) }
+
+                  @JavascriptInterface
+                  fun openUrl(url: String) = runOnUiThread {
+                      if (url.startsWith("https://") || url.startsWith("http://"))
+                          runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+                  }
+
+                  /** Ventana flotante (imagen en imagen) para los videos. */
+                  @JavascriptInterface
+                  fun enterPip(w: Int, h: Int) = runOnUiThread {
+                      runCatching {
+                          var rw = if (w > 0) w else 16; var rh = if (h > 0) h else 9
+                          val r = rw.toDouble() / rh
+                          if (r > 2.39) { rw = 239; rh = 100 } else if (r < 1 / 2.39) { rw = 100; rh = 239 }
+                          enterPictureInPictureMode(android.app.PictureInPictureParams.Builder()
+                              .setAspectRatio(android.util.Rational(rw, rh)).build())
+                      }.onFailure { js("window.nxToast && nxToast('Tu teléfono no permite ventana flotante')") }
+                  }
               }
 
               override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -810,8 +903,52 @@ jobs:
                   return super.onKeyDown(keyCode, event)
               }
 
+              override fun onPictureInPictureModeChanged(isInPip: Boolean, newConfig: android.content.res.Configuration) {
+                  super.onPictureInPictureModeChanged(isInPip, newConfig)
+                  js("window.nxPip && nxPip($isInPip)")
+                  if (!isInPip) {
+                      // Si se cerró la ventana flotante (y no se agrandó), pausamos el video.
+                      root.postDelayed({ if (!resumedNow) js("window.nxPipClosed && nxPipClosed()") }, 400)
+                  }
+              }
+
+              override fun onNewIntent(intent: Intent) {
+                  super.onNewIntent(intent)
+                  setIntent(intent)
+                  handleExternal(intent)
+              }
+
+              /** Abre un video o canción que otra app (Nexora Download, un explorador de archivos…) le pasó a Nexora Pro. */
+              private fun handleExternal(intent: Intent?) {
+                  if (intent == null || intent.action != Intent.ACTION_VIEW) return
+                  val uri = intent.data ?: return
+                  intent.data = null
+                  val mime = intent.type ?: runCatching { contentResolver.getType(uri) }.getOrNull() ?: ""
+                  var title = intent.getStringExtra("nexora_title")
+                  if (title.isNullOrBlank()) title = runCatching {
+                      contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)
+                          ?.use { if (it.moveToFirst()) it.getString(0) else null }
+                  }.getOrNull()
+                  if (title.isNullOrBlank()) title = uri.lastPathSegment ?: "Archivo"
+                  val url = MediaHttpServer.externalUrl(this, uri)
+                  val type = when {
+                      mime.startsWith("video") -> "video"
+                      mime.startsWith("audio") -> "audio"
+                      Regex("\\.(mp4|mkv|webm|3gp|mov|avi)$", RegexOption.IGNORE_CASE).containsMatchIn(title) -> "video"
+                      else -> "audio"
+                  }
+                  val json = JSONObject().put("url", url).put("title", title).put("type", type).toString()
+                  if (pageReady) js("window.nxOpenExternal && nxOpenExternal($json)") else pendingExternal = json
+              }
+
+              override fun onPause() {
+                  super.onPause()
+                  resumedNow = false
+              }
+
               override fun onResume() {
                   super.onResume()
+                  resumedNow = true
                   js("window.nxOnResume && nxOnResume()")
               }
 
@@ -831,6 +968,7 @@ jobs:
 
               override fun onDestroy() {
                   PlaybackService.listener = null
+                  Updater.listener = null
                   nat.release()
                   if (isFinishing) stopService(Intent(this, PlaybackService::class.java))
                   root.removeAllViews()
@@ -853,7 +991,9 @@ jobs:
           import java.net.ServerSocket
           import java.net.Socket
           import java.util.UUID
+          import java.util.concurrent.ConcurrentHashMap
           import java.util.concurrent.Executors
+          import android.net.Uri
 
           /**
            * Pequeño servidor local (solo 127.0.0.1) que entrega la música y los videos al reproductor
@@ -865,6 +1005,14 @@ jobs:
               private var server: ServerSocket? = null
               private val pool = Executors.newCachedThreadPool()
               private lateinit var appCtx: Context
+              private val external = ConcurrentHashMap<String, Uri>()
+
+              /** Registra un archivo que otra app (por ejemplo Nexora Download) le pasó a Nexora Pro. */
+              fun externalUrl(ctx: Context, uri: Uri): String {
+                  val id = UUID.randomUUID().toString().replace("-", "")
+                  external[id] = uri
+                  return base(ctx) + "/ext/" + id
+              }
 
               @Synchronized
               fun base(ctx: Context): String {
@@ -914,15 +1062,21 @@ jobs:
                           val path = (parts.getOrNull(1) ?: "/").substringBefore('?')
                           val out = BufferedOutputStream(s.getOutputStream(), 64 * 1024)
 
-                          // Ruta esperada: /<token>/media/<audio|video>/<id>
+                          // Rutas: /<token>/media/<audio|video>/<id>  o  /<token>/ext/<id>
                           val seg = path.trim('/').split('/')
-                          if (seg.size != 4 || seg[0] != token || seg[1] != "media" || seg[3].toLongOrNull() == null) {
+                          val uri: android.net.Uri
+                          val type: String
+                          if (seg.size == 4 && seg[0] == token && seg[1] == "media" && seg[3].toLongOrNull() != null) {
+                              type = seg[2]
+                              val base = if (type == "video") MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                                         else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                              uri = ContentUris.withAppendedId(base, seg[3].toLong())
+                          } else if (seg.size == 3 && seg[0] == token && seg[1] == "ext" && external.containsKey(seg[2])) {
+                              uri = external[seg[2]]!!
+                              type = if ((appCtx.contentResolver.getType(uri) ?: "").startsWith("video")) "video" else "audio"
+                          } else {
                               status(out, 404, "Not Found", "text/plain", 0, null); out.flush(); return
                           }
-                          val type = seg[2]
-                          val base = if (type == "video") MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                                     else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-                          val uri = ContentUris.withAppendedId(base, seg[3].toLong())
                           val pfd = appCtx.contentResolver.openFileDescriptor(uri, "r")
                           if (pfd == null) { status(out, 404, "Not Found", "text/plain", 0, null); out.flush(); return }
                           val total = pfd.statSize
@@ -949,7 +1103,7 @@ jobs:
                                   }
                                   partial = true
                               }
-                              val len = if (total > 0) end - start + 1 else 0
+                              val len = if (total > 0) end - start + 1 else -1L
                               if (partial) status(out, 206, "Partial Content", mime, len, "bytes $start-$end/$total")
                               else status(out, 200, "OK", mime, len, null)
                               if (method == "HEAD") { out.flush(); return }
@@ -961,7 +1115,7 @@ jobs:
                                   skipped += n
                               }
                               val buf = ByteArray(64 * 1024)
-                              var left = len
+                              var left = if (len < 0) Long.MAX_VALUE else len
                               while (left > 0) {
                                   val n = file.read(buf, 0, minOf(buf.size.toLong(), left).toInt())
                                   if (n < 0) break
@@ -985,7 +1139,8 @@ jobs:
                   sb.append("Cache-Control: no-store\r\n")
                   sb.append("Connection: close\r\n")
                   if (contentRange != null) sb.append("Content-Range: $contentRange\r\n")
-                  sb.append("Content-Length: $len\r\n\r\n")
+                  if (len >= 0) sb.append("Content-Length: $len\r\n")
+                  sb.append("\r\n")
                   out.write(sb.toString().toByteArray(Charsets.US_ASCII))
               }
           }
@@ -1544,6 +1699,116 @@ jobs:
               override fun onBind(intent: Intent?): IBinder? = null
           }
           NXEOF
+          cat > app/src/main/java/com/nexora/pro/Updater.kt <<'NXEOF'
+          package com.nexora.pro
+
+          import android.app.Activity
+          import android.app.PendingIntent
+          import android.content.BroadcastReceiver
+          import android.content.Context
+          import android.content.Intent
+          import android.content.pm.PackageInstaller
+          import android.net.Uri
+          import android.provider.Settings
+          import java.net.HttpURLConnection
+          import java.net.URL
+
+          /**
+           * Descarga el APK nuevo desde GitHub y lo instala encima, dentro de la app.
+           * Android siempre muestra su ventana de confirmación antes de instalar.
+           */
+          object Updater {
+              var listener: ((String, Int) -> Unit)? = null
+              @Volatile private var running = false
+
+              fun start(act: Activity, apkUrl: String) {
+                  if (running) return
+                  if (!apkUrl.startsWith("https://github.com/")) { listener?.invoke("error", 0); return }
+                  if (!act.packageManager.canRequestPackageInstalls()) {
+                      // Primero hay que permitir "Instalar apps desconocidas" para Nexora Pro.
+                      listener?.invoke("perm", 0)
+                      runCatching {
+                          act.startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                              Uri.parse("package:" + act.packageName)))
+                      }
+                      return
+                  }
+                  running = true
+                  Thread {
+                      try {
+                          var url = URL(apkUrl)
+                          var conn: HttpURLConnection
+                          var hops = 0
+                          while (true) {
+                              conn = url.openConnection() as HttpURLConnection
+                              conn.instanceFollowRedirects = false
+                              conn.connectTimeout = 15000; conn.readTimeout = 30000
+                              val code = conn.responseCode
+                              if (code in 300..399 && hops++ < 6) {
+                                  url = URL(url, conn.getHeaderField("Location")); conn.disconnect(); continue
+                              }
+                              if (code != 200) throw IllegalStateException("HTTP $code")
+                              break
+                          }
+                          val total = conn.contentLengthLong
+                          val installer = act.packageManager.packageInstaller
+                          val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
+                          params.setAppPackageName(act.packageName)
+                          if (total > 0) params.setSize(total)
+                          val id = installer.createSession(params)
+                          installer.openSession(id).use { session ->
+                              conn.inputStream.use { input ->
+                                  session.openWrite("NexoraPro.apk", 0, if (total > 0) total else -1).use { out ->
+                                      val buf = ByteArray(64 * 1024)
+                                      var done = 0L
+                                      var lastPct = -1
+                                      while (true) {
+                                          val n = input.read(buf)
+                                          if (n < 0) break
+                                          out.write(buf, 0, n)
+                                          done += n
+                                          if (total > 0) {
+                                              val pct = (done * 100 / total).toInt()
+                                              if (pct != lastPct) { lastPct = pct; listener?.invoke("progress", pct) }
+                                          }
+                                      }
+                                      session.fsync(out)
+                                  }
+                              }
+                              conn.disconnect()
+                              listener?.invoke("installing", 100)
+                              val pi = PendingIntent.getBroadcast(act, 7,
+                                  Intent(act, InstallResultReceiver::class.java),
+                                  PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+                              session.commit(pi.intentSender)
+                          }
+                      } catch (e: Exception) {
+                          listener?.invoke("error", 0)
+                      } finally {
+                          running = false
+                      }
+                  }.start()
+              }
+          }
+
+          /** Recibe la respuesta del instalador de Android. */
+          class InstallResultReceiver : BroadcastReceiver() {
+              override fun onReceive(context: Context, intent: Intent) {
+                  when (intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE)) {
+                      PackageInstaller.STATUS_PENDING_USER_ACTION -> {
+                          @Suppress("DEPRECATION")
+                          val confirm = intent.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
+                          if (confirm != null) {
+                              confirm.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                              runCatching { context.startActivity(confirm) }
+                          }
+                      }
+                      PackageInstaller.STATUS_SUCCESS -> Updater.listener?.invoke("done", 100)
+                      else -> Updater.listener?.invoke("error", 0)
+                  }
+              }
+          }
+          NXEOF
           mkdir -p app/src/main/res/drawable
           cat > app/src/main/res/drawable/ic_launcher_foreground.xml <<'NXEOF'
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -1665,6 +1930,45 @@ jobs:
           cp ../index.html app/src/main/assets/index.html
           cp ../privacidad.html app/src/main/assets/privacidad.html 2>/dev/null || true
 
+      - name: Versión automática y novedades
+        id: ver
+        env:
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.run_number }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          run = int(os.environ['RUN'])
+          ver = '1.7.' + str(run)
+          code = 20000 + run
+          lines = []
+          try:
+              lines = [l.strip() for l in open('novedades.md', encoding='utf-8-sig').read().splitlines()]
+          except Exception:
+              pass
+          opcional = any(l.lower().startswith('[opcional]') for l in lines)
+          import re as _re
+          for l in lines:
+              m = _re.match('^(?:versi[oó]n|version)[ :]*[vV]?([0-9]+[.][0-9]+(?:[.][0-9]+)?)', l, _re.I)
+              if m:
+                  ver = m.group(1)
+                  break
+          nov = [l[1:].strip() for l in lines if l.startswith('-') and l[1:].strip()]
+          g = open('proyecto/app/build.gradle.kts', encoding='utf-8').read()
+          import re
+          g = re.sub('versionCode = [0-9]+', 'versionCode = ' + str(code), g)
+          g = re.sub('versionName = "[^"]*"', 'versionName = "' + ver + '"', g)
+          open('proyecto/app/build.gradle.kts', 'w', encoding='utf-8').write(g)
+          info = {'version': ver, 'code': code, 'obligatoria': not opcional, 'novedades': nov,
+                  'apk': 'https://github.com/' + os.environ['REPO'] + '/releases/latest/download/NexoraPro.apk'}
+          json.dump(info, open('version-release.json', 'w', encoding='utf-8'), ensure_ascii=False)
+          NL = chr(10)
+          notes = 'Nexora Pro v' + ver + NL + NL + ''.join('- ' + x + NL for x in nov) + NL + 'Descarga NexoraPro.apk e instálalo en tu teléfono.'
+          open('release-notes.md', 'w', encoding='utf-8').write(notes)
+          open(os.environ['GITHUB_OUTPUT'], 'a').write('version=' + ver + chr(10))
+          print('Versión', ver, 'código', code, 'obligatoria', not opcional)
+          PY
+
       - name: Instalar Java 17
         uses: actions/setup-java@v4
         with:
@@ -1692,11 +1996,15 @@ jobs:
       - name: Publicar APK en Releases
         env:
           GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
         run: |
-          TAG="v1.1.${{ github.run_number }}"
-          gh release create "$TAG" NexoraPro.apk \
-            --repo "${{ github.repository }}" \
+          VER="${{ steps.ver.outputs.version }}"
+          TAG="v$VER"
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then TAG="v$VER-build${{ github.run_number }}"; fi
+          cp version-release.json version.json
+          gh release create "$TAG" NexoraPro.apk version.json \
+            --repo "$REPO" \
             --target "${{ github.sha }}" \
-            --title "Nexora Pro 1.1.${{ github.run_number }}" \
-            --notes "Descarga NexoraPro.apk e instálalo en tu teléfono." \
+            --title "Nexora Pro v$VER" \
+            --notes-file release-notes.md \
             --latest
