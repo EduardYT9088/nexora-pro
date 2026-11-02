@@ -606,6 +606,85 @@ body.selecting .content{padding-bottom:150px}
 .sopt.sel .si{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
 .sopt.sel .tx b{color:var(--accent)}
 .sopt.sel .rd{background:var(--accent);border-color:var(--accent)}
+
+/* ====== v1.6.7 · Recarga, temas, cuenta y personalización ====== */
+.content{overscroll-behavior-y:contain}
+.ptr{left:calc(50% - 20px);margin-left:0;top:0;transform:translateY(0) scale(.6);will-change:transform,opacity;background:var(--solid)}
+.ptr svg{transition:none}
+:root[data-theme="ember"]{--bg:#140707;--surface:#211010;--surface2:#331818;--text:#FFEDEA;--muted:#C99A94;--line:rgba(255,255,255,.08);--surfaceA:rgba(33,16,16,0.74);color-scheme:dark}
+:root[data-theme="grape"]{--bg:#1A0B2E;--surface:#281344;--surface2:#381C5C;--text:#F6EEFF;--muted:#B79AD6;--line:rgba(255,255,255,.08);--surfaceA:rgba(40,19,68,0.74);color-scheme:dark}
+:root[data-theme="matrix"]{--bg:#020A04;--surface:#07160B;--surface2:#0E2815;--text:#D8FFE3;--muted:#6FB988;--line:rgba(255,255,255,.08);--surfaceA:rgba(7,22,11,0.74);color-scheme:dark}
+:root[data-theme="slate"]{--bg:#14181F;--surface:#1D232D;--surface2:#28313F;--text:#E8EDF5;--muted:#8F9BB0;--line:rgba(255,255,255,.08);--surfaceA:rgba(29,35,45,0.74);color-scheme:dark}
+:root[data-theme="ice"]{--bg:#07191C;--surface:#0E2A2F;--surface2:#163C43;--text:#E4FBFF;--muted:#86B9C2;--line:rgba(255,255,255,.08);--surfaceA:rgba(14,42,47,0.74);color-scheme:dark}
+:root[data-theme="gold"]{--bg:#15110A;--surface:#231C0F;--surface2:#352B17;--text:#FFF4D8;--muted:#C2AE7C;--line:rgba(255,255,255,.08);--surfaceA:rgba(35,28,15,0.74);color-scheme:dark}
+:root[data-theme="graphite"]{--bg:#17181A;--surface:#222427;--surface2:#2E3135;--text:#ECEDEF;--muted:#9A9EA6;--line:rgba(255,255,255,.08);--surfaceA:rgba(34,36,39,0.74);color-scheme:dark}
+:root[data-theme="wine"]{--bg:#1C0A12;--surface:#2B1220;--surface2:#3C1A2D;--text:#FFEAF1;--muted:#C48FA6;--line:rgba(255,255,255,.08);--surfaceA:rgba(43,18,32,0.74);color-scheme:dark}
+:root[data-theme="mint"]{--bg:#EDF9F3;--surface:#FFFFFF;--surface2:#D9F0E5;--text:#0E2A1F;--muted:#5F8A75;--line:rgba(14,42,31,0.1);--surfaceA:rgba(255,255,255,0.8);color-scheme:light}
+:root[data-theme="lavender"]{--bg:#F4F0FF;--surface:#FFFFFF;--surface2:#E6DEFB;--text:#20143F;--muted:#7D6CA8;--line:rgba(32,20,63,0.1);--surfaceA:rgba(255,255,255,0.8);color-scheme:light}
+:root[data-theme="peach"]{--bg:#FFF3EC;--surface:#FFFFFF;--surface2:#FFE2D2;--text:#3A1B10;--muted:#A5705A;--line:rgba(58,27,16,0.1);--surfaceA:rgba(255,255,255,0.8);color-scheme:light}
+:root[data-theme="sand"]{--bg:#F5F0E6;--surface:#FFFDF8;--surface2:#E8DFCB;--text:#2E2815;--muted:#8B8063;--line:rgba(46,40,21,0.1);--surfaceA:rgba(255,253,248,0.8);color-scheme:light}
+:root[data-theme="candy"]{--bg:#FFF0F6;--surface:#FFFFFF;--surface2:#FFD9E8;--text:#3D1424;--muted:#B0627F;--line:rgba(61,20,36,0.1);--surfaceA:rgba(255,255,255,0.8);color-scheme:light}
+
+/* esquinas ajustables */
+.vcard .thumb{border-radius:calc(20px*var(--rs,1))}
+.tab,.top .icon-btn,.selbar .icon-btn,.selchip,.search input{border-radius:calc(15px*var(--rs,1))}
+.group,.stiles div,.qtiles button{border-radius:calc(22px*var(--rs,1))}
+.sheet{border-radius:calc(26px*var(--rs,1)) calc(26px*var(--rs,1)) 0 0}
+.set-hero,.bk-hero,.acct-hero,.donate{border-radius:calc(26px*var(--rs,1))}
+.mini{border-radius:calc(24px*var(--rs,1))}
+.fab,.play-big,.brand img{border-radius:calc(20px*var(--rs,1))!important}
+.btn,.bk-share,.seg,.seg button{border-radius:calc(23px*var(--rs,1))}
+.sopt,.sel-actions{border-radius:calc(22px*var(--rs,1))}
+.art,.opt,.eq-presets button,.bk-acts button{border-radius:calc(16px*var(--rs,1))}
+/* videos por fila */
+:root[data-vcols="1"] .grid{grid-template-columns:minmax(0,1fr)}
+:root[data-vcols="2"] .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+:root[data-vcols="3"] .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+:root[data-vcols="4"] .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+:root[data-vcols="3"] .vcard .cap .t,:root[data-vcols="4"] .vcard .cap .t{font-size:11px}
+:root[data-vcols="4"] .vcard .cap .m{display:none}
+/* pantalla de personalizar */
+.cz-prev{border-radius:calc(26px*var(--rs,1));overflow:hidden;background:var(--surface);border:1px solid var(--line);margin-bottom:16px}
+.cz-hero{padding:22px 20px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;flex-direction:column;gap:3px}
+.cz-hero b{font-family:Sora,Manrope,sans-serif;font-size:1.3rem}.cz-hero span{font-size:13px;opacity:.9}
+.cz-chips{display:flex;align-items:center;gap:8px;padding:14px 16px}
+.cz-chips i{font-style:normal;font-weight:700;font-size:13px;padding:8px 14px;border-radius:calc(14px*var(--rs,1));background:var(--surface2);color:var(--muted)}
+.cz-chips i.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.cz-fab{margin-left:auto;width:40px;height:40px;border-radius:calc(14px*var(--rs,1));display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.cz-row{display:flex;align-items:center;gap:12px;padding:14px 16px}
+.cz-row+.cz-row,.tg+.cz-row,.cz-row+.tg{border-top:1px solid var(--line)}
+.cz-row .n{flex:1;font-weight:600;font-size:15.5px}.cz-row .v{color:var(--muted);font-size:14px}
+.cz-row input[type=color]{width:46px;height:36px;border:2px solid var(--line);border-radius:12px;background:none;padding:2px}
+.cz-reset{background:var(--surface)!important;color:var(--danger)!important;border:1px solid var(--line);margin-top:18px}
+.seg{margin-bottom:14px}
+/* cuenta */
+.alink{background:none;color:var(--accent);font-weight:800;font-size:14px;padding:8px 6px}
+.alink.danger{color:var(--danger);display:block;width:100%;text-align:center}
+.acct-hero{text-align:center;padding:22px 18px 18px;margin-bottom:14px;background:radial-gradient(circle at 50% 0%,color-mix(in srgb,var(--accent) 40%,transparent),transparent 72%),var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:6px}
+.acct-hero .ico{width:60px;height:60px;border-radius:20px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 14px 28px -12px var(--accent)}
+.acct-hero .ico svg{width:30px;height:30px}
+.acct-hero b{font-family:Sora,Manrope,sans-serif;font-size:1.15rem;margin-top:6px}
+.acct-hero p{margin:0 0 8px;color:var(--muted);font-size:13.5px;line-height:1.5;max-width:34ch}
+.acct-hero .btn{width:100%;max-width:300px;justify-content:center;height:48px}
+.acct{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:calc(22px*var(--rs,1));background:var(--surface);border:1px solid var(--line);margin-bottom:12px}
+.acct .av{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;font-family:Sora,sans-serif;font-weight:800;font-size:1.2rem;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));flex:none}
+.acct .tx{flex:1;min-width:0}.acct .tx b{display:block;font-size:15px}
+.acct .tx small{display:block;color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.authbox{display:flex;flex-direction:column;gap:12px}
+.authbox .sub-head{margin-bottom:0}
+.ahero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:10px 0 8px}
+.ahero img{width:84px;height:84px;border-radius:26px;box-shadow:0 18px 36px -14px var(--accent);margin-bottom:10px}
+.ahero b{font-family:Sora,Manrope,sans-serif;font-size:1.45rem}.ahero span{color:var(--muted);font-size:14px;max-width:32ch;line-height:1.45}
+.af{display:flex;align-items:center;gap:10px;height:54px;padding:0 6px 0 16px;border-radius:calc(18px*var(--rs,1));background:var(--surface);border:1.5px solid var(--line);transition:border-color .15s}
+.af:focus-within{border-color:var(--accent)}
+.af .ai{color:var(--muted);flex:none}.af:focus-within .ai{color:var(--accent)}.af .ai svg{width:21px;height:21px}
+.af input{flex:1;min-width:0;height:100%;border:0;background:none;color:var(--text);font:inherit;font-size:15.5px;outline:0}
+.aeye{width:44px;height:44px;display:grid;place-items:center;color:var(--muted)}.aeye svg{width:20px;height:20px}
+.amsg{display:none;padding:10px 14px;border-radius:14px;background:color-mix(in srgb,var(--danger) 15%,transparent);color:var(--danger);font-weight:700;font-size:13.5px}
+.amsg.on{display:block}.amsg.ok{background:color-mix(in srgb,var(--accent2) 18%,transparent);color:var(--accent2)}
+.bk-share.busy{opacity:.6;pointer-events:none}
+.aswap{text-align:center;color:var(--muted);font-size:14px;margin:2px 0 14px}
+.aswap button{color:var(--accent);font-weight:800}
 </style>
 </head>
 <body>
@@ -837,9 +916,10 @@ const ACCENTS = [['#6C4CF5','#12B5CB'],['#E2366F','#FF9A3D'],['#0E9F6E','#7BD3A8
  ['#9B30FF','#FF4FD8'],['#FF2E63','#FF9F1C'],['#00B4D8','#7CF5E0'],['#16A34A','#D9F99D'],['#E11D48','#FB7185'],['#7C3AED','#A5B4FC'],
  ['#0EA5E9','#6366F1'],['#F59E0B','#EF4444'],['#14B8A6','#3B82F6'],['#DB2777','#8B5CF6'],['#64748B','#94A3B8'],['#B45309','#FDE68A'],['#111827','#6B7280']];
 function hexToHsl(h){ h=h.replace('#',''); const r=parseInt(h.substr(0,2),16)/255,g=parseInt(h.substr(2,2),16)/255,b=parseInt(h.substr(4,2),16)/255; const mx=Math.max(r,g,b),mn=Math.min(r,g,b); let H=0,Sx=0; const L=(mx+mn)/2; if(mx!==mn){ const d=mx-mn; Sx=L>.5?d/(2-mx-mn):d/(mx+mn); H = mx===r?(g-b)/d+(g<b?6:0): mx===g?(b-r)/d+2:(r-g)/d+4; H*=60; } return [H,Sx*100,L*100]; }
-const accentPair = () => S.accent==='custom' && S.accentCustom ? (()=>{ const [h,sx,l]=hexToHsl(S.accentCustom); return [S.accentCustom, `hsl(${(h+40)%360} ${Math.min(100,sx+10)}% ${Math.min(70,l+12)}%)`]; })() : (ACCENTS[S.accent]||ACCENTS[0]);
+const accentPair = () => S.accent==='custom' && S.accentCustom ? (()=>{ const [h,sx,l]=hexToHsl(S.accentCustom); return [S.accentCustom, S.accent2Custom || `hsl(${(h+40)%360} ${Math.min(100,sx+10)}% ${Math.min(70,l+12)}%)`]; })() : (ACCENTS[S.accent]||ACCENTS[0]);
 const S = Object.assign({accent:0,theme:'auto',sortV:'recent',sortA:'recent',playMs:0,shuffle:false,repeat:0,speed:1,lang:'es'}, store.get('settings',{}));
 for(const k in DEF) if(S[k]===undefined) S[k]=DEF[k];
+if(S.gradOn===undefined) S.gradOn=true;
 const shownKeys = new Set(store.get('shown',[]));
 const covers = store.get('covers',{});
 const save = () => store.set('settings',S);
@@ -854,12 +934,30 @@ let tab = 'videos', query = '', openPlaylist = null, openFolder = null;
 let queue = [], qi = -1, current = null;
 let sleepTimer = null, sleepEnd = 0, sleepMode = 'off';
 
+const hx2n = h => [parseInt(h.substr(1,2),16),parseInt(h.substr(3,2),16),parseInt(h.substr(5,2),16)];
+const mixHex = (a,b,k) => { const A=hx2n(a),B=hx2n(b); return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*k).toString(16).padStart(2,'0')).join(''); };
+function bgVars(hex){
+  const [r,g,bl]=hx2n(hex), lum=(0.299*r+0.587*g+0.114*bl)/255, dark=lum<.5;
+  const sf = dark?mixHex(hex,'#ffffff',.07):mixHex(hex,'#ffffff',.65);
+  const s2 = dark?mixHex(hex,'#ffffff',.14):mixHex(hex,'#000000',.07);
+  const tx = dark?'#F4F3FF':'#17142E';
+  const [R,G,B]=hx2n(sf);
+  return {dark,'--bg':hex,'--surface':sf,'--surface2':s2,'--text':tx,'--muted':mixHex(tx,hex,.5),'--line':dark?'rgba(255,255,255,.08)':'rgba(0,0,0,.09)','--surfaceA':`rgba(${R},${G},${B},${dark?.74:.8})`,'--scrim':dark?'rgba(0,0,0,.6)':'rgba(10,8,25,.45)'};
+}
+const THEME_VARS=['--bg','--surface','--surface2','--text','--muted','--line','--surfaceA','--scrim'];
 function applyTheme(){
-  const [a,b] = accentPair();
-  document.documentElement.style.setProperty('--accent',a);
-  document.documentElement.style.setProperty('--accent2',b);
-  if(S.theme==='auto') document.documentElement.removeAttribute('data-theme');
-  else document.documentElement.setAttribute('data-theme',S.theme);
+  const root=document.documentElement;
+  let [a,b] = accentPair(); if(S.gradOn===false) b=a;
+  root.style.setProperty('--accent',a);
+  root.style.setProperty('--accent2',b);
+  if(S.theme==='auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme',S.theme);
+  if(S.bgCustom && /^#[0-9a-f]{6}$/i.test(S.bgCustom)){
+    const v=bgVars(S.bgCustom); root.setAttribute('data-theme', v.dark?'dark':'light');
+    THEME_VARS.forEach(k=>root.style.setProperty(k,v[k]));
+    const mt=document.querySelector('meta[name=theme-color]'); if(mt) mt.content=S.bgCustom;
+  } else THEME_VARS.forEach(k=>root.style.removeProperty(k));
+  root.style.setProperty('--rs', ({sharp:.45,normal:1,round:1.45})[S.radius||'normal']);
+  if(S.vcols>0) root.setAttribute('data-vcols',S.vcols); else root.removeAttribute('data-vcols');
 }
 applyTheme();
 
@@ -1662,7 +1760,7 @@ function renderSettings(){
 }
 $('settings').addEventListener('click', e=>{
   const b=e.target.closest('[data-set]'); if(!b) return; const k=b.dataset.set;
-  if(k==='accent'){ openSheet(`<h3>Color de acento</h3><div class="swatches" style="padding:6px 18px 12px">${ACCENTS.map((c,i)=>`<button class="sw ${S.accent===i?'sel':''}" data-v="${i}" aria-label="Color ${i+1}" style="background:linear-gradient(135deg,${c[0]},${c[1]})"></button>`).join('')}</div><div class="cpick"><input type="color" id="cPick" value="${S.accentCustom||'#7C5CFF'}" aria-label="Elegir tu propio color"><span style="font-weight:700">Elegir tu propio color</span></div>`, v=>{ S.accent=+v; save(); applyTheme(); renderSettings(); });
+  if(k==='accent'){ openSheet(`<h3>Color de acento</h3><div class="swatches" style="padding:6px 18px 12px">${ACCENTS.map((c,i)=>`<button class="sw ${S.accent===i?'sel':''}" data-v="${i}" aria-label="Color ${i+1}" style="background:linear-gradient(135deg,${c[0]},${c[1]})"></button>`).join('')}</div><div class="cpick"><input type="color" id="cPick" value="${S.accentCustom||'#7C5CFF'}" aria-label="Elegir tu propio color"><span style="font-weight:700">Elegir tu propio color</span></div><button class="opt" data-v="__cz" style="margin-top:2px"><span class="ib" style="--ibc:#FF5C8A">${I.palette}</span><span class="grow">Personalizar toda la interfaz<span class="val" style="display:block;margin:2px 0 0">Colores, fondo, esquinas y más</span></span>${I.chev}</button>`, v=>{ if(v==='__cz'){ setTimeout(()=>openSub('custom'),260); return; } S.accent=+v; save(); applyTheme(); renderSettings(); });
     $('cPick').oninput=e=>{ S.accent='custom'; S.accentCustom=e.target.value; save(); applyTheme(); };
     $('cPick').onchange=()=>{ renderSettings(); toast('Color guardado'); }; }
   if(k==='theme') themeSheet();
@@ -1909,6 +2007,7 @@ function updateSelUI(){
 }
 const msRef = it => { const m=/^ms:(audio|video):(\d+)$/.exec(it.key); return m?{type:m[1],id:+m[2]}:null; };
 $('selClose').onclick = exitSel;
+document.addEventListener('keydown',e=>{ if(e.key==='Enter' && e.target.closest && e.target.closest('.af')){ const g=$('afGo'); g&&g.click(); } });
 $('selAllBtn').onclick = () => { if(!sel) return; const allOn=shown.length>0 && shown.every(i=>sel.has(i.key)); if(allOn){ exitSel(); } else { shown.forEach(i=>sel.add(i.key)); render(); } };
 $('selActions').onclick = e => {
   const b=e.target.closest('[data-sa]'); if(!b||!sel) return;
@@ -1970,28 +2069,38 @@ window.nxToast = m => toast(m);
 
 /* ---------- Deslizar hacia abajo para actualizar ---------- */
 (()=>{
-  const c=$('content'), ptr=$('ptr'); let y0=null, dy=0;
-  c.addEventListener('touchstart', e=>{ if(c.scrollTop<=0 && !sel && NATIVE && !scanning) { y0=e.touches[0].clientY; dy=0; } else y0=null; }, {passive:true});
+  const c=$('content'), ptr=$('ptr'); let y0=null, dy=0, base=0;
+  const HOLD=58, GO=64;
+  const place=d=>{ // d = cuánto baja el contenido; el indicador queda centrado en el hueco
+    c.style.transform = d>0?`translateY(${d}px)`:'';
+    ptr.style.top = base+'px';
+    ptr.style.opacity = Math.min(1,d/40);
+    ptr.style.transform = `translateY(${Math.max(0,(d-40)/2)}px) scale(${.6+Math.min(.4,d/GO*.4)})`;
+    const s=ptr.firstElementChild; if(s && !ptr.classList.contains('spin')) s.style.transform=`rotate(${d*5}deg)`;
+  };
+  window._ptrPlace=place;
+  c.addEventListener('touchstart', e=>{ if(c.scrollTop<=0 && !sel && NATIVE && !scanning){ y0=e.touches[0].clientY; dy=0; base=c.getBoundingClientRect().top; c.style.transition='none'; ptr.style.transition='none'; } else y0=null; }, {passive:true});
   c.addEventListener('touchmove', e=>{
     if(y0===null) return; dy=e.touches[0].clientY-y0;
-    if(dy<=0){ ptr.style.opacity=0; return; }
-    const d=Math.min(dy*0.5,90); ptr.style.transition='none'; ptr.style.opacity=Math.min(1,d/60); ptr.style.transform=`translateY(${d-30}px) rotate(${d*4}deg)`;
+    if(dy<=0){ place(0); return; }
+    place(Math.min(dy*0.5,96));
   }, {passive:true});
   c.addEventListener('touchend', ()=>{
-    if(y0===null) return; y0=null; ptr.style.transition='transform .25s, opacity .25s';
-    if(dy*0.5>65){ ptr.style.transform='translateY(30px)'; ptr.style.opacity=1; ptr.classList.add('spin'); startScan(false); }
-    else { ptr.style.transform='translateY(-30px)'; ptr.style.opacity=0; }
+    if(y0===null) return; y0=null;
+    c.style.transition='transform .28s cubic-bezier(.2,.8,.2,1)'; ptr.style.transition='transform .28s cubic-bezier(.2,.8,.2,1), opacity .2s';
+    if(dy*0.5>GO){ ptr.classList.add('spin'); const s=ptr.firstElementChild; if(s) s.style.transform=''; place(HOLD); startScan(false); }
+    else place(0);
   });
 })();
-function hidePtr(){ const ptr=$('ptr'); ptr.classList.remove('spin'); ptr.style.transition='transform .25s, opacity .25s'; ptr.style.transform='translateY(-30px)'; ptr.style.opacity=0; }
+function hidePtr(){ const ptr=$('ptr'), c=$('content'); ptr.classList.remove('spin'); c.style.transition='transform .28s cubic-bezier(.2,.8,.2,1)'; ptr.style.transition='transform .28s cubic-bezier(.2,.8,.2,1), opacity .2s'; window._ptrPlace&&window._ptrPlace(0); }
 
 /* ---------- Temas ---------- */
 const THEMES=[['auto','Automático','#1C1838','#262148','#F1EFFF'],['dark','Oscuro','#120F2A','#262148','#F1EFFF'],['light','Claro','#F3F2FA','#FFFFFF','#17142E'],
  ['amoled','Medianoche','#000000','#1A1A23','#F4F4F8'],['ocean','Océano','#06182B','#163458','#E8F4FF'],['forest','Bosque','#0A1912','#1B3A29','#EAF7EE'],
  ['sunset','Atardecer','#1E0F1A','#40203A','#FFEFF5'],['mocha','Café','#1B1512','#382C25','#F6EDE6'],['nord','Nórdico','#1F2430','#353E50','#ECEFF4'],
- ['cream','Crema','#FBF6EE','#F1E8DA','#2B2118'],['sky','Cielo','#EEF5FF','#DDE9FA','#0F2340']];
+ ['cream','Crema','#FBF6EE','#F1E8DA','#2B2118'],['sky','Cielo','#EEF5FF','#DDE9FA','#0F2340'],['ember','Brasa','#140707','#331818','#FFEDEA'],['grape','Uva','#1A0B2E','#381C5C','#F6EEFF'],['matrix','Matrix','#020A04','#0E2815','#D8FFE3'],['slate','Pizarra','#14181F','#28313F','#E8EDF5'],['ice','Hielo','#07191C','#163C43','#E4FBFF'],['gold','Dorado','#15110A','#352B17','#FFF4D8'],['graphite','Grafito','#17181A','#2E3135','#ECEDEF'],['wine','Vino','#1C0A12','#3C1A2D','#FFEAF1'],['mint','Menta','#EDF9F3','#D9F0E5','#0E2A1F'],['lavender','Lavanda','#F4F0FF','#E6DEFB','#20143F'],['peach','Durazno','#FFF3EC','#FFE2D2','#3A1B10'],['sand','Arena','#F5F0E6','#E8DFCB','#2E2815'],['candy','Algodón de azúcar','#FFF0F6','#FFD9E8','#3D1424']];
 function themeSheet(){
-  openSheet(`<h3>Tema</h3><div class="themes">${THEMES.map(([k,l,bg,sf,tx])=>`<button data-v="${k}" class="${S.theme===k?'sel':''}"><div class="tprev" style="background:${k==='auto'?'linear-gradient(135deg,#F3F2FA 50%,#120F2A 50%)':bg}"><i style="top:10px;background:${sf}"></i><i style="top:28px;right:30px;background:${sf};opacity:.7"></i><i style="top:46px;right:44px;height:8px;background:${tx};opacity:.35"></i><b></b></div>${l}</button>`).join('')}</div>`, v=>{ S.theme=v; save(); applyTheme(); renderSettings(); });
+  openSheet(`<h3>Tema</h3><div class="themes">${THEMES.map(([k,l,bg,sf,tx])=>`<button data-v="${k}" class="${S.theme===k?'sel':''}"><div class="tprev" style="background:${k==='auto'?'linear-gradient(135deg,#F3F2FA 50%,#120F2A 50%)':bg}"><i style="top:10px;background:${sf}"></i><i style="top:28px;right:30px;background:${sf};opacity:.7"></i><i style="top:46px;right:44px;height:8px;background:${tx};opacity:.35"></i><b></b></div>${l}</button>`).join('')}</div>`, v=>{ S.theme=v; S.bgCustom=null; save(); applyTheme(); renderSettings(); });
 }
 
 /* ---------- Copia de seguridad (archivo propio, sin cuentas) ---------- */
@@ -2062,6 +2171,117 @@ $('restoreIn').onchange = e => {
   };
   rd.readAsText(f);
 };
+
+/* ---------- Cuenta y copia en la nube (Supabase) ---------- */
+// 1) Crea un proyecto gratis en supabase.com  2) Ejecuta supabase-setup.sql  3) Pega aquí tu Project URL y tu anon key.
+const NX_CLOUD = { url:'', key:'' };
+const cloudOn = () => !!(NX_CLOUD.url && NX_CLOUD.key);
+let acct = store.get('acct', null), authBusy=false, authStep=1, authMail='';
+const AIC = {
+  mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 8 8 6 8-6"/></svg>',
+  lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>',
+  eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'
+};
+function cloudErr(j,st){
+  const l=String((j&&(j.msg||j.error_description||j.message||j.error))||'').toLowerCase();
+  if(l.includes('invalid login')) return 'Correo o contraseña incorrectos';
+  if(l.includes('already registered')||l.includes('already been registered')) return 'Ese correo ya tiene una cuenta';
+  if(l.includes('not confirmed')) return 'Confirma tu correo antes de entrar';
+  if(l.includes('at least')) return 'La contraseña debe tener al menos 6 caracteres';
+  if(l.includes('rate limit')||st===429) return 'Demasiados intentos. Espera un momento';
+  if(l.includes('same password')) return 'Usa una contraseña distinta a la anterior';
+  if(l.includes('expired')||l.includes('invalid')) return 'Código incorrecto o vencido';
+  if(l.includes('payload')||st===413) return 'La copia es demasiado grande para subirla';
+  return (j&&(j.msg||j.error_description||j.message))||('Error '+st);
+}
+async function cloud(path,{method='POST',body,token,headers}={}){
+  if(!cloudOn()) throw new Error('La nube aún no está configurada');
+  let r; try{ r=await fetch(NX_CLOUD.url.replace(/\/+$/,'')+path,{method,headers:{apikey:NX_CLOUD.key,'Content-Type':'application/json',Authorization:'Bearer '+(token||NX_CLOUD.key),...(headers||{})},body:body?JSON.stringify(body):undefined}); }
+  catch(e){ throw new Error('Sin conexión a internet'); }
+  const tx=await r.text(); let j=null; try{ j=tx?JSON.parse(tx):null; }catch(e){}
+  if(!r.ok) throw new Error(cloudErr(j,r.status));
+  return j;
+}
+function setAcct(j){
+  if(!j||!j.access_token){ acct=null; }
+  else acct={access:j.access_token, refresh:j.refresh_token, exp:Date.now()+(j.expires_in||3600)*1000-60000, email:(j.user&&j.user.email)||(acct&&acct.email)||'', name:(j.user&&j.user.user_metadata&&j.user.user_metadata.name)||(acct&&acct.name)||'', id:(j.user&&j.user.id)||(acct&&acct.id)};
+  store.set('acct',acct);
+}
+async function getToken(){
+  if(!acct) throw new Error('Inicia sesión primero');
+  if(Date.now()>acct.exp){
+    try{ setAcct(await cloud('/auth/v1/token?grant_type=refresh_token',{body:{refresh_token:acct.refresh}})); }
+    catch(e){ acct=null; store.set('acct',null); throw new Error('Tu sesión venció. Inicia sesión de nuevo'); }
+  }
+  return acct.access;
+}
+const validMail = s => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s);
+async function authDo(kind){
+  if(authBusy) return;
+  const val=id=>{ const e=$(id); return e?e.value:''; };
+  const msg=(m,ok)=>{ const e=$('authMsg'); if(e){ e.textContent=m||''; e.className='amsg'+(m?' on':'')+(ok?' ok':''); } return false; };
+  const busy=on=>{ authBusy=on; const g=$('afGo'); if(g){ g.disabled=on; g.classList.toggle('busy',on); } };
+  msg('');
+  try{
+    if(kind==='login'){
+      const email=val('afMail').trim().toLowerCase(), pw=val('afPass');
+      if(!validMail(email)) return msg('Escribe un correo válido'); if(!pw) return msg('Escribe tu contraseña');
+      busy(true); setAcct(await cloud('/auth/v1/token?grant_type=password',{body:{email,password:pw}}));
+      busy(false); toast('Sesión iniciada'); openSub('backup'); return;
+    }
+    if(kind==='register'){
+      const name=val('afName').trim(), email=val('afMail').trim().toLowerCase(), pw=val('afPass'), pw2=val('afPass2');
+      if(!name) return msg('Escribe tu nombre'); if(!validMail(email)) return msg('Escribe un correo válido');
+      if(pw.length<6) return msg('La contraseña debe tener al menos 6 caracteres'); if(pw!==pw2) return msg('Las contraseñas no coinciden');
+      busy(true); const j=await cloud('/auth/v1/signup',{body:{email,password:pw,data:{name}}}); busy(false);
+      if(j&&j.access_token){ setAcct(j); toast('Cuenta creada'); openSub('backup'); }
+      else { toast('Te enviamos un correo para confirmar tu cuenta'); openSub('login'); }
+      return;
+    }
+    if(kind==='recover1'||kind==='recover1b'){
+      const email=kind==='recover1b'?authMail:val('afMail').trim().toLowerCase();
+      if(!validMail(email)) return msg('Escribe un correo válido');
+      busy(true); await cloud('/auth/v1/recover',{body:{email}}); busy(false);
+      authMail=email; authStep=2; if(kind==='recover1b') toast('Código reenviado'); renderSub(); return;
+    }
+    if(kind==='recover2'){
+      const code=val('afCode').trim(), pw=val('afPass');
+      if(!code) return msg('Escribe el código que te enviamos'); if(pw.length<6) return msg('La contraseña debe tener al menos 6 caracteres');
+      busy(true);
+      const s=await cloud('/auth/v1/verify',{body:{type:'recovery',email:authMail,token:code}});
+      await cloud('/auth/v1/user',{method:'PUT',token:s.access_token,body:{password:pw}});
+      setAcct(s); busy(false); authStep=1; toast('Contraseña cambiada'); openSub('backup'); return;
+    }
+  }catch(e){ busy(false); msg(e.message||'No se pudo completar'); }
+}
+function askRestoreCloud(d,when){
+  openSheet(`<h3>¿Traer tu copia de la nube?</h3><p style="margin:0 18px 6px;color:var(--muted);line-height:1.5">Se combinarán tus playlists y favoritos con los de la copia, y se usarán sus ajustes.</p><p style="margin:0 18px 16px;font-weight:700">${esc(when?new Date(when).toLocaleString():'')} · ${(d.playlists||[]).length} playlists · ${(d.favs||[]).length} favoritos</p><div style="padding:0 18px;display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" data-v="no">Cancelar</button><button class="btn" data-v="yes">Restaurar</button></div>`, v=>{
+    if(v!=='yes') return; restoreBackup(d); toast('Copia restaurada'); setTimeout(()=>location.reload(),900);
+  });
+}
+async function cloudAct(a){
+  if(authBusy) return;
+  if(a==='delask'){ openSheet(`<h3>¿Borrar tu copia de la nube?</h3><p style="margin:0 18px 16px;color:var(--muted);line-height:1.5">Se elimina la copia guardada en tu cuenta. Los datos de este teléfono no se tocan.</p><div style="padding:0 18px;display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" data-v="no">Cancelar</button><button class="btn" data-v="yes" style="background:var(--danger)">Borrar</button></div>`, v=>{ if(v==='yes') cloudAct('del'); }); return; }
+  authBusy=true;
+  try{
+    const tk=await getToken();
+    if(a==='up'){ toast('Subiendo copia…'); await cloud('/rest/v1/nexora_backups?on_conflict=user_id',{token:tk,headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:{user_id:acct.id,data:buildBackup(),updated_at:new Date().toISOString()}}); store.set('lastCloud',Date.now()); toast('Copia guardada en tu cuenta'); }
+    if(a==='down'){ toast('Buscando tu copia…'); const j=await cloud(`/rest/v1/nexora_backups?select=data,updated_at&user_id=eq.${acct.id}`,{method:'GET',token:tk}); if(!j||!j.length) toast('Aún no tienes una copia en la nube'); else askRestoreCloud(j[0].data,j[0].updated_at); }
+    if(a==='del'){ await cloud(`/rest/v1/nexora_backups?user_id=eq.${acct.id}`,{method:'DELETE',token:tk}); store.set('lastCloud',null); toast('Copia borrada de la nube'); }
+  }catch(e){ toast(e.message||'No se pudo completar'); if(!acct) renderSub(); }
+  authBusy=false; if(subKind==='backup') renderSub();
+}
+function cloudCard(){
+  if(!cloudOn()) return '';
+  if(acct){
+    const lc=store.get('lastCloud',null);
+    return `<div class="acct"><div class="av">${esc((acct.name||acct.email||'?').trim()[0].toUpperCase())}</div><div class="tx"><b>${esc(acct.name||'Mi cuenta')}</b><small>${esc(acct.email||'')}</small></div><button class="alink" data-s="auth:logout">Salir</button></div>
+      <div class="bk-acts"><button data-s="cloud:up"><span class="ib" style="--ibc:#7C5CFF">${IC_UP}</span><b>Subir a la nube</b><small>${lc?'Última: '+new Date(lc).toLocaleDateString():'Aún no hay copia'}</small></button><button data-s="cloud:down"><span class="ib" style="--ibc:#12B5CB">${IC_DOWN}</span><b>Traer de la nube</b><small>Restaura tus datos aquí</small></button></div>
+      <button class="alink danger" style="margin:0 0 14px" data-s="cloud:delask">Borrar mi copia de la nube</button>`;
+  }
+  return `<div class="acct-hero"><div class="ico">${IC_CLOUD}</div><b>Tu copia en la nube</b><p>Inicia sesión para guardar tus playlists, favoritos y ajustes en tu cuenta y recuperarlos en cualquier teléfono.</p><button class="btn" data-s="go:login">Iniciar sesión</button><button class="alink" data-s="go:register">Crear cuenta</button></div>`;
+}
 
 /* ---------- Fondo personalizado de galería ---------- */
 function applyBg(){
@@ -2162,11 +2382,49 @@ function renderSub(){
   else if(subKind==='backup'){
     const last=store.get('lastBackup',null);
     const nPl=playlists.length, nFav=favKeys.size, nCov=Object.keys(covers).length;
-    h = subHead('Copia de seguridad') + `<div class="bk-hero"><div class="ico">${IC_CLOUD}</div><b>Tus datos, siempre a salvo</b><p>Guarda tus playlists, favoritos, portadas, ajustes y estadísticas en un archivo. Puedes guardarlo en Google Drive y restaurarlo en otro teléfono.</p><span class="bk-last">${I.restore.replace('<svg','<svg width="15" height="15"')}${last?`Última copia: ${new Date(last).toLocaleDateString()}`:'Última copia: Nunca'}</span></div>
+    h = subHead('Copia de seguridad') + `${cloudOn()?'':`<div class="bk-hero"><div class="ico">${IC_CLOUD}</div><b>Tus datos, siempre a salvo</b><p>Guarda tus playlists, favoritos, portadas, ajustes y estadísticas en un archivo. Puedes guardarlo en Google Drive y restaurarlo en otro teléfono.</p><span class="bk-last">${I.restore.replace('<svg','<svg width="15" height="15"')}${last?`Última copia: ${new Date(last).toLocaleDateString()}`:'Última copia: Nunca'}</span></div>`}
+      ${cloudCard()}${cloudOn()?'<div class="sec-t">En tu teléfono</div>':''}
       <div class="bk-acts"><button data-s="bk:make"><span class="ib" style="--ibc:#7C5CFF">${IC_UP}</span><b>Crear copia</b><small>Se guarda en Descargas/Nexora</small></button><button data-s="bk:restore"><span class="ib" style="--ibc:#12B5CB">${IC_DOWN}</span><b>Restaurar</b><small>Elige un archivo de copia (.json)</small></button></div>
       <button class="bk-share" data-s="bk:share" ${lastBackupUri?'':'disabled'}>${IC_SHARE}Guardar en Drive, WhatsApp…</button>
       <div class="sec-t">Qué se guarda</div>
       <div class="bk-inc"><span>${nPl} playlists</span><span>${nFav} favoritos</span><span>${nCov} portadas</span><span>Ajustes</span><span>Estadísticas</span><span>Posición de videos</span><span>Fondo</span></div>`;
+  }
+  else if(subKind==='login' || subKind==='register' || subKind==='recover'){
+    const logo=(document.querySelector('.brand img')||{}).src||'';
+    const AF=(id,ic,ph,type='text',ac='off')=>`<label class="af"><span class="ai">${AIC[ic]}</span><input id="${id}" type="${type}" placeholder="${ph}" autocomplete="${ac}" autocapitalize="none" spellcheck="false">${type==='password'?`<button type="button" class="aeye" data-s="eye:${id}" aria-label="Mostrar contraseña">${AIC.eye}</button>`:''}</label>`;
+    const head=(ti,su)=>`<div class="ahero"><img src="${logo}" alt=""><b>${ti}</b><span>${su}</span></div>`;
+    h = subHead('Mi cuenta');
+    if(subKind==='login') h += head('Bienvenido de vuelta','Inicia sesión para guardar tu copia en la nube')
+      + AF('afMail','mail','Correo electrónico','email','email') + AF('afPass','lock','Contraseña','password','current-password')
+      + `<button class="alink" style="align-self:flex-end" data-s="go:recover">¿Olvidaste tu contraseña?</button><div class="amsg" id="authMsg"></div>`
+      + `<button class="bk-share" id="afGo" data-s="auth:login">Iniciar sesión</button><p class="aswap">¿No tienes cuenta? <button data-s="go:register">Regístrate</button></p>`;
+    if(subKind==='register') h += head('Crea tu cuenta','Es gratis y solo sirve para tu copia en la nube')
+      + AF('afName','user','Nombre','text','name') + AF('afMail','mail','Correo electrónico','email','email')
+      + AF('afPass','lock','Contraseña (mínimo 6)','password','new-password') + AF('afPass2','lock','Confirmar contraseña','password','new-password')
+      + `<div class="amsg" id="authMsg"></div><button class="bk-share" id="afGo" data-s="auth:register">Crear cuenta</button><p class="aswap">¿Ya tienes cuenta? <button data-s="go:login">Inicia sesión</button></p>`;
+    if(subKind==='recover' && authStep===1) h += head('Recuperar contraseña','Escribe tu correo y te enviaremos un código')
+      + AF('afMail','mail','Correo electrónico','email','email') + `<div class="amsg" id="authMsg"></div><button class="bk-share" id="afGo" data-s="auth:recover1">Enviar código</button><p class="aswap"><button data-s="go:login">Volver a iniciar sesión</button></p>`;
+    if(subKind==='recover' && authStep===2) h += head('Revisa tu correo',`Enviamos un código a ${esc(authMail)}`)
+      + AF('afCode','lock','Código de verificación','text','one-time-code') + AF('afPass','lock','Nueva contraseña','password','new-password')
+      + `<div class="amsg" id="authMsg"></div><button class="bk-share" id="afGo" data-s="auth:recover2">Cambiar contraseña</button><p class="aswap"><button data-s="auth:recover1b">Reenviar código</button></p>`;
+    h = `<div class="authbox">${h}</div>`;
+  }
+  else if(subKind==='custom'){
+    const [ca,cb]=accentPair(); const hex2=v=>/^#[0-9a-f]{6}$/i.test(v)?v:'#7C5CFF';
+    const bgNow = S.bgCustom || getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+    const seg=(cmd,cur,arr)=>`<div class="seg">${arr.map(([v,l])=>`<button class="${String(cur)===String(v)?'on':''}" data-s="${cmd}:${v}">${l}</button>`).join('')}</div>`;
+    h = subHead('Personalizar') + `<div class="cz-prev"><div class="cz-hero"><b>Nexora Pro</b><span>Así se verá tu app</span></div><div class="cz-chips"><i class="on">Videos</i><i>Canciones</i><i>Favoritos</i><span class="cz-fab">+</span></div></div>
+      <div class="sec-t">Colores</div>
+      <div class="group">
+        <div class="cz-row"><span class="n">Color principal</span><input type="color" id="czA" value="${hex2(ca)}" aria-label="Color principal"></div>
+        <div class="cz-row"><span class="n">Color secundario</span>${S.accent2Custom?'<button class="alink" data-s="cz:auto">Automático</button>':'<span class="v">Automático</span>'}<input type="color" id="czB" value="${hex2(S.accent2Custom||(cb.startsWith('#')?cb:'#12B5CB'))}" aria-label="Color secundario"></div>
+        ${tgRow('gradOn', I.palette, 'Usar degradado','Mezcla el color principal con el secundario en botones y pestañas.')}
+        <div class="cz-row"><span class="n">Color de fondo</span>${S.bgCustom?'<button class="alink" data-s="cz:nobg">Quitar</button>':'<span class="v">Del tema</span>'}<input type="color" id="czBg" value="${hex2(bgNow)}" aria-label="Color de fondo"></div>
+      </div>
+      <div class="sec-t">Forma de las esquinas</div>${seg('cz:rad',S.radius||'normal',[['sharp','Cuadradas'],['normal','Normales'],['round','Redondas']])}
+      <div class="sec-t">Videos por fila</div>${seg('cz:cols',S.vcols||0,[[0,'Auto'],[1,'1'],[2,'2'],[3,'3'],[4,'4']])}
+      <button class="bk-share cz-reset" data-s="cz:reset">Restablecer todo</button>
+      <p style="color:var(--muted);font-size:13px;line-height:1.5;margin:0 4px 18px">El fondo y los temas también se pueden cambiar en Ajustes → Tema y Fondo.</p>`;
   }
   else if(subKind==='lang'){
     h = subHead('Idioma') + Object.entries(LANGS).map(([k,l])=>`<button class="lang ${S.lang===k?'on':''}" data-s="lang:${k}"><span>${l}</span>${S.lang===k?IC_CHECK:''}</button>`).join('');
@@ -2177,10 +2435,23 @@ function renderSub(){
 $('sub').addEventListener('click', e=>{
   const b=e.target.closest('[data-s]'); if(!b) return;
   const [cmd, ...rest]=b.dataset.s.split(':'), arg=rest.join(':');
-  if(cmd==='back') closeSub();
+  if(cmd==='back'){ if(['login','register','recover'].includes(subKind)) openSub('backup'); else closeSub(); }
   if(cmd==='tab'){ subTab=arg; subChip='all'; renderSub(); }
   if(cmd==='chip'){ subChip=arg; renderSub(); }
   if(cmd==='lang'){ setLang(arg); renderSub(); }
+  if(cmd==='go'){ authStep=1; openSub(arg); }
+  if(cmd==='eye'){ const i=$(arg); if(i){ i.type=i.type==='password'?'text':'password'; } }
+  if(cmd==='auth'){ if(arg==='logout'){ acct=null; store.set('acct',null); toast('Sesión cerrada'); renderSub(); } else authDo(arg); }
+  if(cmd==='cloud') cloudAct(arg);
+  if(cmd==='cz'){
+    const [k,v]=arg.split(':');
+    if(k==='rad'){ S.radius=v; }
+    if(k==='cols'){ S.vcols=+v; }
+    if(k==='auto'){ S.accent2Custom=null; }
+    if(k==='nobg'){ S.bgCustom=null; }
+    if(k==='reset'){ S.accent=0; S.accentCustom=null; S.accent2Custom=null; S.bgCustom=null; S.radius='normal'; S.vcols=0; S.gradOn=true; toast('Personalización restablecida'); }
+    save(); applyTheme(); renderSub(); render();
+  }
   if(cmd==='bk'){ if(arg==='make') doBackup(); if(arg==='restore') $('restoreIn').click(); if(arg==='share' && lastBackupUri) native('shareBackup', lastBackupUri); }
   if(cmd==='unhideall'){
     items.filter(i=>!i.deleted&&isHidden(i)&&i.type===subTab).forEach(i=>{ hiddenKeys.delete(i.key); if(autoHidden(i)) shownKeys.add(i.key); });
@@ -2213,7 +2484,16 @@ window.nxOnTrashAction = (kind, ok) => {
   else toast('No se realizó ningún cambio');
   loadTrash(); renderSub(); render();
 };
+$('sub').addEventListener('input', e=>{
+  const id=e.target.id;
+  if(id==='czA'){ S.accent='custom'; S.accentCustom=e.target.value; }
+  else if(id==='czB'){ S.accent='custom'; S.accentCustom=S.accentCustom||accentPair()[0]; S.accent2Custom=e.target.value; }
+  else if(id==='czBg'){ S.bgCustom=e.target.value; }
+  else return;
+  save(); applyTheme();
+});
 $('sub').addEventListener('change', e=>{
+  if(['czA','czB','czBg'].includes(e.target.id)){ renderSub(); return; }
   const t=e.target.closest('[data-tg]'); if(!t) return;
   const k=t.dataset.tg; S[k]=t.checked; save();
   if(k==='hideVoice'){ render(); }
@@ -2223,6 +2503,7 @@ $('sub').addEventListener('change', e=>{
     if(want!==audio.isNative){ setEngine(want); audio.src=current.url; audio.playbackRate=S.speed; audio.currentTime=t; setVol(); if(was) audio.play().catch(()=>{}); }
   }
   if(k==='crossfade') renderSub();
+  if(k==='gradOn') applyTheme();
   if(subKind==='hidden') renderSub();
 });
 $('sub').addEventListener('input', e=>{
@@ -2532,6 +2813,12 @@ Object.assign(I18N.fr,{"Todos":"Tout","Ninguno":"Aucun","Los últimos agregados 
 Object.assign(I18N.it,{"Todos":"Tutti","Ninguno":"Nessuno","Los últimos agregados primero":"Prima i più recenti","Lo que más has reproducido":"Quello che riproduci di più","Por nombre, de la A a la Z":"Per nome, dalla A alla Z","Por nombre del artista":"Per nome dell’artista","Los más largos primero":"Prima i più lunghi"});
 Object.assign(I18N.de,{"Todos":"Alle","Ninguno":"Keine","Los últimos agregados primero":"Zuletzt hinzugefügte zuerst","Lo que más has reproducido":"Am häufigsten gespielt","Por nombre, de la A a la Z":"Nach Name, A bis Z","Por nombre del artista":"Nach Künstlername","Los más largos primero":"Längste zuerst"});
 Object.assign(I18N.id,{"Todos":"Semua","Ninguno":"Tidak ada","Los últimos agregados primero":"Yang terbaru ditambahkan dulu","Lo que más has reproducido":"Yang paling sering diputar","Por nombre, de la A a la Z":"Menurut nama, A sampai Z","Por nombre del artista":"Menurut nama artis","Los más largos primero":"Yang terpanjang dulu"});
+Object.assign(I18N.en,{"Brasa": "Ember", "Uva": "Grape", "Matrix": "Matrix", "Pizarra": "Slate", "Hielo": "Ice", "Dorado": "Gold", "Grafito": "Graphite", "Vino": "Wine", "Menta": "Mint", "Lavanda": "Lavender", "Durazno": "Peach", "Arena": "Sand", "Algodón de azúcar": "Cotton candy", "Mi cuenta": "My account", "Iniciar sesión": "Log in", "Crear cuenta": "Create account", "Regístrate": "Sign up", "Inicia sesión": "Log in", "Bienvenido de vuelta": "Welcome back", "Inicia sesión para guardar tu copia en la nube": "Log in to save your backup in the cloud", "Correo electrónico": "Email", "Contraseña": "Password", "Contraseña (mínimo 6)": "Password (min. 6)", "Confirmar contraseña": "Confirm password", "Nombre": "Name", "¿Olvidaste tu contraseña?": "Forgot your password?", "¿No tienes cuenta?": "Don't have an account?", "¿Ya tienes cuenta?": "Already have an account?", "Crea tu cuenta": "Create your account", "Es gratis y solo sirve para tu copia en la nube": "It's free and only used for your cloud backup", "Recuperar contraseña": "Recover password", "Escribe tu correo y te enviaremos un código": "Enter your email and we'll send you a code", "Enviar código": "Send code", "Volver a iniciar sesión": "Back to log in", "Revisa tu correo": "Check your email", "Código de verificación": "Verification code", "Nueva contraseña": "New password", "Cambiar contraseña": "Change password", "Reenviar código": "Resend code", "Tu copia en la nube": "Your cloud backup", "Inicia sesión para guardar tus playlists, favoritos y ajustes en tu cuenta y recuperarlos en cualquier teléfono.": "Log in to save your playlists, favorites and settings to your account and get them back on any phone.", "Subir a la nube": "Upload to cloud", "Traer de la nube": "Get from cloud", "Restaura tus datos aquí": "Restore your data here", "Aún no hay copia": "No backup yet", "Salir": "Log out", "Borrar mi copia de la nube": "Delete my cloud backup", "En tu teléfono": "On your phone", "Sesión iniciada": "Logged in", "Sesión cerrada": "Logged out", "Cuenta creada": "Account created", "Personalizar": "Customize", "Personalizar toda la interfaz": "Customize the whole interface", "Colores, fondo, esquinas y más": "Colors, background, corners and more", "Así se verá tu app": "This is how your app will look", "Colores": "Colors", "Color principal": "Main color", "Color secundario": "Secondary color", "Automático": "Automatic", "Usar degradado": "Use gradient", "Color de fondo": "Background color", "Del tema": "From theme", "Quitar": "Remove", "Forma de las esquinas": "Corner shape", "Cuadradas": "Square", "Normales": "Normal", "Redondas": "Round", "Videos por fila": "Videos per row", "Auto": "Auto", "Restablecer todo": "Reset all", "Escribe un correo válido": "Enter a valid email", "Escribe tu contraseña": "Enter your password", "Escribe tu nombre": "Enter your name", "Las contraseñas no coinciden": "Passwords don't match", "La contraseña debe tener al menos 6 caracteres": "Password must be at least 6 characters", "Correo o contraseña incorrectos": "Wrong email or password", "Sin conexión a internet": "No internet connection", "Copia guardada en tu cuenta": "Backup saved to your account", "Aún no tienes una copia en la nube": "You don't have a cloud backup yet", "Código incorrecto o vencido": "Wrong or expired code"});
+Object.assign(I18N.pt,{"Brasa": "Brasa", "Uva": "Uva", "Matrix": "Matrix", "Pizarra": "Ardósia", "Hielo": "Gelo", "Dorado": "Dourado", "Grafito": "Grafite", "Vino": "Vinho", "Menta": "Menta", "Lavanda": "Lavanda", "Durazno": "Pêssego", "Arena": "Areia", "Algodón de azúcar": "Algodão-doce"});
+Object.assign(I18N.fr,{"Brasa": "Braise", "Uva": "Raisin", "Matrix": "Matrix", "Pizarra": "Ardoise", "Hielo": "Glace", "Dorado": "Doré", "Grafito": "Graphite", "Vino": "Vin", "Menta": "Menthe", "Lavanda": "Lavande", "Durazno": "Pêche", "Arena": "Sable", "Algodón de azúcar": "Barbe à papa"});
+Object.assign(I18N.it,{"Brasa": "Brace", "Uva": "Uva", "Matrix": "Matrix", "Pizarra": "Ardesia", "Hielo": "Ghiaccio", "Dorado": "Dorato", "Grafito": "Grafite", "Vino": "Vino", "Menta": "Menta", "Lavanda": "Lavanda", "Durazno": "Pesca", "Arena": "Sabbia", "Algodón de azúcar": "Zucchero filato"});
+Object.assign(I18N.de,{"Brasa": "Glut", "Uva": "Traube", "Matrix": "Matrix", "Pizarra": "Schiefer", "Hielo": "Eis", "Dorado": "Gold", "Grafito": "Graphit", "Vino": "Wein", "Menta": "Minze", "Lavanda": "Lavendel", "Durazno": "Pfirsich", "Arena": "Sand", "Algodón de azúcar": "Zuckerwatte"});
+Object.assign(I18N.id,{"Brasa": "Bara", "Uva": "Anggur", "Matrix": "Matrix", "Pizarra": "Batu tulis", "Hielo": "Es", "Dorado": "Emas", "Grafito": "Grafit", "Vino": "Anggur merah", "Menta": "Mint", "Lavanda": "Lavender", "Durazno": "Persik", "Arena": "Pasir", "Algodón de azúcar": "Harum manis"});
 Object.assign(I18N.en,{"Medianoche": "Midnight", "Océano": "Ocean", "Bosque": "Forest", "Atardecer": "Sunset", "Café": "Mocha", "Nórdico": "Nordic", "Crema": "Cream", "Cielo": "Sky", "Copia de seguridad": "Backup", "Tus datos, siempre a salvo": "Your data, always safe", "Guarda tus playlists, favoritos, portadas, ajustes y estadísticas en un archivo. Puedes guardarlo en Google Drive y restaurarlo en otro teléfono.": "Save your playlists, favorites, covers, settings and stats to a file. Keep it in Google Drive and restore it on another phone.", "Crear copia": "Create backup", "Se guarda en Descargas/Nexora": "Saved in Downloads/Nexora", "Elige un archivo de copia (.json)": "Pick a backup file (.json)", "Guardar en Drive, WhatsApp…": "Save to Drive, WhatsApp…", "Qué se guarda": "What’s saved", "Estadísticas": "Statistics", "Posición de videos": "Video positions", "Copia guardada en Descargas/Nexora": "Backup saved in Downloads/Nexora", "No se pudo crear la copia": "Couldn’t create the backup", "Ese archivo no es una copia de Nexora": "That file isn’t a Nexora backup", "Copia restaurada": "Backup restored", "¿Restaurar esta copia?": "Restore this backup?", "Se combinarán tus playlists y favoritos con los de la copia, y se usarán sus ajustes.": "Your playlists and favorites will be merged with the backup’s, and its settings will be used.", "Restaurar": "Restore", "Ajustes": "Settings", "Fondo": "Background"});
 Object.assign(I18N.pt,{"Medianoche": "Meia-noite", "Océano": "Oceano", "Bosque": "Floresta", "Atardecer": "Pôr do sol", "Café": "Café", "Nórdico": "Nórdico", "Crema": "Creme", "Cielo": "Céu", "Copia de seguridad": "Backup", "Tus datos, siempre a salvo": "Seus dados, sempre seguros", "Guarda tus playlists, favoritos, portadas, ajustes y estadísticas en un archivo. Puedes guardarlo en Google Drive y restaurarlo en otro teléfono.": "Salve suas playlists, favoritos, capas, configurações e estatísticas em um arquivo. Guarde no Google Drive e restaure em outro celular.", "Crear copia": "Criar backup", "Se guarda en Descargas/Nexora": "Salvo em Downloads/Nexora", "Elige un archivo de copia (.json)": "Escolha um arquivo de backup (.json)", "Guardar en Drive, WhatsApp…": "Salvar no Drive, WhatsApp…", "Qué se guarda": "O que é salvo", "Estadísticas": "Estatísticas", "Posición de videos": "Posição dos vídeos", "Copia guardada en Descargas/Nexora": "Backup salvo em Downloads/Nexora", "No se pudo crear la copia": "Não foi possível criar o backup", "Ese archivo no es una copia de Nexora": "Esse arquivo não é um backup do Nexora", "Copia restaurada": "Backup restaurado", "¿Restaurar esta copia?": "Restaurar este backup?", "Se combinarán tus playlists y favoritos con los de la copia, y se usarán sus ajustes.": "Suas playlists e favoritos serão combinados com os do backup, e as configurações dele serão usadas.", "Restaurar": "Restaurar", "Ajustes": "Configurações", "Fondo": "Fundo"});
 Object.assign(I18N.fr,{"Medianoche": "Minuit", "Océano": "Océan", "Bosque": "Forêt", "Atardecer": "Coucher de soleil", "Café": "Moka", "Nórdico": "Nordique", "Crema": "Crème", "Cielo": "Ciel", "Copia de seguridad": "Sauvegarde", "Tus datos, siempre a salvo": "Tes données, toujours en sécurité", "Guarda tus playlists, favoritos, portadas, ajustes y estadísticas en un archivo. Puedes guardarlo en Google Drive y restaurarlo en otro teléfono.": "Enregistre tes playlists, favoris, pochettes, réglages et statistiques dans un fichier. Garde-le sur Google Drive et restaure-le sur un autre téléphone.", "Crear copia": "Créer une sauvegarde", "Se guarda en Descargas/Nexora": "Enregistrée dans Téléchargements/Nexora", "Elige un archivo de copia (.json)": "Choisis un fichier de sauvegarde (.json)", "Guardar en Drive, WhatsApp…": "Enregistrer sur Drive, WhatsApp…", "Qué se guarda": "Ce qui est enregistré", "Estadísticas": "Statistiques", "Posición de videos": "Position des vidéos", "Copia guardada en Descargas/Nexora": "Sauvegarde enregistrée dans Téléchargements/Nexora", "No se pudo crear la copia": "Impossible de créer la sauvegarde", "Ese archivo no es una copia de Nexora": "Ce fichier n’est pas une sauvegarde Nexora", "Copia restaurada": "Sauvegarde restaurée", "¿Restaurar esta copia?": "Restaurer cette sauvegarde ?", "Se combinarán tus playlists y favoritos con los de la copia, y se usarán sus ajustes.": "Tes playlists et favoris seront fusionnés avec ceux de la sauvegarde, et ses réglages seront utilisés.", "Restaurar": "Restaurer", "Ajustes": "Réglages", "Fondo": "Fond"});

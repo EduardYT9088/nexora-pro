@@ -1,7 +1,6 @@
-Versión: 1.6.6
-- Nuevo logo de Nexora en la app y en el ícono del teléfono
-- La app ahora se llama Reproductor De Música Nexora Pro
-- Selección de videos y canciones rediseñada: cabecera con contador, botón Todos y barra de acciones flotante
-- Nueva hoja para ordenar con iconos y descripción de cada opción
-- Las hojas inferiores ahora tienen fondo sólido y se leen mejor con fondo personalizado
-- Renombrar ahora aparece en la barra de acciones al seleccionar un solo archivo
+Versión: 1.6.7
+- Cuenta opcional: inicia sesión, regístrate o recupera tu contraseña desde Copia de seguridad
+- Copia de seguridad en la nube: sube y trae tus playlists, favoritos y ajustes en cualquier teléfono
+- Al deslizar para recargar, el indicador queda centrado y la lista baja con tu dedo
+- 13 temas nuevos: Brasa, Uva, Matrix, Pizarra, Hielo, Dorado, Grafito, Vino, Menta, Lavanda, Durazno, Arena y Algodón de azúcar
+- Nueva pantalla Personalizar: color principal y secundario, degradado, color de fondo, forma de las esquinas y videos por fila
