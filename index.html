@@ -713,6 +713,51 @@ input.cp-hue{display:block;width:calc(100% - 36px);margin:0 18px 12px;height:28p
 .gbtn:disabled{opacity:.65}
 .acct .av{position:relative;overflow:hidden}.acct .av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .bk-acts button:disabled{opacity:.6}
+
+/* ====== Tema e Idioma rediseñados ====== */
+.sheet:has(.th-sec){max-height:90vh}
+.th-sec{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:14px 22px 8px}
+.themes2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:0 14px 4px}
+.thc{display:flex;flex-direction:column;gap:7px;padding:6px 6px 8px;border-radius:calc(20px*var(--rs,1));background:var(--surface2);border:2px solid transparent;text-align:center;transition:transform .12s,border-color .15s,box-shadow .15s}
+.thc:active{transform:scale(.96)}
+.thc.sel{border-color:var(--accent);box-shadow:0 10px 24px -12px var(--accent)}
+.thn{font-size:12.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.thc.sel .thn{color:var(--accent)}
+.thp{position:relative;height:112px;border-radius:calc(14px*var(--rs,1));background:var(--tb);padding:9px 8px 8px;display:flex;flex-direction:column;gap:6px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(128,128,128,.18)}
+.thp .r1{display:flex;align-items:center;gap:5px}
+.thp .r1 i{width:14px;height:14px;border-radius:5px;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.thp .r1 b{height:5px;width:42%;border-radius:3px;background:var(--tt);opacity:.55}
+.thp .r2{display:flex;gap:4px}
+.thp .r2 u{height:9px;flex:1;border-radius:5px;background:var(--t2)}
+.thp .r2 u.a{background:linear-gradient(135deg,var(--accent),var(--accent2));flex:1.3}
+.thp .r3{display:flex;gap:5px;flex:1}
+.thp .r3 s{flex:1;border-radius:7px;background:var(--t2);position:relative;overflow:hidden}
+.thp .r3 s:first-child::after{content:"";position:absolute;inset:auto 0 0 0;height:45%;background:linear-gradient(transparent,var(--accent));opacity:.55}
+.thp .r4{display:flex;align-items:center;gap:5px;height:15px;padding:0 4px;border-radius:8px;background:var(--ts)}
+.thp .r4 em{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.thp .r4 span{flex:1;height:3px;border-radius:2px;background:var(--tt);opacity:.4}
+.thp .ck2{position:absolute;right:6px;top:6px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+.thp .ck2 svg{width:12px;height:12px}
+.tha{display:flex;align-items:center;gap:14px;width:calc(100% - 28px);margin:0 14px 2px;padding:8px 14px 8px 8px;border-radius:calc(20px*var(--rs,1));background:var(--surface2);border:2px solid transparent;text-align:left}
+.tha.sel{border-color:var(--accent);box-shadow:0 10px 24px -12px var(--accent)}
+.tha .thp{width:96px;height:62px;flex:none;padding:7px 7px 6px;gap:5px;--tb:#F3F2FA;--tt:#17142E;--t2:#fff;--ts:#fff;background:linear-gradient(115deg,#F3F2FA 50%,#120F2A 50%)}
+.tha .tx{flex:1;min-width:0}.tha .tx b{display:block;font-size:15.5px}.tha .tx small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px;line-height:1.35}
+.tha .rd{width:24px;height:24px;border-radius:50%;border:2px solid color-mix(in srgb,var(--muted) 55%,transparent);flex:none;display:grid;place-items:center;color:#fff}
+.tha .rd svg{width:14px;height:14px}.tha.sel .rd{background:var(--accent);border-color:var(--accent)}
+.lg-hero{display:flex;align-items:center;gap:14px;padding:6px 4px 16px}
+.lg-hero .ico{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 10px 22px -10px var(--accent);flex:none}
+.lg-hero .ico svg{width:24px;height:24px}
+.lg-hero b{font-family:Sora,Manrope,sans-serif;font-size:1.15rem;display:block}.lg-hero small{color:var(--muted);font-size:13px;font-weight:600}
+.lg-list{display:flex;flex-direction:column;gap:10px}
+.lg{display:flex;align-items:center;gap:14px;width:100%;padding:13px 16px 13px 14px;border-radius:calc(20px*var(--rs,1));background:var(--surface);border:1.5px solid var(--line);text-align:left;transition:transform .1s,background .15s,border-color .15s}
+.lg:active{transform:scale(.985)}
+.lg .fl{font-size:28px;line-height:1;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--surface2);flex:none}
+.lg .nm{flex:1;min-width:0;font-weight:700;font-size:16.5px;color:var(--text)}
+.lg .cd{font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--muted);padding:4px 9px;border-radius:9px;background:var(--surface2)}
+.lg .rd{width:26px;height:26px;border-radius:50%;border:2px solid color-mix(in srgb,var(--muted) 55%,transparent);flex:none;display:grid;place-items:center;color:#fff}
+.lg .rd svg{width:14px;height:14px}
+.lg.on{background:color-mix(in srgb,var(--accent) 16%,var(--solid));border-color:var(--accent);box-shadow:0 12px 26px -16px var(--accent)}
+.lg.on .nm{color:var(--accent)}.lg.on .rd{background:var(--accent);border-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -994,7 +1039,7 @@ const fmt = s => { if(!isFinite(s)||s<0) s=0; s=Math.floor(s); const h=Math.floo
 const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const hash = s => { let h=0; for(const c of s) h=(h*31+c.charCodeAt(0))|0; return Math.abs(h); };
 const grad = key => { const h=hash(key)%360; return `linear-gradient(135deg,hsl(${h} 70% 55%),hsl(${(h+60)%360} 75% 40%))`; };
-const toast = msg => { const t=$('toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('on'),2200); };
+const toast = (msg,ms=2200) => { const t=$('toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('on'),ms); };
 const keyOf = f => `${f.name}|${f.size}`;
 function parseName(name){
   const base = name.replace(/\.[^.]+$/,'').replace(/_/g,' ').trim();
@@ -2168,8 +2213,21 @@ const THEMES=[['auto','Automático','#1C1838','#262148','#F1EFFF'],['dark','Oscu
  ['amoled','Medianoche','#000000','#1A1A23','#F4F4F8'],['ocean','Océano','#06182B','#163458','#E8F4FF'],['forest','Bosque','#0A1912','#1B3A29','#EAF7EE'],
  ['sunset','Atardecer','#1E0F1A','#40203A','#FFEFF5'],['mocha','Café','#1B1512','#382C25','#F6EDE6'],['nord','Nórdico','#1F2430','#353E50','#ECEFF4'],
  ['cream','Crema','#FBF6EE','#F1E8DA','#2B2118'],['sky','Cielo','#EEF5FF','#DDE9FA','#0F2340'],['ember','Brasa','#140707','#331818','#FFEDEA'],['grape','Uva','#1A0B2E','#381C5C','#F6EEFF'],['matrix','Matrix','#020A04','#0E2815','#D8FFE3'],['slate','Pizarra','#14181F','#28313F','#E8EDF5'],['ice','Hielo','#07191C','#163C43','#E4FBFF'],['gold','Dorado','#15110A','#352B17','#FFF4D8'],['graphite','Grafito','#17181A','#2E3135','#ECEDEF'],['wine','Vino','#1C0A12','#3C1A2D','#FFEAF1'],['mint','Menta','#EDF9F3','#D9F0E5','#0E2A1F'],['lavender','Lavanda','#F4F0FF','#E6DEFB','#20143F'],['peach','Durazno','#FFF3EC','#FFE2D2','#3A1B10'],['sand','Arena','#F5F0E6','#E8DFCB','#2E2815'],['candy','Algodón de azúcar','#FFF0F6','#FFD9E8','#3D1424']];
+const THEME_LIGHT = new Set(['light','cream','sky','mint','lavender','peach','sand','candy']);
+function themeCard([k,l,bg,s2,tx]){
+  const sf = mixHex(bg,s2,.55), on=S.theme===k && !S.bgCustom;
+  return `<button class="thc ${on?'sel':''}" data-v="${k}" style="--tb:${bg};--ts:${sf};--t2:${s2};--tt:${tx}" aria-label="${l}" aria-pressed="${on}">
+    <div class="thp"><div class="r1"><i></i><b></b></div><div class="r2"><u class="a"></u><u></u><u></u></div><div class="r3"><s></s><s></s></div><div class="r4"><em></em><span></span></div>${on?`<span class="ck2">${I.check}</span>`:''}</div>
+    <span class="thn">${l}</span></button>`;
+}
 function themeSheet(){
-  openSheet(`<h3>Tema</h3><div class="themes">${THEMES.map(([k,l,bg,sf,tx])=>`<button data-v="${k}" class="${S.theme===k?'sel':''}"><div class="tprev" style="background:${k==='auto'?'linear-gradient(135deg,#F3F2FA 50%,#120F2A 50%)':bg}"><i style="top:10px;background:${sf}"></i><i style="top:28px;right:30px;background:${sf};opacity:.7"></i><i style="top:46px;right:44px;height:8px;background:${tx};opacity:.35"></i><b></b></div>${l}</button>`).join('')}</div>`, v=>{ S.theme=v; S.bgCustom=null; save(); applyTheme(); renderSettings(); });
+  const dark=THEMES.filter(x=>x[0]!=='auto'&&!THEME_LIGHT.has(x[0])), light=THEMES.filter(x=>THEME_LIGHT.has(x[0]));
+  const autoOn=S.theme==='auto' && !S.bgCustom;
+  openSheet(`<div class="sort-head"><div class="ico">${I.palette}</div><div><h3>Tema</h3><small>${THEMES.length} temas para tu app</small></div></div>
+    <button class="tha ${autoOn?'sel':''}" data-v="auto"><div class="thp auto"><div class="r1"><i></i><b></b></div><div class="r4"><em></em><span></span></div></div><div class="tx"><b>Automático</b><small>Sigue el modo claro u oscuro de tu teléfono</small></div><span class="rd">${autoOn?I.check:''}</span></button>
+    <div class="th-sec">Oscuros</div><div class="themes2">${dark.map(themeCard).join('')}</div>
+    <div class="th-sec">Claros</div><div class="themes2">${light.map(themeCard).join('')}</div>`,
+    v=>{ S.theme=v; S.bgCustom=null; save(); applyTheme(); renderSettings(); });
 }
 
 /* ---------- Copia de seguridad (archivo propio, sin cuentas) ---------- */
@@ -2250,7 +2308,8 @@ function gErr(e){
   e=String(e||'');
   if(e==='perm') return 'Debes permitir el acceso a Google Drive para guardar tu copia';
   if(/(^|\D)10(\D|$)|DEVELOPER_ERROR|12500/.test(e)) return 'Google aún no está configurado para esta app (falta el ID de cliente)';
-  if(/cancel|12501|16:/i.test(e)) return 'Inicio de sesión cancelado';
+  if(/^cancel/i.test(e)){ const d=e.replace(/^cancel:?/i,'').trim(); return d && !/sin detalle/.test(d) ? 'Google no completó el inicio de sesión ('+d.slice(0,90)+'). Revisa que la pantalla de consentimiento esté publicada o que tu cuenta sea usuario de prueba' : 'Inicio de sesión cancelado'; }
+  if(/12501|(^|\D)16:/.test(e)) return 'Inicio de sesión cancelado';
   if(/network|(^|\D)7:/i.test(e)) return 'Sin conexión a internet';
   return e || 'No se pudo conectar con Google';
 }
@@ -2296,7 +2355,7 @@ async function gAct(a){
       else { const d=await (await gApi(`${GD_FILES}/${f[0].id}?alt=media`,tok)).json(); if(!d||d.app!=='Nexora Pro') toast('La copia de Drive no es válida'); else askRestoreCloud(d,f[0].modifiedTime); }
     }
     if(a==='del'){ const f=await gFind(tok); for(const x of f) await gApi(`${GD_FILES}/${x.id}`,tok,{method:'DELETE'}); store.set('lastCloud',null); toast('Copia borrada de Drive'); }
-  }catch(e){ toast(e.message||'No se pudo completar'); }
+  }catch(e){ toast(e.message||'No se pudo completar',5500); }
   gBusy=false; if(subKind==='backup') renderSub();
 }
 function cloudCard(){
@@ -2432,7 +2491,9 @@ function renderSub(){
       <p style="color:var(--muted);font-size:13px;line-height:1.5;margin:0 4px 18px">El fondo y los temas también se pueden cambiar en Ajustes → Tema y Fondo.</p>`;
   }
   else if(subKind==='lang'){
-    h = subHead('Idioma') + Object.entries(LANGS).map(([k,l])=>`<button class="lang ${S.lang===k?'on':''}" data-s="lang:${k}"><span>${l}</span>${S.lang===k?IC_CHECK:''}</button>`).join('');
+    const FL={es:'🇪🇸',en:'🇺🇸',pt:'🇧🇷',fr:'🇫🇷',it:'🇮🇹',de:'🇩🇪',id:'🇮🇩'};
+    h = subHead('Idioma') + `<div class="lg-hero"><div class="ico">${I.globe}</div><div><b>Elige tu idioma</b><small>La app cambia al instante</small></div></div>
+      <div class="lg-list">${Object.entries(LANGS).map(([k,l])=>`<button class="lg ${S.lang===k?'on':''}" data-s="lang:${k}" aria-pressed="${S.lang===k}"><span class="fl">${FL[k]||'🌐'}</span><span class="nm">${l}</span><span class="cd">${k.toUpperCase()}</span><span class="rd">${S.lang===k?IC_CHECK:''}</span></button>`).join('')}</div>`;
   }
   box.innerHTML=h;
   box.querySelectorAll('input[data-rng]').forEach(r=>r.style.setProperty('--p',((r.value-r.min)/(r.max-r.min)*100)+'%'));
