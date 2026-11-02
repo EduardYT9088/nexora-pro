@@ -1,6 +1,5 @@
-Versión: 1.6.8
-- Nueva pantalla de Tema: vistas previas en miniatura, secciones Oscuros y Claros y selección bien marcada
-- Nueva pantalla de Idioma: banderas, nombres claros y el idioma elegido ahora se lee perfectamente sobre cualquier fondo
-- Mejoras en el inicio de sesión con Google: mensajes de error más claros
-- Inicia sesión con Google y guarda tu copia de seguridad en tu Google Drive
-- Selector de color propio y 13 temas nuevos
+Versión: 1.7.0
+- Copia de seguridad más clara: botón "Borrar mi copia de Drive" rediseñado, títulos de sección legibles sobre cualquier fondo y botón "Compartir la copia en WhatsApp"
+- Inicia sesión con Google desde cualquier cuenta y guarda tu copia en tu Google Drive
+- Todo el texto de la app se traduce en los 7 idiomas
+- Nueva pantalla de Tema y nueva pantalla de Idioma
