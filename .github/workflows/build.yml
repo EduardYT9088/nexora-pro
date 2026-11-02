@@ -89,6 +89,11 @@ jobs:
                   abortOnError = false
               }
           }
+
+          dependencies {
+              // Inicio de sesión con Google y permiso para guardar la copia de seguridad en Drive
+              implementation("com.google.android.gms:play-services-auth:21.2.0")
+          }
           NXEOF
           cat > app/proguard-rules.pro <<'NXEOF'
           # Métodos que la interfaz llama desde JavaScript
@@ -546,6 +551,10 @@ jobs:
           import android.webkit.WebView
           import android.webkit.WebViewClient
           import android.widget.FrameLayout
+          import com.google.android.gms.auth.api.identity.AuthorizationRequest
+          import com.google.android.gms.auth.api.identity.AuthorizationResult
+          import com.google.android.gms.auth.api.identity.Identity
+          import com.google.android.gms.common.api.Scope
           import org.json.JSONObject
 
           class MainActivity : Activity() {
@@ -556,6 +565,8 @@ jobs:
                   private const val REQ_FILES = 10
                   private const val REQ_MEDIA = 11
                   private const val REQ_NOTIF = 12
+                  private const val REQ_GOOGLE = 13
+                  private const val DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file"
                   private const val PERM_VISUAL_SELECTED = "android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
               }
 
@@ -728,6 +739,41 @@ jobs:
 
               private fun js(code: String) = runOnUiThread { webView.evaluateJavascript(code, null) }
 
+              // ---- Inicio de sesión con Google (permiso para Drive) ----
+              private fun googleFail(msg: String?) =
+                  js("window.nxOnGoogle && nxOnGoogle(null, ${JSONObject.quote(msg ?: "error")})")
+
+              private fun googleDone(r: AuthorizationResult) {
+                  val tok = r.accessToken
+                  when {
+                      tok == null -> googleFail("error")
+                      !r.grantedScopes.contains(DRIVE_SCOPE) -> googleFail("perm")
+                      else -> js("window.nxOnGoogle && nxOnGoogle(${JSONObject.quote(tok)}, null)")
+                  }
+              }
+
+              private fun googleAuth() {
+                  val req = AuthorizationRequest.builder()
+                      .setRequestedScopes(listOf(Scope(DRIVE_SCOPE), Scope("email"), Scope("profile")))
+                      .build()
+                  Identity.getAuthorizationClient(this).authorize(req)
+                      .addOnSuccessListener { r ->
+                          val pi = r.pendingIntent
+                          if (r.hasResolution() && pi != null) {
+                              runCatching { startIntentSenderForResult(pi.intentSender, REQ_GOOGLE, null, 0, 0, 0) }
+                                  .onFailure { googleFail(it.message) }
+                          } else googleDone(r)
+                      }
+                      .addOnFailureListener { e -> googleFail(e.message) }
+              }
+
+              private fun googleResult(resultCode: Int, data: Intent?) {
+                  if (resultCode != RESULT_OK) { googleFail("cancel"); return }
+                  runCatching { Identity.getAuthorizationClient(this).getAuthorizationResultFromIntent(data) }
+                      .onSuccess { googleDone(it) }
+                      .onFailure { googleFail(it.message) }
+              }
+
               private fun granted(p: String) = checkSelfPermission(p) == PackageManager.PERMISSION_GRANTED
 
               private fun permState(): JSONObject {
@@ -746,6 +792,9 @@ jobs:
               }
 
               inner class Bridge {
+                  @JavascriptInterface
+                  fun googleSignIn() = runOnUiThread { googleAuth() }
+
                   @JavascriptInterface
                   fun hasPermissions(): String = permState().toString()
 
@@ -937,6 +986,7 @@ jobs:
                   @Suppress("DEPRECATION")
                   super.onActivityResult(requestCode, resultCode, data)
                   if (files.onResult(requestCode, resultCode)) return
+                  if (requestCode == REQ_GOOGLE) { googleResult(resultCode, data); return }
                   if (requestCode != REQ_FILES) return
                   val uris: Array<Uri>? = when {
                       resultCode != RESULT_OK || data == null -> null
