@@ -685,6 +685,34 @@ body.selecting .content{padding-bottom:150px}
 .bk-share.busy{opacity:.6;pointer-events:none}
 .aswap{text-align:center;color:var(--muted);font-size:14px;margin:2px 0 14px}
 .aswap button{color:var(--accent);font-weight:800}
+
+/* selector de color propio */
+.cp-chip{width:34px;height:34px;border-radius:12px;flex:none;box-shadow:inset 0 0 0 2px rgba(255,255,255,.25),0 6px 14px -6px rgba(0,0,0,.5)}
+.cp-open{margin-top:2px}
+.cp-prev{margin:0 18px 10px;padding:12px 16px;border-radius:calc(20px*var(--rs,1));color:#fff;display:flex;flex-direction:column;gap:2px;transition:background .15s;box-shadow:0 12px 26px -14px var(--accent)}
+.cp-prev b{font-family:Sora,Manrope,sans-serif;font-size:1.15rem}.cp-prev span{font-size:12.5px;opacity:.9}
+.cp-tabs{display:flex;gap:6px;margin:0 18px 12px;background:var(--surface2);padding:4px;border-radius:16px}
+.cp-tabs button{flex:1;height:38px;border-radius:12px;font-weight:700;font-size:14px;color:var(--muted)}
+.cp-tabs button.on{background:var(--accent);color:#fff}
+.cp-sv{position:relative;margin:0 18px 14px;height:140px;border-radius:18px;touch-action:none;cursor:crosshair;
+  background:linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,transparent),hsl(var(--h,260) 100% 50%)}
+.cp-knob{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.55);pointer-events:none}
+.sheet:has(.cp-sv){max-height:92vh}
+input.cp-hue{display:block;width:calc(100% - 36px);margin:0 18px 12px;height:28px}
+.cp-hue::-webkit-slider-runnable-track{height:14px;border-radius:7px;background:linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)!important}
+.cp-hue::-webkit-slider-thumb{width:26px;height:26px;margin-top:-6px;background:var(--hc,#fff);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.cp-row{display:flex;align-items:center;gap:12px;margin:0 18px 14px}
+.cp-dot{width:44px;height:44px;border-radius:14px;flex:none;box-shadow:inset 0 0 0 2px rgba(255,255,255,.25)}
+.cp-row input{flex:1;min-width:0;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--text);padding:0 14px;font:inherit;font-weight:700;font-size:16px;letter-spacing:.06em}
+.cp-auto{height:44px;padding:0 14px;border-radius:14px;background:var(--surface2);font-weight:700;font-size:13px}
+.cp-sw{display:grid;grid-template-columns:repeat(6,1fr);gap:10px 12px;margin:0 22px 14px}
+.cp-sw button{aspect-ratio:1;max-height:38px;justify-self:center;width:100%;max-width:38px;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(128,128,128,.4)}
+.cp-act{display:flex;gap:10px;justify-content:flex-end;padding:0 18px 4px}
+
+.gbtn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;max-width:320px;height:50px;border-radius:calc(25px*var(--rs,1));background:#fff;color:#1f1f1f;font-weight:700;font-size:15.5px;box-shadow:0 10px 24px -12px rgba(0,0,0,.6);margin-top:4px}
+.gbtn:disabled{opacity:.65}
+.acct .av{position:relative;overflow:hidden}.acct .av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bk-acts button:disabled{opacity:.6}
 </style>
 </head>
 <body>
@@ -1760,9 +1788,7 @@ function renderSettings(){
 }
 $('settings').addEventListener('click', e=>{
   const b=e.target.closest('[data-set]'); if(!b) return; const k=b.dataset.set;
-  if(k==='accent'){ openSheet(`<h3>Color de acento</h3><div class="swatches" style="padding:6px 18px 12px">${ACCENTS.map((c,i)=>`<button class="sw ${S.accent===i?'sel':''}" data-v="${i}" aria-label="Color ${i+1}" style="background:linear-gradient(135deg,${c[0]},${c[1]})"></button>`).join('')}</div><div class="cpick"><input type="color" id="cPick" value="${S.accentCustom||'#7C5CFF'}" aria-label="Elegir tu propio color"><span style="font-weight:700">Elegir tu propio color</span></div><button class="opt" data-v="__cz" style="margin-top:2px"><span class="ib" style="--ibc:#FF5C8A">${I.palette}</span><span class="grow">Personalizar toda la interfaz<span class="val" style="display:block;margin:2px 0 0">Colores, fondo, esquinas y más</span></span>${I.chev}</button>`, v=>{ if(v==='__cz'){ setTimeout(()=>openSub('custom'),260); return; } S.accent=+v; save(); applyTheme(); renderSettings(); });
-    $('cPick').oninput=e=>{ S.accent='custom'; S.accentCustom=e.target.value; save(); applyTheme(); };
-    $('cPick').onchange=()=>{ renderSettings(); toast('Color guardado'); }; }
+  if(k==='accent'){ const [pa,pb]=accentPair(); openSheet(`<h3>Color de acento</h3><div class="swatches" style="padding:6px 18px 12px">${ACCENTS.map((c,i)=>`<button class="sw ${S.accent===i?'sel':''}" data-v="${i}" aria-label="Color ${i+1}" style="background:linear-gradient(135deg,${c[0]},${c[1]})"></button>`).join('')}</div><button class="opt cp-open ${S.accent==='custom'?'sel':''}" data-v="__pick"><span class="cp-chip" style="background:linear-gradient(135deg,${pa},${pb})"></span><span class="grow">Elegir tu propio color</span>${S.accent==='custom'?I.check:I.chev}</button>`, v=>{ if(v==='__pick'){ setTimeout(colorSheet,260); return; } S.accent=+v; save(); applyTheme(); renderSettings(); }); }
   if(k==='theme') themeSheet();
   if(k==='backup') openSub('backup');
   if(k==='sleep') sleepSheet();
@@ -2007,7 +2033,6 @@ function updateSelUI(){
 }
 const msRef = it => { const m=/^ms:(audio|video):(\d+)$/.exec(it.key); return m?{type:m[1],id:+m[2]}:null; };
 $('selClose').onclick = exitSel;
-document.addEventListener('keydown',e=>{ if(e.key==='Enter' && e.target.closest && e.target.closest('.af')){ const g=$('afGo'); g&&g.click(); } });
 $('selAllBtn').onclick = () => { if(!sel) return; const allOn=shown.length>0 && shown.every(i=>sel.has(i.key)); if(allOn){ exitSel(); } else { shown.forEach(i=>sel.add(i.key)); render(); } };
 $('selActions').onclick = e => {
   const b=e.target.closest('[data-sa]'); if(!b||!sel) return;
@@ -2094,6 +2119,50 @@ window.nxToast = m => toast(m);
 })();
 function hidePtr(){ const ptr=$('ptr'), c=$('content'); ptr.classList.remove('spin'); c.style.transition='transform .28s cubic-bezier(.2,.8,.2,1)'; ptr.style.transition='transform .28s cubic-bezier(.2,.8,.2,1), opacity .2s'; window._ptrPlace&&window._ptrPlace(0); }
 
+/* ---------- Selector de color propio (dentro de la app) ---------- */
+function hsv2hex(h,s,v){ const f=n=>{ const k=(n+h/60)%6; const x=v-v*s*Math.max(0,Math.min(k,4-k,1)); return Math.round(x*255).toString(16).padStart(2,'0'); }; return '#'+f(5)+f(3)+f(1); }
+function hex2hsv(hex){ const [r,g,b]=hx2n(hex).map(x=>x/255); const mx=Math.max(r,g,b), mn=Math.min(r,g,b), d=mx-mn; let h=0;
+  if(d){ h = mx===r?((g-b)/d+(g<b?6:0)): mx===g?((b-r)/d+2):((r-g)/d+4); h*=60; } return [h, mx?d/mx:0, mx]; }
+function colorSheet(){
+  const QUICK=['#6C4CF5','#E2366F','#FF7A1A','#F5B83D','#16A34A','#00B4D8','#2F6BFF','#9B30FF','#FF4FD8','#FFFFFF','#8A8FA3','#111111'];
+  let tgt='a', hsv=hex2hsv(accentPair()[0].startsWith('#')?accentPair()[0]:'#6C4CF5');
+  const cur = k => k==='a' ? accentPair()[0] : (S.accent2Custom || accentPair()[1]);
+  const toHex = c => { if(/^#[0-9a-f]{6}$/i.test(c)) return c; const m=document.createElement('canvas').getContext('2d'); m.fillStyle=c; const v=m.fillStyle; return /^#/.test(v)?v:'#12B5CB'; };
+  openSheet(`<h3>Elige tu color</h3>
+    <div class="cp-prev" id="cpPrev"><b id="cpName">Nexora Pro</b><span id="cpHint">Así se verá el color</span></div>
+    <div class="cp-tabs"><button class="on" data-v="tab:a" id="cpTa">Principal</button><button data-v="tab:b" id="cpTb">Secundario</button></div>
+    <div class="cp-sv" id="cpSV"><i class="cp-knob" id="cpK"></i></div>
+    <input type="range" class="cp-hue" id="cpHue" min="0" max="360" step="1" aria-label="Tono">
+    <div class="cp-row"><span class="cp-dot" id="cpDot"></span><input id="cpHex" maxlength="7" autocapitalize="characters" spellcheck="false" aria-label="Código del color"><button class="cp-auto" id="cpAuto" data-v="auto" style="display:none">Automático</button></div>
+    <div class="cp-sw">${QUICK.map(c=>`<button data-v="q:${c}" style="background:${c}" aria-label="${c}"></button>`).join('')}</div>
+    <div class="cp-act"><button class="btn ghost" data-v="reset">Restablecer</button><button class="btn" data-v="ok">Listo</button></div>`, (v)=>{
+    if(v==='ok'){ save(); renderSettings(); toast('Color guardado'); return true; }
+    if(v==='reset'){ S.accent=0; S.accentCustom=null; S.accent2Custom=null; save(); applyTheme(); renderSettings(); return true; }
+    if(v==='auto'){ S.accent2Custom=null; applyTheme(); sync(true); return false; }
+    if(v.startsWith('tab:')){ tgt=v.slice(4); hsv=hex2hsv(toHex(cur(tgt))); sync(true); return false; }
+    if(v.startsWith('q:')){ hsv=hex2hsv(v.slice(2)); commit(); sync(true); return false; }
+    return false;
+  });
+  const sv=$('cpSV'), hue=$('cpHue'), hex=$('cpHex');
+  function commit(){ const c=hsv2hex(...hsv); S.accent='custom'; if(tgt==='a') S.accentCustom=c; else { S.accentCustom=S.accentCustom||accentPair()[0]; S.accent2Custom=c; } applyTheme(); sync(false); }
+  function sync(full){
+    const c=hsv2hex(...hsv), [A,B]=accentPair();
+    $('cpPrev').style.background=`linear-gradient(135deg,${A},${B})`;
+    $('cpDot').style.background=c; $('cpTa').classList.toggle('on',tgt==='a'); $('cpTb').classList.toggle('on',tgt==='b');
+    $('cpAuto').style.display = (tgt==='b' && S.accent2Custom)?'':'none';
+    $('cpHint').textContent = tgt==='b' && !S.accent2Custom ? 'Secundario automático · toca para cambiarlo' : 'Así se verá el color';
+    sv.style.setProperty('--h',hsv[0]); $('cpK').style.left=(hsv[1]*100)+'%'; $('cpK').style.top=((1-hsv[2])*100)+'%'; $('cpK').style.background=c;
+    hue.value=hsv[0]; hue.style.setProperty('--hc',hsv2hex(hsv[0],1,1));
+    if(full || document.activeElement!==hex) hex.value=c.toUpperCase();
+  }
+  const pick=e=>{ const r=sv.getBoundingClientRect(); hsv[1]=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)); hsv[2]=1-Math.min(1,Math.max(0,(e.clientY-r.top)/r.height)); commit(); };
+  sv.addEventListener('pointerdown',e=>{ sv.setPointerCapture(e.pointerId); sv._d=true; pick(e); });
+  sv.addEventListener('pointermove',e=>{ if(sv._d) pick(e); });
+  sv.addEventListener('pointerup',()=>{ sv._d=false; }); sv.addEventListener('pointercancel',()=>{ sv._d=false; });
+  hue.addEventListener('input',()=>{ hsv[0]=+hue.value; commit(); });
+  hex.addEventListener('input',()=>{ let v=hex.value.trim(); if(v[0]!=='#') v='#'+v; if(/^#[0-9a-f]{6}$/i.test(v)){ hsv=hex2hsv(v); commit(); } });
+  sync(true);
+}
 /* ---------- Temas ---------- */
 const THEMES=[['auto','Automático','#1C1838','#262148','#F1EFFF'],['dark','Oscuro','#120F2A','#262148','#F1EFFF'],['light','Claro','#F3F2FA','#FFFFFF','#17142E'],
  ['amoled','Medianoche','#000000','#1A1A23','#F4F4F8'],['ocean','Océano','#06182B','#163458','#E8F4FF'],['forest','Bosque','#0A1912','#1B3A29','#EAF7EE'],
@@ -2172,115 +2241,72 @@ $('restoreIn').onchange = e => {
   rd.readAsText(f);
 };
 
-/* ---------- Cuenta y copia en la nube (Supabase) ---------- */
-// 1) Crea un proyecto gratis en supabase.com  2) Ejecuta supabase-setup.sql  3) Pega aquí tu Project URL y tu anon key.
-const NX_CLOUD = { url:'', key:'' };
-const cloudOn = () => !!(NX_CLOUD.url && NX_CLOUD.key);
-let acct = store.get('acct', null), authBusy=false, authStep=1, authMail='';
-const AIC = {
-  mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 8 8 6 8-6"/></svg>',
-  lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>',
-  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>',
-  eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'
-};
-function cloudErr(j,st){
-  const l=String((j&&(j.msg||j.error_description||j.message||j.error))||'').toLowerCase();
-  if(l.includes('invalid login')) return 'Correo o contraseña incorrectos';
-  if(l.includes('already registered')||l.includes('already been registered')) return 'Ese correo ya tiene una cuenta';
-  if(l.includes('not confirmed')) return 'Confirma tu correo antes de entrar';
-  if(l.includes('at least')) return 'La contraseña debe tener al menos 6 caracteres';
-  if(l.includes('rate limit')||st===429) return 'Demasiados intentos. Espera un momento';
-  if(l.includes('same password')) return 'Usa una contraseña distinta a la anterior';
-  if(l.includes('expired')||l.includes('invalid')) return 'Código incorrecto o vencido';
-  if(l.includes('payload')||st===413) return 'La copia es demasiado grande para subirla';
-  return (j&&(j.msg||j.error_description||j.message))||('Error '+st);
+/* ---------- Cuenta de Google y copia de seguridad en Drive ---------- */
+const GD_NAME = 'Nexora Pro - copia de seguridad.json';
+const GD_FILES = 'https://www.googleapis.com/drive/v3/files';
+let gacct = store.get('gacct', null), gBusy = false, gWait = null;
+const IC_G = '<svg viewBox="0 0 24 24" width="22" height="22"><path fill="#4285F4" d="M23 12.27c0-.8-.07-1.56-.2-2.3H12v4.35h6.17a5.28 5.28 0 0 1-2.29 3.47v2.88h3.7C21.74 18.7 23 15.7 23 12.27z"/><path fill="#34A853" d="M12 24c3.1 0 5.7-1.03 7.6-2.8l-3.7-2.88c-1.03.69-2.35 1.1-3.9 1.1-3 0-5.54-2.02-6.45-4.74H1.73v2.97A11.99 11.99 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.55 14.68A7.2 7.2 0 0 1 5.17 12c0-.93.16-1.83.38-2.68V6.35H1.73A11.99 11.99 0 0 0 0 12c0 1.94.46 3.77 1.73 5.65l3.82-2.97z"/><path fill="#EA4335" d="M12 4.77c1.69 0 3.2.58 4.4 1.72l3.3-3.3C17.7 1.35 15.1 0 12 0 7.3 0 3.25 2.7 1.73 6.35l3.82 2.97C6.46 6.79 9 4.77 12 4.77z"/></svg>';
+function gErr(e){
+  e=String(e||'');
+  if(e==='perm') return 'Debes permitir el acceso a Google Drive para guardar tu copia';
+  if(/(^|\D)10(\D|$)|DEVELOPER_ERROR|12500/.test(e)) return 'Google aún no está configurado para esta app (falta el ID de cliente)';
+  if(/cancel|12501|16:/i.test(e)) return 'Inicio de sesión cancelado';
+  if(/network|(^|\D)7:/i.test(e)) return 'Sin conexión a internet';
+  return e || 'No se pudo conectar con Google';
 }
-async function cloud(path,{method='POST',body,token,headers}={}){
-  if(!cloudOn()) throw new Error('La nube aún no está configurada');
-  let r; try{ r=await fetch(NX_CLOUD.url.replace(/\/+$/,'')+path,{method,headers:{apikey:NX_CLOUD.key,'Content-Type':'application/json',Authorization:'Bearer '+(token||NX_CLOUD.key),...(headers||{})},body:body?JSON.stringify(body):undefined}); }
-  catch(e){ throw new Error('Sin conexión a internet'); }
-  const tx=await r.text(); let j=null; try{ j=tx?JSON.parse(tx):null; }catch(e){}
-  if(!r.ok) throw new Error(cloudErr(j,r.status));
-  return j;
+window.nxOnGoogle = (tok, err) => { const w=gWait; gWait=null; if(!w) return; tok ? w.res(tok) : w.rej(new Error(gErr(err))); };
+function gToken(){
+  return new Promise((res,rej)=>{
+    if(!NATIVE || !Nexora.googleSignIn){ rej(new Error('Disponible solo en la app instalada')); return; }
+    gWait={res,rej}; Nexora.googleSignIn();
+  });
 }
-function setAcct(j){
-  if(!j||!j.access_token){ acct=null; }
-  else acct={access:j.access_token, refresh:j.refresh_token, exp:Date.now()+(j.expires_in||3600)*1000-60000, email:(j.user&&j.user.email)||(acct&&acct.email)||'', name:(j.user&&j.user.user_metadata&&j.user.user_metadata.name)||(acct&&acct.name)||'', id:(j.user&&j.user.id)||(acct&&acct.id)};
-  store.set('acct',acct);
+async function gApi(url, tok, opt={}){
+  let r; try{ r=await fetch(url,{...opt,headers:{Authorization:'Bearer '+tok,...(opt.headers||{})}}); }catch(e){ throw new Error('Sin conexión a internet'); }
+  if(r.status===401) throw new Error('Tu sesión de Google venció. Inicia sesión de nuevo');
+  if(!r.ok){ let m=''; try{ m=(await r.json()).error.message; }catch(e){} throw new Error(r.status===403?'Activa la API de Google Drive en tu proyecto de Google Cloud':(m||('Error '+r.status))); }
+  return r;
 }
-async function getToken(){
-  if(!acct) throw new Error('Inicia sesión primero');
-  if(Date.now()>acct.exp){
-    try{ setAcct(await cloud('/auth/v1/token?grant_type=refresh_token',{body:{refresh_token:acct.refresh}})); }
-    catch(e){ acct=null; store.set('acct',null); throw new Error('Tu sesión venció. Inicia sesión de nuevo'); }
-  }
-  return acct.access;
-}
-const validMail = s => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s);
-async function authDo(kind){
-  if(authBusy) return;
-  const val=id=>{ const e=$(id); return e?e.value:''; };
-  const msg=(m,ok)=>{ const e=$('authMsg'); if(e){ e.textContent=m||''; e.className='amsg'+(m?' on':'')+(ok?' ok':''); } return false; };
-  const busy=on=>{ authBusy=on; const g=$('afGo'); if(g){ g.disabled=on; g.classList.toggle('busy',on); } };
-  msg('');
-  try{
-    if(kind==='login'){
-      const email=val('afMail').trim().toLowerCase(), pw=val('afPass');
-      if(!validMail(email)) return msg('Escribe un correo válido'); if(!pw) return msg('Escribe tu contraseña');
-      busy(true); setAcct(await cloud('/auth/v1/token?grant_type=password',{body:{email,password:pw}}));
-      busy(false); toast('Sesión iniciada'); openSub('backup'); return;
-    }
-    if(kind==='register'){
-      const name=val('afName').trim(), email=val('afMail').trim().toLowerCase(), pw=val('afPass'), pw2=val('afPass2');
-      if(!name) return msg('Escribe tu nombre'); if(!validMail(email)) return msg('Escribe un correo válido');
-      if(pw.length<6) return msg('La contraseña debe tener al menos 6 caracteres'); if(pw!==pw2) return msg('Las contraseñas no coinciden');
-      busy(true); const j=await cloud('/auth/v1/signup',{body:{email,password:pw,data:{name}}}); busy(false);
-      if(j&&j.access_token){ setAcct(j); toast('Cuenta creada'); openSub('backup'); }
-      else { toast('Te enviamos un correo para confirmar tu cuenta'); openSub('login'); }
-      return;
-    }
-    if(kind==='recover1'||kind==='recover1b'){
-      const email=kind==='recover1b'?authMail:val('afMail').trim().toLowerCase();
-      if(!validMail(email)) return msg('Escribe un correo válido');
-      busy(true); await cloud('/auth/v1/recover',{body:{email}}); busy(false);
-      authMail=email; authStep=2; if(kind==='recover1b') toast('Código reenviado'); renderSub(); return;
-    }
-    if(kind==='recover2'){
-      const code=val('afCode').trim(), pw=val('afPass');
-      if(!code) return msg('Escribe el código que te enviamos'); if(pw.length<6) return msg('La contraseña debe tener al menos 6 caracteres');
-      busy(true);
-      const s=await cloud('/auth/v1/verify',{body:{type:'recovery',email:authMail,token:code}});
-      await cloud('/auth/v1/user',{method:'PUT',token:s.access_token,body:{password:pw}});
-      setAcct(s); busy(false); authStep=1; toast('Contraseña cambiada'); openSub('backup'); return;
-    }
-  }catch(e){ busy(false); msg(e.message||'No se pudo completar'); }
-}
+const gFind = async tok => (await (await gApi(`${GD_FILES}?q=${encodeURIComponent(`name='${GD_NAME}' and trashed=false`)}&fields=${encodeURIComponent('files(id,modifiedTime)')}&orderBy=modifiedTime%20desc&pageSize=5`,tok)).json()).files||[];
 function askRestoreCloud(d,when){
-  openSheet(`<h3>¿Traer tu copia de la nube?</h3><p style="margin:0 18px 6px;color:var(--muted);line-height:1.5">Se combinarán tus playlists y favoritos con los de la copia, y se usarán sus ajustes.</p><p style="margin:0 18px 16px;font-weight:700">${esc(when?new Date(when).toLocaleString():'')} · ${(d.playlists||[]).length} playlists · ${(d.favs||[]).length} favoritos</p><div style="padding:0 18px;display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" data-v="no">Cancelar</button><button class="btn" data-v="yes">Restaurar</button></div>`, v=>{
+  openSheet(`<h3>¿Traer tu copia de Google Drive?</h3><p style="margin:0 18px 6px;color:var(--muted);line-height:1.5">Se combinarán tus playlists y favoritos con los de la copia, y se usarán sus ajustes.</p><p style="margin:0 18px 16px;font-weight:700">${esc(when?new Date(when).toLocaleString():'')} · ${(d.playlists||[]).length} playlists · ${(d.favs||[]).length} favoritos</p><div style="padding:0 18px;display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" data-v="no">Cancelar</button><button class="btn" data-v="yes">Restaurar</button></div>`, v=>{
     if(v!=='yes') return; restoreBackup(d); toast('Copia restaurada'); setTimeout(()=>location.reload(),900);
   });
 }
-async function cloudAct(a){
-  if(authBusy) return;
-  if(a==='delask'){ openSheet(`<h3>¿Borrar tu copia de la nube?</h3><p style="margin:0 18px 16px;color:var(--muted);line-height:1.5">Se elimina la copia guardada en tu cuenta. Los datos de este teléfono no se tocan.</p><div style="padding:0 18px;display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" data-v="no">Cancelar</button><button class="btn" data-v="yes" style="background:var(--danger)">Borrar</button></div>`, v=>{ if(v==='yes') cloudAct('del'); }); return; }
-  authBusy=true;
+async function gAct(a){
+  if(gBusy) return;
+  if(a==='logout'){ gacct=null; store.set('gacct',null); toast('Sesión cerrada'); renderSub(); return; }
+  if(a==='delask'){ openSheet(`<h3>¿Borrar tu copia de Drive?</h3><p style="margin:0 18px 16px;color:var(--muted);line-height:1.5">Se elimina la copia guardada en tu Google Drive. Los datos de este teléfono no se tocan.</p><div style="padding:0 18px;display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" data-v="no">Cancelar</button><button class="btn" data-v="yes" style="background:var(--danger)">Borrar</button></div>`, v=>{ if(v==='yes') gAct('del'); }); return; }
+  gBusy=true; if(subKind==='backup') renderSub();
   try{
-    const tk=await getToken();
-    if(a==='up'){ toast('Subiendo copia…'); await cloud('/rest/v1/nexora_backups?on_conflict=user_id',{token:tk,headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:{user_id:acct.id,data:buildBackup(),updated_at:new Date().toISOString()}}); store.set('lastCloud',Date.now()); toast('Copia guardada en tu cuenta'); }
-    if(a==='down'){ toast('Buscando tu copia…'); const j=await cloud(`/rest/v1/nexora_backups?select=data,updated_at&user_id=eq.${acct.id}`,{method:'GET',token:tk}); if(!j||!j.length) toast('Aún no tienes una copia en la nube'); else askRestoreCloud(j[0].data,j[0].updated_at); }
-    if(a==='del'){ await cloud(`/rest/v1/nexora_backups?user_id=eq.${acct.id}`,{method:'DELETE',token:tk}); store.set('lastCloud',null); toast('Copia borrada de la nube'); }
-  }catch(e){ toast(e.message||'No se pudo completar'); if(!acct) renderSub(); }
-  authBusy=false; if(subKind==='backup') renderSub();
+    const tok=await gToken();
+    if(a==='login'){
+      const u=await (await gApi('https://www.googleapis.com/oauth2/v3/userinfo',tok)).json();
+      gacct={email:u.email||'',name:u.name||u.given_name||'',pic:u.picture||''}; store.set('gacct',gacct); toast('Sesión iniciada');
+    }
+    if(a==='up'){
+      toast('Subiendo copia…'); const data=JSON.stringify(buildBackup()), f=await gFind(tok);
+      if(f.length) await gApi(`https://www.googleapis.com/upload/drive/v3/files/${f[0].id}?uploadType=media`,tok,{method:'PATCH',headers:{'Content-Type':'application/json'},body:data});
+      else { const b='nxb'+Date.now(); await gApi('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',tok,{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body:`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({name:GD_NAME,mimeType:'application/json'})}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${data}\r\n--${b}--`}); }
+      store.set('lastCloud',Date.now()); toast('Copia guardada en tu Google Drive');
+    }
+    if(a==='down'){
+      toast('Buscando tu copia…'); const f=await gFind(tok);
+      if(!f.length) toast('Aún no tienes una copia en Google Drive');
+      else { const d=await (await gApi(`${GD_FILES}/${f[0].id}?alt=media`,tok)).json(); if(!d||d.app!=='Nexora Pro') toast('La copia de Drive no es válida'); else askRestoreCloud(d,f[0].modifiedTime); }
+    }
+    if(a==='del'){ const f=await gFind(tok); for(const x of f) await gApi(`${GD_FILES}/${x.id}`,tok,{method:'DELETE'}); store.set('lastCloud',null); toast('Copia borrada de Drive'); }
+  }catch(e){ toast(e.message||'No se pudo completar'); }
+  gBusy=false; if(subKind==='backup') renderSub();
 }
 function cloudCard(){
-  if(!cloudOn()) return '';
-  if(acct){
-    const lc=store.get('lastCloud',null);
-    return `<div class="acct"><div class="av">${esc((acct.name||acct.email||'?').trim()[0].toUpperCase())}</div><div class="tx"><b>${esc(acct.name||'Mi cuenta')}</b><small>${esc(acct.email||'')}</small></div><button class="alink" data-s="auth:logout">Salir</button></div>
-      <div class="bk-acts"><button data-s="cloud:up"><span class="ib" style="--ibc:#7C5CFF">${IC_UP}</span><b>Subir a la nube</b><small>${lc?'Última: '+new Date(lc).toLocaleDateString():'Aún no hay copia'}</small></button><button data-s="cloud:down"><span class="ib" style="--ibc:#12B5CB">${IC_DOWN}</span><b>Traer de la nube</b><small>Restaura tus datos aquí</small></button></div>
-      <button class="alink danger" style="margin:0 0 14px" data-s="cloud:delask">Borrar mi copia de la nube</button>`;
+  if(gacct){
+    const lc=store.get('lastCloud',null), dis=gBusy?'disabled':'';
+    return `<div class="acct"><div class="av">${gacct.pic?`<img src="${esc(gacct.pic)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:''}${esc((gacct.name||gacct.email||'G').trim()[0].toUpperCase())}</div><div class="tx"><b>${esc(gacct.name||'Cuenta de Google')}</b><small>${esc(gacct.email||'')}</small></div><button class="alink" data-s="g:logout">Salir</button></div>
+      <div class="bk-acts"><button data-s="g:up" ${dis}><span class="ib" style="--ibc:#7C5CFF">${IC_UP}</span><b>${gBusy?'Espera…':'Subir a Drive'}</b><small>${lc?'Última: '+new Date(lc).toLocaleDateString():'Guarda tu copia ahora'}</small></button><button data-s="g:down" ${dis}><span class="ib" style="--ibc:#12B5CB">${IC_DOWN}</span><b>Traer de Drive</b><small>Restaura tus datos aquí</small></button></div>
+      <button class="alink danger" style="margin:0 0 14px" data-s="g:delask">Borrar mi copia de Drive</button>`;
   }
-  return `<div class="acct-hero"><div class="ico">${IC_CLOUD}</div><b>Tu copia en la nube</b><p>Inicia sesión para guardar tus playlists, favoritos y ajustes en tu cuenta y recuperarlos en cualquier teléfono.</p><button class="btn" data-s="go:login">Iniciar sesión</button><button class="alink" data-s="go:register">Crear cuenta</button></div>`;
+  return `<div class="acct-hero"><div class="ico">${IC_CLOUD}</div><b>Guarda tu copia en Google Drive</b><p>Inicia sesión con tu cuenta de Google y recupera tus playlists, favoritos y ajustes en cualquier teléfono.</p><button class="gbtn" data-s="g:login" ${gBusy?'disabled':''}>${IC_G}<span>${gBusy?'Conectando…':'Iniciar sesión con Google'}</span></button></div>`;
 }
 
 /* ---------- Fondo personalizado de galería ---------- */
@@ -2382,32 +2408,11 @@ function renderSub(){
   else if(subKind==='backup'){
     const last=store.get('lastBackup',null);
     const nPl=playlists.length, nFav=favKeys.size, nCov=Object.keys(covers).length;
-    h = subHead('Copia de seguridad') + `${cloudOn()?'':`<div class="bk-hero"><div class="ico">${IC_CLOUD}</div><b>Tus datos, siempre a salvo</b><p>Guarda tus playlists, favoritos, portadas, ajustes y estadísticas en un archivo. Puedes guardarlo en Google Drive y restaurarlo en otro teléfono.</p><span class="bk-last">${I.restore.replace('<svg','<svg width="15" height="15"')}${last?`Última copia: ${new Date(last).toLocaleDateString()}`:'Última copia: Nunca'}</span></div>`}
-      ${cloudCard()}${cloudOn()?'<div class="sec-t">En tu teléfono</div>':''}
+    h = subHead('Copia de seguridad') + `${cloudCard()}<div class="sec-t">En tu teléfono</div><div style="margin:0 0 12px"><span class="bk-last">${I.restore.replace('<svg','<svg width="15" height="15"')}${last?`Última copia: ${new Date(last).toLocaleDateString()}`:'Última copia: Nunca'}</span></div>
       <div class="bk-acts"><button data-s="bk:make"><span class="ib" style="--ibc:#7C5CFF">${IC_UP}</span><b>Crear copia</b><small>Se guarda en Descargas/Nexora</small></button><button data-s="bk:restore"><span class="ib" style="--ibc:#12B5CB">${IC_DOWN}</span><b>Restaurar</b><small>Elige un archivo de copia (.json)</small></button></div>
       <button class="bk-share" data-s="bk:share" ${lastBackupUri?'':'disabled'}>${IC_SHARE}Guardar en Drive, WhatsApp…</button>
       <div class="sec-t">Qué se guarda</div>
       <div class="bk-inc"><span>${nPl} playlists</span><span>${nFav} favoritos</span><span>${nCov} portadas</span><span>Ajustes</span><span>Estadísticas</span><span>Posición de videos</span><span>Fondo</span></div>`;
-  }
-  else if(subKind==='login' || subKind==='register' || subKind==='recover'){
-    const logo=(document.querySelector('.brand img')||{}).src||'';
-    const AF=(id,ic,ph,type='text',ac='off')=>`<label class="af"><span class="ai">${AIC[ic]}</span><input id="${id}" type="${type}" placeholder="${ph}" autocomplete="${ac}" autocapitalize="none" spellcheck="false">${type==='password'?`<button type="button" class="aeye" data-s="eye:${id}" aria-label="Mostrar contraseña">${AIC.eye}</button>`:''}</label>`;
-    const head=(ti,su)=>`<div class="ahero"><img src="${logo}" alt=""><b>${ti}</b><span>${su}</span></div>`;
-    h = subHead('Mi cuenta');
-    if(subKind==='login') h += head('Bienvenido de vuelta','Inicia sesión para guardar tu copia en la nube')
-      + AF('afMail','mail','Correo electrónico','email','email') + AF('afPass','lock','Contraseña','password','current-password')
-      + `<button class="alink" style="align-self:flex-end" data-s="go:recover">¿Olvidaste tu contraseña?</button><div class="amsg" id="authMsg"></div>`
-      + `<button class="bk-share" id="afGo" data-s="auth:login">Iniciar sesión</button><p class="aswap">¿No tienes cuenta? <button data-s="go:register">Regístrate</button></p>`;
-    if(subKind==='register') h += head('Crea tu cuenta','Es gratis y solo sirve para tu copia en la nube')
-      + AF('afName','user','Nombre','text','name') + AF('afMail','mail','Correo electrónico','email','email')
-      + AF('afPass','lock','Contraseña (mínimo 6)','password','new-password') + AF('afPass2','lock','Confirmar contraseña','password','new-password')
-      + `<div class="amsg" id="authMsg"></div><button class="bk-share" id="afGo" data-s="auth:register">Crear cuenta</button><p class="aswap">¿Ya tienes cuenta? <button data-s="go:login">Inicia sesión</button></p>`;
-    if(subKind==='recover' && authStep===1) h += head('Recuperar contraseña','Escribe tu correo y te enviaremos un código')
-      + AF('afMail','mail','Correo electrónico','email','email') + `<div class="amsg" id="authMsg"></div><button class="bk-share" id="afGo" data-s="auth:recover1">Enviar código</button><p class="aswap"><button data-s="go:login">Volver a iniciar sesión</button></p>`;
-    if(subKind==='recover' && authStep===2) h += head('Revisa tu correo',`Enviamos un código a ${esc(authMail)}`)
-      + AF('afCode','lock','Código de verificación','text','one-time-code') + AF('afPass','lock','Nueva contraseña','password','new-password')
-      + `<div class="amsg" id="authMsg"></div><button class="bk-share" id="afGo" data-s="auth:recover2">Cambiar contraseña</button><p class="aswap"><button data-s="auth:recover1b">Reenviar código</button></p>`;
-    h = `<div class="authbox">${h}</div>`;
   }
   else if(subKind==='custom'){
     const [ca,cb]=accentPair(); const hex2=v=>/^#[0-9a-f]{6}$/i.test(v)?v:'#7C5CFF';
@@ -2435,14 +2440,11 @@ function renderSub(){
 $('sub').addEventListener('click', e=>{
   const b=e.target.closest('[data-s]'); if(!b) return;
   const [cmd, ...rest]=b.dataset.s.split(':'), arg=rest.join(':');
-  if(cmd==='back'){ if(['login','register','recover'].includes(subKind)) openSub('backup'); else closeSub(); }
+  if(cmd==='back') closeSub();
   if(cmd==='tab'){ subTab=arg; subChip='all'; renderSub(); }
   if(cmd==='chip'){ subChip=arg; renderSub(); }
   if(cmd==='lang'){ setLang(arg); renderSub(); }
-  if(cmd==='go'){ authStep=1; openSub(arg); }
-  if(cmd==='eye'){ const i=$(arg); if(i){ i.type=i.type==='password'?'text':'password'; } }
-  if(cmd==='auth'){ if(arg==='logout'){ acct=null; store.set('acct',null); toast('Sesión cerrada'); renderSub(); } else authDo(arg); }
-  if(cmd==='cloud') cloudAct(arg);
+  if(cmd==='g') gAct(arg);
   if(cmd==='cz'){
     const [k,v]=arg.split(':');
     if(k==='rad'){ S.radius=v; }
