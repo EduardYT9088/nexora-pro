@@ -1,9 +1,7 @@
-Versión: 1.6.5
-- Copia de seguridad: guarda tus playlists, favoritos, portadas y ajustes, y restáuralos en otro teléfono
-- 8 temas nuevos: Medianoche, Océano, Bosque, Atardecer, Café, Nórdico, Crema y Cielo
-- Nuevos idiomas: Deutsch y Bahasa Indonesia (ya son 7)
-- Ajustes ahora usa tu fondo personalizado sin que se vea la lista detrás
-- Nuevo reproductor de música con diseño propio y disco que gira
-- Nuevo diseño propio de Nexora en toda la app
-- Mantén presionado el video para verlo a velocidad 2x
-- Donaciones por PayPal en Ajustes
+Versión: 1.6.6
+- Nuevo logo de Nexora en la app y en el ícono del teléfono
+- La app ahora se llama Reproductor De Música Nexora Pro
+- Selección de videos y canciones rediseñada: cabecera con contador, botón Todos y barra de acciones flotante
+- Nueva hoja para ordenar con iconos y descripción de cada opción
+- Las hojas inferiores ahora tienen fondo sólido y se leen mejor con fondo personalizado
+- Renombrar ahora aparece en la barra de acciones al seleccionar un solo archivo
