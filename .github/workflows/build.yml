@@ -768,10 +768,11 @@ jobs:
               }
 
               private fun googleResult(resultCode: Int, data: Intent?) {
-                  if (resultCode != RESULT_OK) { googleFail("cancel"); return }
-                  runCatching { Identity.getAuthorizationClient(this).getAuthorizationResultFromIntent(data) }
-                      .onSuccess { googleDone(it) }
-                      .onFailure { googleFail(it.message) }
+                  // Aunque Android diga "cancelado", intentamos leer el resultado: a veces sí trae el permiso.
+                  val r = runCatching { Identity.getAuthorizationClient(this).getAuthorizationResultFromIntent(data) }
+                  r.getOrNull()?.let { googleDone(it); return }
+                  val why = r.exceptionOrNull()?.message ?: "sin detalle"
+                  googleFail(if (resultCode == RESULT_OK) why else "cancel:$why")
               }
 
               private fun granted(p: String) = checkSelfPermission(p) == PackageManager.PERMISSION_GRANTED
