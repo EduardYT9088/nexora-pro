@@ -1,5 +1,6 @@
-Versión: 1.7.0
-- Copia de seguridad más clara: botón "Borrar mi copia de Drive" rediseñado, títulos de sección legibles sobre cualquier fondo y botón "Compartir la copia en WhatsApp"
-- Inicia sesión con Google desde cualquier cuenta y guarda tu copia en tu Google Drive
-- Todo el texto de la app se traduce en los 7 idiomas
-- Nueva pantalla de Tema y nueva pantalla de Idioma
+Versión: 1.8.0
+- Nuevo visualizador de música con 4 estilos: Barras, Onda, Círculo y Puntos
+- Letras automáticas: las canciones nuevas, incluidas las de Download Nexora, buscan su letra solas
+- Letras sincronizadas con la música; toca una línea para saltar a ese momento
+- Puedes buscar, pegar, editar, ajustar o borrar la letra de cada canción
+- Nuevas pestañas en el reproductor: Portada, Letras y Visual

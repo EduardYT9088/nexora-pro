@@ -117,6 +117,8 @@ jobs:
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
               <uses-permission android:name="android.permission.WAKE_LOCK" />
+              <!-- Solo para el visualizador de música: lee la intensidad del sonido que reproduce Nexora; no graba ni guarda nada -->
+              <uses-permission android:name="android.permission.RECORD_AUDIO" />
               <!-- Necesario para el servidor local 127.0.0.1 que entrega la música al reproductor; la app no usa internet -->
               <uses-permission android:name="android.permission.INTERNET" />
               <!-- Instalar las actualizaciones de Nexora Pro dentro de la app (Android siempre pide confirmar) -->
@@ -566,6 +568,7 @@ jobs:
                   private const val REQ_MEDIA = 11
                   private const val REQ_NOTIF = 12
                   private const val REQ_GOOGLE = 13
+                  private const val REQ_REC = 14
                   private const val DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file"
                   private const val PERM_VISUAL_SELECTED = "android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
               }
@@ -621,6 +624,7 @@ jobs:
                   server = LocalServer(applicationContext)
                   files = FileActions(this) { js(it) }
                   nat = NativeAudioPlayer(applicationContext) { ev, v -> js("window.nxNA && nxNA('$ev', $v)") }
+                  nat.vizOut = { s -> js("window.nxViz && nxViz('$s')") }
 
                   val bg = Color.parseColor("#120F2A")
                   root = FrameLayout(this).apply { setBackgroundColor(bg) }
@@ -895,6 +899,13 @@ jobs:
                   @JavascriptInterface fun naRate(r: Double) = runOnUiThread { nat.setRate(r) }
                   @JavascriptInterface fun naVolume(v: Double) = runOnUiThread { nat.setVolume(v) }
                   @JavascriptInterface fun naEq(on: Boolean, gains: String) = runOnUiThread { nat.setEq(on, gains) }
+                  // Visualizador de música: datos reales del sonido (necesita el permiso de audio, solo para medir; no graba)
+                  @JavascriptInterface fun naViz(on: Boolean) = runOnUiThread {
+                      if (on && checkSelfPermission(Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                          nat.setViz(true)
+                          requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), REQ_REC)
+                      } else nat.setViz(on)
+                  }
                   @JavascriptInterface fun naBoost(level: Int) = runOnUiThread { nat.setBoost(level) }
                   @JavascriptInterface fun naFx(bass: Int, surround: Int, clarity: Int, norm: Boolean) = runOnUiThread { nat.setFx(bass, surround, clarity, norm) }
 
@@ -979,6 +990,11 @@ jobs:
                   when (requestCode) {
                       REQ_MEDIA -> js("window.nxOnPermissions && nxOnPermissions(${permState()})")
                       REQ_NOTIF -> js("window.nxOnNotif && nxOnNotif(${permState().optBoolean("notif")})")
+                      REQ_REC -> {
+                          val ok = grantResults.isNotEmpty() && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED
+                          nat.setViz(ok)
+                          js("window.nxVizPerm && nxVizPerm($ok)")
+                      }
                   }
               }
 
@@ -1361,6 +1377,10 @@ jobs:
           import android.media.audiofx.Equalizer
           import android.media.audiofx.Virtualizer
           import android.media.audiofx.LoudnessEnhancer
+          import android.media.audiofx.Visualizer
+          import android.Manifest
+          import android.content.pm.PackageManager
+          import android.util.Base64
           import android.os.Handler
           import android.os.Looper
           import android.os.PowerManager
@@ -1391,6 +1411,44 @@ jobs:
               private var bass: BassBoost? = null
               private var virt: Virtualizer? = null
               private var dyn: DynamicsProcessing? = null
+              // Visualizador: lee el espectro del sonido que sale (sin grabar ni guardar nada)
+              var vizOut: ((String) -> Unit)? = null
+              private var viz: Visualizer? = null
+              private var vizWanted = false
+              fun setViz(on: Boolean) { vizWanted = on; startViz() }
+              private fun stopViz() { runCatching { viz?.enabled = false }; runCatching { viz?.release() }; viz = null }
+              private fun startViz() {
+                  stopViz()
+                  if (!vizWanted) return
+                  if (ctx.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) return
+                  val sid = mp?.takeIf { prepared }?.audioSessionId ?: 0
+                  runCatching {
+                      val v = Visualizer(sid)
+                      v.captureSize = Visualizer.getCaptureSizeRange()[1].coerceAtMost(1024)
+                      v.setDataCaptureListener(object : Visualizer.OnDataCaptureListener {
+                          override fun onWaveFormDataCapture(vz: Visualizer?, w: ByteArray?, r: Int) {}
+                          override fun onFftDataCapture(vz: Visualizer?, fft: ByteArray?, r: Int) { if (fft != null) sendFft(fft) }
+                      }, Visualizer.getMaxCaptureRate() / 2, false, true)
+                      v.enabled = true
+                      viz = v
+                  }
+              }
+              private fun sendFft(fft: ByteArray) {
+                  val n = fft.size / 2
+                  if (n < 8) return
+                  val out = ByteArray(64)
+                  for (b in 0 until 64) {
+                      val lo = Math.pow((n - 1).toDouble(), b / 64.0).toInt().coerceAtLeast(1)
+                      val hi = Math.pow((n - 1).toDouble(), (b + 1) / 64.0).toInt().coerceAtLeast(lo + 1).coerceAtMost(n)
+                      var m = 0.0
+                      for (i in lo until hi) {
+                          val re = fft[2 * i].toDouble(); val im = fft[2 * i + 1].toDouble()
+                          m = maxOf(m, Math.hypot(re, im))
+                      }
+                      out[b] = minOf(255.0, m * 2.4).toInt().toByte()
+                  }
+                  vizOut?.invoke(Base64.encodeToString(out, Base64.NO_WRAP))
+              }
               private var fxBass = 0; private var fxSurround = 0; private var fxClarity = 0; private var fxNorm = false
               private val freqs = doubleArrayOf(31.0, 62.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0, 16000.0)
 
@@ -1422,6 +1480,7 @@ jobs:
                       prepared = true
                       it.setVolume(vol, vol)
                       applyEffects()
+                      if (vizWanted) startViz()
                       emit("meta", it.duration / 1000.0)
                       if (pendingSeek >= 0) { it.seekTo(pendingSeek.toInt()); pendingSeek = -1 }
                       if (wantPlay) start()
@@ -1569,8 +1628,10 @@ jobs:
                   runCatching { bass?.release() }; bass = null
                   runCatching { virt?.release() }; virt = null
                   runCatching { dyn?.release() }; dyn = null
+                  stopViz()
                   runCatching { mp?.release() }; mp = null
                   prepared = false; wantPlay = false
+                  if (vizWanted) main.post { startViz() }
               }
           }
           NXEOF
