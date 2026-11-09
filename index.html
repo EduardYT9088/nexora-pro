@@ -2425,6 +2425,7 @@ window.nxOnScan = list => {
   { const kn=new Set(store.get('known',[])), hadKn=kn.size>0, fresh=mapped.filter(i=>i.type==='audio' && !kn.has(i.key));
     mapped.forEach(i=>kn.add(i.key)); store.set('known',[...kn]);
     if(hadKn && S.autoLy!==false) fresh.forEach(i=>lyEnqueue(i)); }
+  if(S.autoLy!==false && !S.eco){ clearTimeout(window.__lyBg); window.__lyBg=setTimeout(()=>{ if(navigator.onLine) live().filter(i=>i.type==='audio' && !lyHave.has(i.key)).forEach(i=>lyEnqueue(i)); },4000); }
   if(firstLoad) resumeLast();
   if($('settings').classList.contains('on')) renderSettings();
 };
