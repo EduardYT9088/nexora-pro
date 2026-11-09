@@ -809,6 +809,37 @@ input.cp-hue{display:block;width:calc(100% - 36px);margin:0 18px 12px;height:28p
 .field textarea{width:100%;min-height:200px;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--text);padding:12px 14px;font:inherit;font-size:14px;line-height:1.45;resize:vertical}
 .field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:8px 2px 5px}
 .ly-pc{display:flex;gap:6px;align-items:center;margin-top:8px;font-size:12px;color:var(--muted)}
+
+/* ===== v1.9: ajuste del reproductor, volumen, ahorro de energía, avisos, insignia de letras ===== */
+#player{overflow:hidden}
+.orb-wrap{min-height:0}
+.art-stage{width:auto;height:min(100%,300px);max-width:min(70vw,300px)}
+.ly-pane,.vz-pane{min-height:0}
+@media (max-height:760px){.seek{margin-top:10px}.ctrls{margin-top:10px}.pl-tabs{margin-bottom:4px}}
+@media (max-height:640px){.pl-info h2{font-size:1.25rem;-webkit-line-clamp:1}}
+.lyb{display:inline-block;font-style:normal;font-size:9.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;line-height:1.5;border:1.4px solid color-mix(in srgb,var(--accent) 80%,transparent);color:var(--accent);border-radius:6px;padding:0 5px;margin-right:6px;vertical-align:1px}
+.volhud{right:max(12px,env(safe-area-inset-right));z-index:9999;width:64px;padding:16px 0 14px;border-radius:26px;background:rgba(22,19,48,.84);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:0 18px 40px -10px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.1);gap:9px;transform:translateY(-50%) translateX(12px) scale(.94);transition:opacity .22s,transform .22s}
+.volhud.on{opacity:1;transform:translateY(-50%) scale(1)}
+.volhud .bar{width:14px;height:170px;border-radius:7px;background:rgba(255,255,255,.14);position:relative;overflow:hidden}
+.volhud .bar::after{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:rgba(255,255,255,.35)}
+.volhud .bar i{position:absolute;left:0;right:0;bottom:0;border-radius:7px;background:linear-gradient(0deg,var(--accent),var(--accent2) 44%,#FFB020 54%,#FF3D6E);background-size:100% 170px;background-position:bottom;background-repeat:no-repeat;transition:height .12s}
+.volhud b{font-size:14px;font-weight:800}
+.volhud svg{width:24px;height:24px}
+.volhud .vh-tag{font-size:9px;font-weight:800;letter-spacing:.1em;color:#FF7A59;opacity:0;height:10px;margin-top:-4px}
+.volhud.boost .vh-tag{opacity:1}
+.volhud.boost b{color:#FFB020}
+body.eco *,body.eco *::before,body.eco *::after{animation:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;text-shadow:none!important}
+body.eco .pl-bg{display:none}
+body.eco .ly-l,body.eco .sheet-full{transition-duration:.15s!important}
+.nt-hero{display:flex;gap:14px;align-items:center;padding:16px;border-radius:22px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 24%,transparent),color-mix(in srgb,var(--accent2) 10%,transparent));margin:2px 0 14px;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 30%,transparent)}
+.nt-hero .nt-ic{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;flex:none;box-shadow:0 12px 24px -10px var(--accent)}
+.nt-hero .nt-ic svg{width:28px;height:28px}
+.nt-hero b{display:block;font-family:Sora,sans-serif;font-size:17px}
+.nt-hero small{display:block;color:var(--muted);font-size:13px;line-height:1.4;margin-top:3px}
+.nt-warn{border-radius:18px;padding:14px 16px;margin:0 0 14px;background:rgba(255,176,32,.12);box-shadow:inset 0 0 0 1px rgba(255,176,32,.45);display:flex;flex-direction:column;gap:6px}
+.nt-warn b{color:#FFB020}
+.nt-warn small{color:var(--muted);font-size:13px;line-height:1.4}
+.nt-warn button{align-self:flex-start;margin-top:6px;height:40px;padding:0 18px;border-radius:20px;border:0;font:inherit;font-weight:700;background:var(--accent);color:var(--onaccent)}
 </style>
 </head>
 <body>
@@ -933,7 +964,7 @@ input.cp-hue{display:block;width:calc(100% - 36px);margin:0 18px 12px;height:28p
 </div></section>
 
 <section class="page" id="sub" aria-label="Ajustes"><div class="page-in" id="subIn"></div></section>
-<div class="volhud" id="volhud" aria-live="polite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><div class="bar"><i id="volFill"></i></div><b id="volPct">100%</b></div>
+<div class="volhud" id="volhud" aria-live="polite"><svg id="volIc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></svg><div class="bar"><i id="volFill"></i></div><b id="volPct">100%</b><span class="vh-tag">BOOST</span></div>
 <section class="privpage" id="privPage" aria-label="Política de privacidad"><div class="bar"><button class="icon-btn" id="privClose" aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button><b>Privacidad</b></div><iframe id="privFrame" title="Política de privacidad"></iframe></section>
 <section class="upd" id="upd" aria-live="polite"></section>
 <input class="hidden-input" type="file" id="coverIn" accept="image/*">
@@ -1008,7 +1039,7 @@ const wantNative = (url, force) => !!(window.Nexora && (S.mixAudio || force) && 
 const NATIVE = typeof window.Nexora !== 'undefined';
 if(NATIVE){ audioEl.crossOrigin = 'anonymous'; video.crossOrigin = 'anonymous'; }
 const native = (fn,...a) => { try{ if(NATIVE && Nexora[fn]) return Nexora[fn](...a); }catch(e){} };
-const DEF = {vmode:'all', vscale:'fit', venh:0, covers:null, fx:{bass:0,surround:0,clarity:0,norm:false}, boost:100, boostKeys:true, mixAudio:false, gapless:false, crossfade:false, cfSec:5, hideVoice:true, lang:'es', autoLy:true, plView:'cover', vzStyle:'bars'};
+const DEF = {vmode:'all', vscale:'fit', venh:0, covers:null, fx:{bass:0,surround:0,clarity:0,norm:false}, boost:100, boostKeys:true, mixAudio:false, gapless:false, crossfade:false, cfSec:5, hideVoice:true, lang:'es', autoLy:true, plView:'cover', vzStyle:'bars', eco:false, ecoAuto:false, notifNew:true, notifNames:true, resumeLast:true};
 
 /* ---------- icons ---------- */
 const I = {
@@ -1179,7 +1210,7 @@ function artHTML(it){
 }
 const PENCIL='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg>';
 function rowHTML(it){
-  const sub = it.type==='video' ? `Video · ${fmt(it.duration)}` : `${esc(it.artist)} · ${fmt(it.duration)}`;
+  const sub = (it.type==='audio' && lyHave.has(it.key) ? '<i class="lyb">Letras</i>' : '') + (it.type==='video' ? `Video · ${fmt(it.duration)}` : `${esc(it.artist)} · ${fmt(it.duration)}`);
   if(sel){
     const on=sel.has(it.key);
     return `<div class="row sel-row ${on?'on':''}"><button class="row ${on?'on':''}" style="padding:0;flex:1;min-width:0" data-play="${esc(it.key)}"><span class="ck"></span>${it.type==='video'&&it.thumb?`<div class="art" style="background:var(--surface2)">${coverImg(it.thumb)}</div>`:artHTML(it)}<div class="meta"><div class="t">${esc(it.title)}</div><div class="s">${sub}</div></div></button></div>`;
@@ -1266,9 +1297,10 @@ function applyFx(){
 function applyBoost(){
   nativeCall('naBoost', S.boost);
   if(master){
-    master.gain.setTargetAtTime(S.boost/100, ctx.currentTime, .05);
+    // 300 % = el triple de volumen percibido (+10 dB por cada vez que se duplica) → ganancia ≈ 6,2×
+    master.gain.setTargetAtTime(Math.pow(S.boost/100,1.66), ctx.currentTime, .05);
     // limitador solo activo cuando se amplifica: a 100 % la señal pasa intacta
-    if(S.boost>100){ limiter.threshold.value=-2; limiter.ratio.value=20; } else { limiter.threshold.value=0; limiter.ratio.value=1; }
+    if(S.boost>100){ limiter.threshold.value=-8; limiter.knee.value=6; limiter.ratio.value=20; } else { limiter.threshold.value=0; limiter.knee.value=2; limiter.ratio.value=1; }
   }
   native('setBoost', S.boost, !!S.boostKeys);
 }
@@ -1276,7 +1308,7 @@ function setBoost(v, hud){
   S.boost = Math.max(100, Math.min(300, Math.round(v/10)*10)); save();
   if(S.boost>100){ ensureAudioGraph(true); if(VP.classList.contains('on')) ensureVideoGraph(); }
   applyBoost();
-  if(hud){ const h=$('volhud'); $('volPct').textContent=S.boost+'%'; $('volFill').style.height=((S.boost-100)/200*100)+'%'; h.classList.add('on'); clearTimeout(h._t); h._t=setTimeout(()=>h.classList.remove('on'),1300); }
+  if(hud) showVol(S.boost);
 }
 window.nxVolumeKey = d => setBoost(S.boost + (d==='up'?20:-20), true);
 const EQ_F=[31,62,125,250,500,1000,2000,4000,8000,16000];
@@ -1354,7 +1386,7 @@ function loadAudio(it){
   audio.src = it.url; audio.playbackRate = S.speed;
   audio.play().catch(()=>{});
   plays[it.key]=(plays[it.key]||0)+1; store.set('plays',plays);
-  fillPlayer(); render(); lyOnTrack(it);
+  fillPlayer(); render(); lyOnTrack(it); saveNpq(); saveNp(true);
   if('mediaSession' in navigator){
     navigator.mediaSession.metadata = new MediaMetadata({title:it.title, artist:it.artist, album:'Nexora Pro'});
     navigator.mediaSession.setActionHandler('play',()=>audio.play());
@@ -1470,9 +1502,12 @@ function updateMini(){
 const lyMem={};
 const lyDB = new Promise(res=>{ try{ const r=indexedDB.open('nx_lyrics',1); r.onupgradeneeded=()=>r.result.createObjectStore('l'); r.onsuccess=()=>res(r.result); r.onerror=()=>res(null); }catch(e){ res(null); } });
 async function lyIdb(mode, fn){ const d=await lyDB; if(!d) return undefined; return new Promise(r=>{ try{ const q=fn(d.transaction('l',mode).objectStore('l')); q.onsuccess=()=>r(q.result); q.onerror=()=>r(undefined); }catch(e){ r(undefined); } }); }
+const lyHave = new Set(); let lyRt=0;
+const lyTouch = () => { clearTimeout(lyRt); lyRt=setTimeout(()=>{ try{ render(); }catch(e){} },900); };
+lyDB.then(d=>{ if(!d) return; try{ const q=d.transaction('l').objectStore('l').openCursor(); q.onsuccess=()=>{ const c=q.result; if(c){ if(c.value && c.value.t==='ok') lyHave.add(c.key); c.continue(); } else lyTouch(); }; }catch(e){} });
 const lyGet = async k => { const v = await lyIdb('readonly',s=>s.get(k)); return v!==undefined ? v : lyMem[k]; };
-const lyPut = async (k,v) => { lyMem[k]=v; await lyIdb('readwrite',s=>s.put(v,k)); };
-const lyDel = async k => { delete lyMem[k]; await lyIdb('readwrite',s=>s.delete(k)); };
+const lyPut = async (k,v) => { lyMem[k]=v; await lyIdb('readwrite',s=>s.put(v,k)); if(v && v.t==='ok'){ if(!lyHave.has(k)){ lyHave.add(k); lyTouch(); } } else if(lyHave.delete(k)) lyTouch(); };
+const lyDel = async k => { delete lyMem[k]; await lyIdb('readwrite',s=>s.delete(k)); if(lyHave.delete(k)) lyTouch(); };
 function lyParse(lrc){
   const out=[];
   for(const raw of String(lrc||'').split(/\r?\n/)){
@@ -1484,17 +1519,19 @@ function lyParse(lrc){
   }
   return out.sort((a,b)=>a.t-b.t);
 }
-const lyClean = s => String(s||'').replace(/\(.*?\)|\[.*?\]|【.*?】/g,' ').replace(/\b(official|lyrics?|letra|video|vídeo|audio|hd|4k|mp3|descargar|download)\b/ig,' ').replace(/\s+(ft|feat)\.?\s.*$/i,'').replace(/\s+/g,' ').trim();
+const lyClean = s => String(s||'').replace(/\(.*?\)|\[.*?\]|【.*?】/g,' ').replace(/\b(official|lyrics?|letra|video|vídeo|audio|hd|4k|mp3|descargar|download|loop|slowed|reverb|sped up|nightcore|8d|extended)\b/ig,' ').replace(/\b\d+\s*(hours?|horas?|hrs?|h)\b/ig,' ').replace(/\s+(ft|feat)\.?\s.*$/i,'').replace(/\s+/g,' ').trim();
+const lySleep = ms => new Promise(r=>setTimeout(r,ms));
+const lyLrc = lines => lines.map(l=>{ const m=Math.floor(l.t/60), s=l.t-m*60; return `[${String(m).padStart(2,'0')}:${s.toFixed(2).padStart(5,'0')}]${l.text}`; }).join('\n');
 async function lyHttp(url){
   const c=new AbortController(), to=setTimeout(()=>c.abort(),12000);
   try{ const r=await fetch(url,{signal:c.signal}); if(r.status===404) return null; if(!r.ok) throw new Error('http'+r.status); return await r.json(); }
   finally{ clearTimeout(to); }
 }
-async function lyLookup(it, q){
+async function lyFind(it, q, loose){
   const title=lyClean(q?q.title:it.title), a0=q?q.artist:it.artist;
   const artist=(!a0 || /desconocid|unknown/i.test(a0)) ? '' : lyClean(a0);
-  const dur=Math.round(it.duration||0), base='https://lrclib.net/api/', enc=encodeURIComponent;
-  if(!title) return {t:'none',ts:Date.now()};
+  const dur=loose?0:Math.round(it.duration||0), base='https://lrclib.net/api/', enc=encodeURIComponent;
+  if(!title) return null;
   let rec=null;
   if(artist && dur){ const r=await lyHttp(`${base}get?track_name=${enc(title)}&artist_name=${enc(artist)}&duration=${dur}`); if(r && !r.code) rec=r; }
   if(!rec){
@@ -1509,9 +1546,68 @@ async function lyLookup(it, q){
       }
     }
   }
-  if(!rec) return {t:'none',ts:Date.now()};
-  if(rec.instrumental && !rec.syncedLyrics && !rec.plainLyrics) return {t:'inst',ts:Date.now()};
-  return {t:'ok', synced:rec.syncedLyrics||'', plain:rec.plainLyrics||'', ts:Date.now(), off:0};
+  // "Artista - Título" dentro del nombre del archivo
+  if(!rec && !(q&&q._split) && /\s[-–—]\s/.test(title)){
+    const [a1,...r1]=title.split(/\s[-–—]\s/);
+    return lyFind(it,{title:r1.join(' - '),artist:a1,_split:1},loose);
+  }
+  return rec;
+}
+// Canciones muy largas: una canción repetida (versión de 1 hora…) o un álbum completo
+async function lyAlbum(it,q,D){
+  let raw=lyClean(q?q.title:it.title), artist=(q?q.artist:it.artist)||'', album=raw;
+  const m=raw.split(/\s[-–—]\s/); if(m.length>1){ artist=m[0]; album=m.slice(1).join(' - '); }
+  album=album.replace(/\b(álbum|album|completo|full|oficial|official|ep)\b/ig,'').replace(/\s+/g,' ').trim();
+  artist=/desconocid|unknown/i.test(artist)?'':lyClean(artist);
+  if(album.length<2) return null;
+  const mb='https://musicbrainz.org/ws/2/', qs=`release:"${album.replace(/"/g,'')}"${artist?` AND artist:"${artist.replace(/"/g,'')}"`:''}`;
+  const sr=await lyHttp(`${mb}release?query=${encodeURIComponent(qs)}&fmt=json&limit=5`);
+  const rels=((sr&&sr.releases)||[]).filter(r=>(r.score||0)>=85).slice(0,3);
+  let best=null;
+  for(const r of rels){
+    await lySleep(1100);
+    const d=await lyHttp(`${mb}release/${r.id}?inc=recordings+artist-credits&fmt=json`);
+    const tr=[]; ((d&&d.media)||[]).forEach(md=>(md.tracks||[]).forEach(x=>tr.push({title:x.title,len:x.length||(x.recording&&x.recording.length)||0})));
+    if(!tr.length || tr.some(x=>!x.len)) continue;
+    const tot=tr.reduce((s,x)=>s+x.len,0)/1000, diff=Math.abs(tot-D)/D;
+    if(diff<=.12 && (!best||diff<best.diff)) best={tr,tot,diff,artist:(d['artist-credit']&&d['artist-credit'][0]&&d['artist-credit'][0].name)||artist};
+  }
+  if(!best) return null;
+  const sc=D/best.tot; let pos=0, found=0; const out=[];
+  for(const x of best.tr){
+    const len=x.len/1000, st=pos*sc; pos+=len;
+    await lySleep(350);
+    const rec=await lyFind({title:x.title,artist:best.artist,duration:len},null,false);
+    out.push({t:st,text:'♪ '+x.title});
+    if(!rec) continue;
+    if(rec.syncedLyrics){ lyParse(rec.syncedLyrics).forEach(l=>out.push({t:st+l.t*sc,text:l.text})); found++; }
+    else if(rec.plainLyrics){ const ls=rec.plainLyrics.split(/\r?\n/).map(s=>s.trim()).filter(Boolean); ls.forEach((s,k)=>out.push({t:st+len*sc*(.08+.84*k/ls.length),text:s})); found++; }
+  }
+  if(!found) return null;
+  out.sort((a,b)=>a.t-b.t);
+  return {t:'ok',synced:lyLrc(out),plain:'',ts:Date.now(),off:0,long:'album'};
+}
+async function lyLong(it,q,D){
+  const one=await lyFind(it,q,true);
+  if(one && one.syncedLyrics && one.duration>20){
+    const k=Math.round(D/one.duration);
+    if(k>=2 && Math.abs(D-k*one.duration)<=Math.max(8,D*.04)){
+      const base=lyParse(one.syncedLyrics), step=D/k, out=[];
+      for(let j=0;j<k;j++) base.forEach(l=>out.push({t:l.t+j*step,text:l.text}));
+      return {t:'ok',synced:lyLrc(out),plain:'',ts:Date.now(),off:0,long:'loop'};
+    }
+  }
+  return lyAlbum(it,q,D);
+}
+async function lyLookup(it, q){
+  const D=Math.round(it.duration||0);
+  const rec=await lyFind(it,q,false);
+  if(rec){
+    if(rec.instrumental && !rec.syncedLyrics && !rec.plainLyrics) return {t:'inst',ts:Date.now()};
+    return {t:'ok', synced:rec.syncedLyrics||'', plain:rec.plainLyrics||'', ts:Date.now(), off:0};
+  }
+  if(D>600){ const lg=await lyLong(it,q,D); if(lg) return lg; }
+  return {t:'none',ts:Date.now()};
 }
 const lyQ=[]; let lyRun=false, lyKey=null, lyBulk=null;
 function lyEnqueue(it, front){
@@ -1632,7 +1728,7 @@ let vzSm=new Float32Array(64), nxFft=null, nxFftT=0, vzImg=null, vzImgSrc='', vz
 window.nxViz = b64 => { try{ const s=atob(b64), a=new Uint8Array(64); for(let i=0;i<64&&i<s.length;i++) a[i]=s.charCodeAt(i); nxFft=a; nxFftT=performance.now(); }catch(e){} };
 window.nxVizPerm = ok => { if(!ok && !vzWarned){ vzWarned=true; toast('Sin permiso de audio: el visualizador usa una animación simulada',3200); } };
 function vzNative(){
-  const on = plView==='viz' && $('player').classList.contains('on');
+  const on = plView==='viz' && $('player').classList.contains('on') && !ecoOn;
   if(on===vzOn) return; vzOn=on; nativeCall('naViz', on);
 }
 function setPlView(v){
@@ -1718,10 +1814,74 @@ function vzFrame(){
   }
 }
 
+
+/* ---------- Ahorro de energía, volumen, última canción y avisos ---------- */
+let ecoOn=false, ecoAutoOn=false, lastDrawTs=0;
+function applyEco(){ ecoOn=!!(S.eco||ecoAutoOn); document.body.classList.toggle('eco',ecoOn); vzNative(); }
+try{ if(navigator.getBattery) navigator.getBattery().then(b=>{
+  const chk=()=>{ const v=!!S.ecoAuto && !b.charging && b.level<=.2; if(v!==ecoAutoOn){ ecoAutoOn=v; applyEco(); } };
+  b.addEventListener('levelchange',chk); b.addEventListener('chargingchange',chk); window.nxEcoCheck=chk; chk();
+}).catch(()=>{}); }catch(e){}
+const VOL_IC={mute:'<path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="m17 9 5 6M22 9l-5 6"/>', low:'<path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/>', high:'<path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>'};
+function showVol(pct){
+  const h=$('volhud'); pct=Math.max(0,Math.round(pct)); const b=pct>100;
+  $('volPct').textContent=pct+'%'; $('volFill').style.height=(pct<=100?pct/2:50+(pct-100)/4)+'%';
+  h.classList.toggle('boost',b); $('volIc').innerHTML=VOL_IC[pct===0?'mute':pct<50?'low':'high'];
+  h.classList.add('on'); clearTimeout(h._t); h._t=setTimeout(()=>h.classList.remove('on'),1500);
+}
+window.nxVolHud = p => showVol(p);
+// última canción: se guarda la cola y el minuto exacto
+let npT=0;
+function saveNpq(){ if(!current || current.type!=='audio' || current.solo || !/^ms:/.test(current.key)) return; store.set('npq',{qk:queue.map(i=>i.key).slice(0,800)}); }
+function saveNp(force){
+  if(!current || current.type!=='audio' || current.solo || !/^ms:/.test(current.key)) return;
+  const now=Date.now(); if(!force && now-npT<3000) return; npT=now;
+  let tt=Math.floor(audio.currentTime||0); const d=audio.duration;
+  if(isFinite(d) && d>0 && tt>d-3) tt=0;
+  store.set('np',{key:current.key,t:tt});
+}
+audio.addEventListener('timeupdate',()=>saveNp());
+audio.addEventListener('pause',()=>saveNp(true));
+document.addEventListener('visibilitychange',()=>{ if(document.hidden) saveNp(true); });
+addEventListener('pagehide',()=>saveNp(true));
+function resumeLast(){
+  if(current || S.resumeLast===false) return;
+  const np=store.get('np',null); if(!np) return;
+  const it=items.find(i=>i.key===np.key && !i.deleted); if(!it) return;
+  const q=store.get('npq',null); let list=[];
+  if(q && q.qk){ const m=new Map(items.map(i=>[i.key,i])); list=q.qk.map(k=>m.get(k)).filter(Boolean); }
+  let idx=list.findIndex(i=>i.key===it.key); if(idx<0){ list=[it]; idx=0; }
+  queue=list; qi=idx; current=it; ensureAudioGraph();
+  setEngine(wantNative(it.url,false));
+  audio.src=it.url; audio.playbackRate=S.speed;
+  if(np.t>1){ try{ audio.currentTime=np.t; }catch(e){} }
+  fillPlayer(); render(); lyShow();
+}
+// avisos de música y video nuevos (los envía la parte nativa de Android)
+const trs = s => { const r=trText(s); return (r===null||r===undefined) ? s : r; };
+function syncNotif(){
+  if(!NATIVE) return;
+  const st={title:'Nexora Pro', channel:trs('Nuevos archivos'), aOne:trs('Se añadió nueva música: {name}'), aOneG:trs('Se añadió nueva música'), aMany:trs('Se añadieron {n} canciones nuevas'), vOne:trs('Se añadió un video nuevo: {name}'), vOneG:trs('Se añadió un video nuevo'), vMany:trs('Se añadieron {n} videos nuevos'), mix:trs('Se añadieron {n} archivos nuevos a Nexora')};
+  native('setNewNotif', S.notifNew!==false, JSON.stringify(st), S.notifNames!==false);
+}
+let ntAsked=false;
+window.nxOnNotif = () => {
+  onb('off'); startScan(false);
+  if(ntAsked){ ntAsked=false; let pm={}; try{ pm=JSON.parse(Nexora.hasPermissions()); }catch(e){}
+    if(!pm.notif){ toast('Actívalas en los ajustes de Android',3000); native('openAppSettings'); } }
+  if(subKind==='notif') renderSub();
+};
+$('settings').addEventListener('change', e=>{
+  const t=e.target.closest('[data-tg]'); if(!t) return;
+  const k=t.dataset.tg; S[k]=t.checked; save();
+  if(k==='eco'||k==='ecoAuto'){ applyEco(); if(window.nxEcoCheck) nxEcoCheck(); if(k==='eco') toast(S.eco?'Ahorro de energía activado':'Ahorro de energía desactivado'); }
+});
+
 /* visualizer */
 const cv=$('viz'), g=cv.getContext('2d');
-function draw(){
+function draw(ts){
   requestAnimationFrame(draw);
+  if(ecoOn){ if(ts-lastDrawTs<66) return; lastDrawTs=ts; }
   if(!$('player').classList.contains('on')) return;
   vzFrame();
   if(plView!=='cover') return;
@@ -1744,6 +1904,7 @@ function draw(){
   g.fillStyle='rgba(255,255,255,.12)'; g.beginPath(); g.arc(cx,cy,r-8,0,Math.PI*2); g.fill();
 }
 draw();
+applyEco();
 setPlView(['cover','lyrics','viz'].includes(S.plView)?S.plView:'cover');
 
 /* seek */
@@ -2133,6 +2294,8 @@ function renderSettings(){
   $('setBody').innerHTML = `
     <div class="set-hero"><img src="${logo}" alt=""><div class="tx"><b>Nexora Pro</b><span>Reproductor de música y video</span><br><span class="vp">V${esc(ver)}</span></div></div>
     <div class="stiles"><div><b>${h}h ${m}m</b><span>Escuchado</span></div><div><b>${na}</b><span>Canciones</span></div><div><b>${nv}</b><span>Videos</span></div></div>
+    <div class="sec-t">Batería</div>
+    <div class="group">${tgRow('eco', IC_LEAF, 'Ahorro de energía', 'Reduce animaciones, desenfoques y el visualizador para gastar menos batería.')}${tgRow('ecoAuto', IC_BATT, 'Activar con batería baja', 'Se activa solo cuando queda 20 % o menos y se apaga al cargar.')}</div>
     <div class="sec-t">Personalizar</div>
     <div class="qtiles">
       ${qtile('theme', S.theme==='light'?I.sun:I.moon, 'Tema', themeName, 0)}
@@ -2143,7 +2306,7 @@ function renderSettings(){
     <div class="sec-t">Sonido y reproducción</div>
     <div class="group">${setRow('playback',I.head,'Ajustes de reproducción','','',0)}${setRow('fx',I.music,'Mejoras de sonido', fxActive()?'Activadas':'Calidad original','',8)}${setRow('boost',IC_BOOST,'Amplificador de volumen',S.boost+'%','',5)}${setRow('speed',I.head,'Velocidad predeterminada',S.speed+'x','',6)}${setRow('sleep',I.moon,'Temporizador para dormir',sleepMode==='off'?'Apagado':sleepMode==='end'?'Al terminar':$('sleepLbl').textContent,'',7)}</div>
     <div class="sec-t">Biblioteca</div>
-    <div class="group">${setRow('backup',IC_CLOUD,'Copia de seguridad', store.get('lastBackup',null)?new Date(store.get('lastBackup')).toLocaleDateString():'','',0)}${setRow('hidden',I.eye,'Archivos ocultos',`${hid2} archivo${hid2!==1?'s':''}`,'',9)}${setRow('deleted',I.trash,'Eliminado recientemente','','',5)}${NATIVE?setRow('rescan',I.music,'Buscar música de nuevo', scanning?'Buscando…':'','',2)+setRow('perms',I.gem,'Permisos de la app','','',9):''}</div>
+    <div class="group">${setRow('notif',IC_BELL,'Notificaciones',S.notifNew!==false?'Activadas':'Desactivadas','',3)}${setRow('backup',IC_CLOUD,'Copia de seguridad', store.get('lastBackup',null)?new Date(store.get('lastBackup')).toLocaleDateString():'','',0)}${setRow('hidden',I.eye,'Archivos ocultos',`${hid2} archivo${hid2!==1?'s':''}`,'',9)}${setRow('deleted',I.trash,'Eliminado recientemente','','',5)}${NATIVE?setRow('rescan',I.music,'Buscar música de nuevo', scanning?'Buscando…':'','',2)+setRow('perms',I.gem,'Permisos de la app','','',9):''}</div>
     <div class="donate"><span class="heart">♥</span><b>Apoya a Nexora Pro</b><p>Nexora es gratis y sin anuncios. Si te gusta, puedes invitarme un café con una donación por PayPal. ¡Gracias por tu apoyo!</p><button data-set="donate">${IC_HEARTS}Donar con PayPal</button></div>
     <div class="sec-t">Más</div>
     <div class="group">${setRow('reset',I.restore,'Restablecer estadísticas','','',4)}${setRow('about',I.info,'Acerca de','V'+ver,'',1)}</div>`;
@@ -2153,6 +2316,7 @@ $('settings').addEventListener('click', e=>{
   if(k==='accent'){ const [pa,pb]=accentPair(); openSheet(`<h3>Color de acento</h3><div class="swatches" style="padding:6px 18px 12px">${ACCENTS.map((c,i)=>`<button class="sw ${S.accent===i?'sel':''}" data-v="${i}" aria-label="Color ${i+1}" style="background:linear-gradient(135deg,${c[0]},${c[1]})"></button>`).join('')}</div><button class="opt cp-open ${S.accent==='custom'?'sel':''}" data-v="__pick"><span class="cp-chip" style="background:linear-gradient(135deg,${pa},${pb})"></span><span class="grow">Elegir tu propio color</span>${S.accent==='custom'?I.check:I.chev}</button>`, v=>{ if(v==='__pick'){ setTimeout(colorSheet,260); return; } S.accent=+v; save(); applyTheme(); renderSettings(); }); }
   if(k==='theme') themeSheet();
   if(k==='backup') openSub('backup');
+  if(k==='notif') openSub('notif');
   if(k==='sleep') sleepSheet();
   if(k==='pro') toast('Todas las funciones Pro están activadas');
   if(k==='speed') speedSheet(v=>{ S.speed=v; save(); audio.playbackRate=v; renderSettings(); });
@@ -2258,7 +2422,10 @@ window.nxOnScan = list => {
   if(!scanQuiet || firstLoad && !S.onboarded) showBanner(na ? `¡${na} canci${na===1?'ón encontrada':'ones encontradas'}!` : nv ? `¡${nv} video${nv===1?'':'s'} encontrado${nv===1?'':'s'}!` : 'No se encontró música en el teléfono');
   S.onboarded=true; save();
   render();
-  if(!firstLoad && S.autoLy!==false) mapped.forEach(i=>{ if(i.type==='audio' && !prev.has(i.key)) lyEnqueue(i); });
+  { const kn=new Set(store.get('known',[])), hadKn=kn.size>0, fresh=mapped.filter(i=>i.type==='audio' && !kn.has(i.key));
+    mapped.forEach(i=>kn.add(i.key)); store.set('known',[...kn]);
+    if(hadKn && S.autoLy!==false) fresh.forEach(i=>lyEnqueue(i)); }
+  if(firstLoad) resumeLast();
   if($('settings').classList.contains('on')) renderSettings();
 };
 
@@ -2282,7 +2449,6 @@ window.nxOnPermissions = p => {
   if(p.audio || p.video){ onb('scan'); Nexora.requestNotifications(); }
   else onb('denied');
 };
-window.nxOnNotif = () => { onb('off'); startScan(false); };
 window.nxOnResume = () => {
   if(!NATIVE) return;
   let p={}; try{ p=JSON.parse(Nexora.hasPermissions()); }catch(e){}
@@ -2292,6 +2458,7 @@ window.nxOnResume = () => {
 };
 function boot(){
   if(!NATIVE){ render(); return; }
+  syncNotif();
   let p={}; try{ p=JSON.parse(Nexora.hasPermissions()); }catch(e){}
   if(p.audio || p.video){ if(!S.onboarded) tab='canciones'; startScan(true); }
   else if(!S.onboarded) { render(); onb('welcome'); }
@@ -2738,6 +2905,7 @@ applyBg();
 
 /* ---------- Subpáginas: ocultos, eliminados, reproducción, idioma ---------- */
 const LANGS = {es:'Español', en:'English', pt:'Português', fr:'Français', it:'Italiano', de:'Deutsch', id:'Bahasa Indonesia'};
+const IC_LEAF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-9 5-14 15-14 0 10-5 15-14 15"/><path d="M5 19c2-5 5-8 9-10"/></svg>', IC_BATT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="16" height="10" rx="2.5"/><path d="M21.5 11v2M6 12h5"/></svg>', IC_BELL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>', IC_TAGI='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12V4h8l8 8-8 8z"/><circle cx="8.5" cy="8.5" r="1.3"/></svg>', IC_RESUME='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 3-6.4"/><path d="M3 4v4h4"/><path d="m10.5 9 4 3-4 3z" fill="currentColor"/></svg>';
 const IC_BACK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg>';
 const IC_HEAD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="5" height="7" rx="2"/><rect x="16" y="14" width="5" height="7" rx="2"/></svg>';
 const IC_VID='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z" fill="currentColor"/></svg>';
@@ -2785,6 +2953,7 @@ function renderSub(){
       <button class="alink" style="display:block;width:100%;text-align:left;padding:12px 16px" data-s="ly:all">Buscar letras de toda mi biblioteca</button>
     </div>
     <div class="group">
+      ${tgRow('resumeLast', IC_RESUME, 'Recordar la última canción', 'Al abrir la app, vuelve a la canción y al minuto donde la dejaste.')}
       ${tgRow('mixAudio', IC_HEAD, 'Reproduce junto con otras aplicaciones', 'La música no se pausa cuando otra app reproduce audio, y tampoco pausa a las demás.')}
       ${tgRow('gapless', IC_WAVE, 'Reproducción sin pausas', 'Elimina cualquier espacio o pausa que pueda producirse entre pistas.')}
       ${tgRow('crossfade', IC_CF, 'Crossfade', 'Establece el desvanecimiento y la superposición entre pistas.', S.crossfade?`<div class="rng"><input type="range" min="1" max="12" step="1" value="${S.cfSec}" data-rng="cfSec" aria-label="Duración del crossfade"><div class="rv"><span>1 s</span><span id="cfVal">${S.cfSec} s</span><span>12 s</span></div></div>`:'')}
@@ -2794,6 +2963,13 @@ function renderSub(){
       ${tgRow('boostKeys', IC_KEYS, 'Subir hasta 300 % con los botones de volumen', 'Cuando el volumen del teléfono ya está al máximo, sigue presionando el botón de subir.')}
     </div>
     <p style="color:var(--muted);font-size:13px;line-height:1.5;margin:4px 4px 18px">Un volumen muy alto puede dañar tus oídos y las bocinas. Úsalo con cuidado.</p>`;
+  }
+  else if(subKind==='notif'){
+    let pm={notif:true}; try{ if(NATIVE) pm=JSON.parse(Nexora.hasPermissions()); }catch(e){}
+    h = subHead('Notificaciones') + `<div class="nt-hero"><span class="nt-ic">${IC_BELL}</span><div><b>Avisos de Nexora</b><small>Entérate al instante cuando llegue música o video nuevo a tu teléfono.</small></div></div>`
+      + (NATIVE && !pm.notif ? `<div class="nt-warn"><b>Las notificaciones están bloqueadas</b><small>Actívalas para recibir los avisos de música y video nuevos.</small><button data-s="nt:perm">Activar notificaciones</button></div>` : '')
+      + `<div class="group">${tgRow('notifNew', IC_BELL, 'Notificación de nuevos archivos', 'Te avisa en la barra de estado cuando se añade música o video a Nexora, por ejemplo al descargarlos con Download Nexora.')}${tgRow('notifNames', IC_TAGI, 'Mostrar el nombre del archivo', 'Si lo desactivas, el aviso solo dirá cuántos archivos nuevos hay.')}</div>`
+      + `<button class="alink" style="display:block;width:100%;text-align:left;padding:12px 16px" data-s="nt:sys">Abrir ajustes de notificaciones de Android</button>`;
   }
   else if(subKind==='backup'){
     const last=store.get('lastBackup',null);
@@ -2847,6 +3023,7 @@ $('sub').addEventListener('click', e=>{
     save(); applyTheme(); renderSub(); render();
   }
   if(cmd==='ly'){ if(arg==='all') lyBulkAll(); }
+  if(cmd==='nt'){ if(arg==='perm'){ ntAsked=true; native('requestNotifications'); } if(arg==='sys') native('openAppSettings'); }
   if(cmd==='bk'){ if(arg==='make') doBackup(); if(arg==='restore') $('restoreIn').click(); if(arg==='share' && lastBackupUri) native('shareBackup', lastBackupUri); }
   if(cmd==='unhideall'){
     items.filter(i=>!i.deleted&&isHidden(i)&&i.type===subTab).forEach(i=>{ hiddenKeys.delete(i.key); if(autoHidden(i)) shownKeys.add(i.key); });
@@ -2894,6 +3071,7 @@ $('sub').addEventListener('change', e=>{
   if(k==='hideVoice'){ render(); }
   if(k==='boostKeys') applyBoost();
   if(k==='autoLy' && t.checked && current) lyEnqueue(current,true);
+  if(k==='notifNew'||k==='notifNames') syncNotif();
   if(k==='mixAudio' && current){
     const t=audio.currentTime, was=!audio.paused, want=wantNative(current.url);
     if(want!==audio.isNative){ setEngine(want); audio.src=current.url; audio.playbackRate=S.speed; audio.currentTime=t; setVol(); if(was) audio.play().catch(()=>{}); }
@@ -3310,6 +3488,12 @@ I18N_P.fr.push([/^Letras encontradas: (\d+) de (\d+)$/, (m,a,b)=>`Paroles trouv�
 I18N_P.it.push([/^Letras encontradas: (\d+) de (\d+)$/, (m,a,b)=>`Testi trovati: ${a} su ${b}`]);
 I18N_P.de.push([/^Letras encontradas: (\d+) de (\d+)$/, (m,a,b)=>`Songtexte gefunden: ${a} von ${b}`]);
 I18N_P.id.push([/^Letras encontradas: (\d+) de (\d+)$/, (m,a,b)=>`Lirik ditemukan: ${a} dari ${b}`]);
+Object.assign(I18N.en,{"Ahorro de energía": "Battery saver", "Reduce animaciones, desenfoques y el visualizador para gastar menos batería.": "Reduces animations, blur and the visualizer to use less battery.", "Activar con batería baja": "Turn on when battery is low", "Se activa solo cuando queda 20 % o menos y se apaga al cargar.": "Turns on by itself at 20% or less and turns off when charging.", "Batería": "Battery", "Ahorro de energía activado": "Battery saver on", "Ahorro de energía desactivado": "Battery saver off", "Notificaciones": "Notifications", "Desactivadas": "Off", "Avisos de Nexora": "Nexora alerts", "Entérate al instante cuando llegue música o video nuevo a tu teléfono.": "Find out right away when new music or video reaches your phone.", "Notificación de nuevos archivos": "New files notification", "Te avisa en la barra de estado cuando se añade música o video a Nexora, por ejemplo al descargarlos con Download Nexora.": "Alerts you in the status bar when music or video is added to Nexora, for example when downloaded with Download Nexora.", "Mostrar el nombre del archivo": "Show the file name", "Si lo desactivas, el aviso solo dirá cuántos archivos nuevos hay.": "If you turn it off, the alert will only say how many new files there are.", "Las notificaciones están bloqueadas": "Notifications are blocked", "Actívalas para recibir los avisos de música y video nuevos.": "Turn them on to get alerts about new music and videos.", "Activar notificaciones": "Turn on notifications", "Abrir ajustes de notificaciones de Android": "Open Android notification settings", "Actívalas en los ajustes de Android": "Turn them on in Android settings", "Nuevos archivos": "New files", "Se añadió nueva música: {name}": "New music added: {name}", "Se añadió nueva música": "New music added", "Se añadieron {n} canciones nuevas": "{n} new songs added", "Se añadió un video nuevo: {name}": "New video added: {name}", "Se añadió un video nuevo": "New video added", "Se añadieron {n} videos nuevos": "{n} new videos added", "Se añadieron {n} archivos nuevos a Nexora": "{n} new files added to Nexora", "Recordar la última canción": "Remember the last song", "Al abrir la app, vuelve a la canción y al minuto donde la dejaste.": "When you open the app, it goes back to the song and the minute where you left off."});
+Object.assign(I18N.pt,{"Ahorro de energía": "Economia de energia", "Reduce animaciones, desenfoques y el visualizador para gastar menos batería.": "Reduz animações, desfoques e o visualizador para gastar menos bateria.", "Activar con batería baja": "Ativar com bateria baixa", "Se activa solo cuando queda 20 % o menos y se apaga al cargar.": "Ativa sozinho com 20% ou menos e desativa ao carregar.", "Batería": "Bateria", "Ahorro de energía activado": "Economia de energia ativada", "Ahorro de energía desactivado": "Economia de energia desativada", "Notificaciones": "Notificações", "Desactivadas": "Desativadas", "Avisos de Nexora": "Avisos do Nexora", "Entérate al instante cuando llegue música o video nuevo a tu teléfono.": "Saiba na hora quando chegar música ou vídeo novo no seu celular.", "Notificación de nuevos archivos": "Notificação de novos arquivos", "Te avisa en la barra de estado cuando se añade música o video a Nexora, por ejemplo al descargarlos con Download Nexora.": "Avisa na barra de status quando música ou vídeo é adicionado ao Nexora, por exemplo ao baixar com o Download Nexora.", "Mostrar el nombre del archivo": "Mostrar o nome do arquivo", "Si lo desactivas, el aviso solo dirá cuántos archivos nuevos hay.": "Se desativar, o aviso dirá apenas quantos arquivos novos há.", "Las notificaciones están bloqueadas": "As notificações estão bloqueadas", "Actívalas para recibir los avisos de música y video nuevos.": "Ative-as para receber avisos de músicas e vídeos novos.", "Activar notificaciones": "Ativar notificações", "Abrir ajustes de notificaciones de Android": "Abrir configurações de notificações do Android", "Actívalas en los ajustes de Android": "Ative-as nas configurações do Android", "Nuevos archivos": "Novos arquivos", "Se añadió nueva música: {name}": "Nova música adicionada: {name}", "Se añadió nueva música": "Nova música adicionada", "Se añadieron {n} canciones nuevas": "{n} novas músicas adicionadas", "Se añadió un video nuevo: {name}": "Novo vídeo adicionado: {name}", "Se añadió un video nuevo": "Novo vídeo adicionado", "Se añadieron {n} videos nuevos": "{n} novos vídeos adicionados", "Se añadieron {n} archivos nuevos a Nexora": "{n} novos arquivos adicionados ao Nexora", "Recordar la última canción": "Lembrar a última música", "Al abrir la app, vuelve a la canción y al minuto donde la dejaste.": "Ao abrir o app, volta para a música e o minuto onde você parou."});
+Object.assign(I18N.fr,{"Ahorro de energía": "Économie d'énergie", "Reduce animaciones, desenfoques y el visualizador para gastar menos batería.": "Réduit les animations, les flous et le visualiseur pour consommer moins de batterie.", "Activar con batería baja": "Activer quand la batterie est faible", "Se activa solo cuando queda 20 % o menos y se apaga al cargar.": "S'active tout seul à 20 % ou moins et s'arrête pendant la charge.", "Batería": "Batterie", "Ahorro de energía activado": "Économie d'énergie activée", "Ahorro de energía desactivado": "Économie d'énergie désactivée", "Notificaciones": "Notifications", "Desactivadas": "Désactivées", "Avisos de Nexora": "Alertes Nexora", "Entérate al instante cuando llegue música o video nuevo a tu teléfono.": "Soyez prévenu dès que de la musique ou une vidéo arrive sur votre téléphone.", "Notificación de nuevos archivos": "Notification de nouveaux fichiers", "Te avisa en la barra de estado cuando se añade música o video a Nexora, por ejemplo al descargarlos con Download Nexora.": "Vous prévient dans la barre d'état quand de la musique ou une vidéo est ajoutée à Nexora, par exemple via Download Nexora.", "Mostrar el nombre del archivo": "Afficher le nom du fichier", "Si lo desactivas, el aviso solo dirá cuántos archivos nuevos hay.": "Si vous le désactivez, l'alerte indiquera seulement le nombre de nouveaux fichiers.", "Las notificaciones están bloqueadas": "Les notifications sont bloquées", "Actívalas para recibir los avisos de música y video nuevos.": "Activez-les pour recevoir les alertes de nouvelle musique et vidéo.", "Activar notificaciones": "Activer les notifications", "Abrir ajustes de notificaciones de Android": "Ouvrir les réglages de notifications d'Android", "Actívalas en los ajustes de Android": "Activez-les dans les réglages d'Android", "Nuevos archivos": "Nouveaux fichiers", "Se añadió nueva música: {name}": "Nouvelle musique ajoutée : {name}", "Se añadió nueva música": "Nouvelle musique ajoutée", "Se añadieron {n} canciones nuevas": "{n} nouveaux titres ajoutés", "Se añadió un video nuevo: {name}": "Nouvelle vidéo ajoutée : {name}", "Se añadió un video nuevo": "Nouvelle vidéo ajoutée", "Se añadieron {n} videos nuevos": "{n} nouvelles vidéos ajoutées", "Se añadieron {n} archivos nuevos a Nexora": "{n} nouveaux fichiers ajoutés à Nexora", "Recordar la última canción": "Se souvenir du dernier titre", "Al abrir la app, vuelve a la canción y al minuto donde la dejaste.": "À l'ouverture de l'app, revient au titre et à la minute où vous vous étiez arrêté."});
+Object.assign(I18N.it,{"Ahorro de energía": "Risparmio energetico", "Reduce animaciones, desenfoques y el visualizador para gastar menos batería.": "Riduce animazioni, sfocature e il visualizzatore per consumare meno batteria.", "Activar con batería baja": "Attiva con batteria scarica", "Se activa solo cuando queda 20 % o menos y se apaga al cargar.": "Si attiva da solo al 20% o meno e si spegne in carica.", "Batería": "Batteria", "Ahorro de energía activado": "Risparmio energetico attivato", "Ahorro de energía desactivado": "Risparmio energetico disattivato", "Notificaciones": "Notifiche", "Desactivadas": "Disattivate", "Avisos de Nexora": "Avvisi di Nexora", "Entérate al instante cuando llegue música o video nuevo a tu teléfono.": "Scopri subito quando arriva nuova musica o un nuovo video sul telefono.", "Notificación de nuevos archivos": "Notifica di nuovi file", "Te avisa en la barra de estado cuando se añade música o video a Nexora, por ejemplo al descargarlos con Download Nexora.": "Ti avvisa nella barra di stato quando viene aggiunta musica o un video a Nexora, ad esempio con Download Nexora.", "Mostrar el nombre del archivo": "Mostra il nome del file", "Si lo desactivas, el aviso solo dirá cuántos archivos nuevos hay.": "Se lo disattivi, l'avviso dirà solo quanti file nuovi ci sono.", "Las notificaciones están bloqueadas": "Le notifiche sono bloccate", "Actívalas para recibir los avisos de música y video nuevos.": "Attivale per ricevere gli avvisi di nuova musica e nuovi video.", "Activar notificaciones": "Attiva le notifiche", "Abrir ajustes de notificaciones de Android": "Apri le impostazioni notifiche di Android", "Actívalas en los ajustes de Android": "Attivale nelle impostazioni di Android", "Nuevos archivos": "Nuovi file", "Se añadió nueva música: {name}": "Nuova musica aggiunta: {name}", "Se añadió nueva música": "Nuova musica aggiunta", "Se añadieron {n} canciones nuevas": "{n} nuovi brani aggiunti", "Se añadió un video nuevo: {name}": "Nuovo video aggiunto: {name}", "Se añadió un video nuevo": "Nuovo video aggiunto", "Se añadieron {n} videos nuevos": "{n} nuovi video aggiunti", "Se añadieron {n} archivos nuevos a Nexora": "{n} nuovi file aggiunti a Nexora", "Recordar la última canción": "Ricorda l'ultimo brano", "Al abrir la app, vuelve a la canción y al minuto donde la dejaste.": "All'apertura dell'app torna al brano e al minuto in cui eri rimasto."});
+Object.assign(I18N.de,{"Ahorro de energía": "Energiesparmodus", "Reduce animaciones, desenfoques y el visualizador para gastar menos batería.": "Reduziert Animationen, Unschärfe und den Visualizer, um Akku zu sparen.", "Activar con batería baja": "Bei niedrigem Akkustand aktivieren", "Se activa solo cuando queda 20 % o menos y se apaga al cargar.": "Schaltet sich bei 20 % oder weniger automatisch ein und beim Laden aus.", "Batería": "Akku", "Ahorro de energía activado": "Energiesparmodus an", "Ahorro de energía desactivado": "Energiesparmodus aus", "Notificaciones": "Benachrichtigungen", "Desactivadas": "Aus", "Avisos de Nexora": "Nexora-Hinweise", "Entérate al instante cuando llegue música o video nuevo a tu teléfono.": "Erfahre sofort, wenn neue Musik oder ein neues Video auf dein Handy kommt.", "Notificación de nuevos archivos": "Benachrichtigung bei neuen Dateien", "Te avisa en la barra de estado cuando se añade música o video a Nexora, por ejemplo al descargarlos con Download Nexora.": "Meldet in der Statusleiste, wenn Musik oder Video zu Nexora hinzukommt, z. B. beim Download mit Download Nexora.", "Mostrar el nombre del archivo": "Dateinamen anzeigen", "Si lo desactivas, el aviso solo dirá cuántos archivos nuevos hay.": "Wenn du es ausschaltest, nennt der Hinweis nur die Anzahl neuer Dateien.", "Las notificaciones están bloqueadas": "Benachrichtigungen sind blockiert", "Actívalas para recibir los avisos de música y video nuevos.": "Schalte sie ein, um Hinweise zu neuer Musik und neuen Videos zu erhalten.", "Activar notificaciones": "Benachrichtigungen aktivieren", "Abrir ajustes de notificaciones de Android": "Android-Benachrichtigungseinstellungen öffnen", "Actívalas en los ajustes de Android": "Aktiviere sie in den Android-Einstellungen", "Nuevos archivos": "Neue Dateien", "Se añadió nueva música: {name}": "Neue Musik hinzugefügt: {name}", "Se añadió nueva música": "Neue Musik hinzugefügt", "Se añadieron {n} canciones nuevas": "{n} neue Songs hinzugefügt", "Se añadió un video nuevo: {name}": "Neues Video hinzugefügt: {name}", "Se añadió un video nuevo": "Neues Video hinzugefügt", "Se añadieron {n} videos nuevos": "{n} neue Videos hinzugefügt", "Se añadieron {n} archivos nuevos a Nexora": "{n} neue Dateien zu Nexora hinzugefügt", "Recordar la última canción": "Letzten Song merken", "Al abrir la app, vuelve a la canción y al minuto donde la dejaste.": "Beim Öffnen der App geht es zum Song und zur Minute, wo du aufgehört hast."});
+Object.assign(I18N.id,{"Ahorro de energía": "Hemat daya", "Reduce animaciones, desenfoques y el visualizador para gastar menos batería.": "Mengurangi animasi, blur, dan visualizer agar baterai lebih hemat.", "Activar con batería baja": "Aktifkan saat baterai rendah", "Se activa solo cuando queda 20 % o menos y se apaga al cargar.": "Aktif otomatis saat 20% atau kurang dan mati saat mengisi daya.", "Batería": "Baterai", "Ahorro de energía activado": "Hemat daya aktif", "Ahorro de energía desactivado": "Hemat daya nonaktif", "Notificaciones": "Notifikasi", "Desactivadas": "Nonaktif", "Avisos de Nexora": "Pemberitahuan Nexora", "Entérate al instante cuando llegue música o video nuevo a tu teléfono.": "Langsung tahu saat musik atau video baru masuk ke ponsel Anda.", "Notificación de nuevos archivos": "Notifikasi file baru", "Te avisa en la barra de estado cuando se añade música o video a Nexora, por ejemplo al descargarlos con Download Nexora.": "Memberi tahu di bilah status saat musik atau video ditambahkan ke Nexora, misalnya saat diunduh dengan Download Nexora.", "Mostrar el nombre del archivo": "Tampilkan nama file", "Si lo desactivas, el aviso solo dirá cuántos archivos nuevos hay.": "Jika dimatikan, pemberitahuan hanya menyebut jumlah file baru.", "Las notificaciones están bloqueadas": "Notifikasi diblokir", "Actívalas para recibir los avisos de música y video nuevos.": "Aktifkan untuk menerima pemberitahuan musik dan video baru.", "Activar notificaciones": "Aktifkan notifikasi", "Abrir ajustes de notificaciones de Android": "Buka pengaturan notifikasi Android", "Actívalas en los ajustes de Android": "Aktifkan di pengaturan Android", "Nuevos archivos": "File baru", "Se añadió nueva música: {name}": "Musik baru ditambahkan: {name}", "Se añadió nueva música": "Musik baru ditambahkan", "Se añadieron {n} canciones nuevas": "{n} lagu baru ditambahkan", "Se añadió un video nuevo: {name}": "Video baru ditambahkan: {name}", "Se añadió un video nuevo": "Video baru ditambahkan", "Se añadieron {n} videos nuevos": "{n} video baru ditambahkan", "Se añadieron {n} archivos nuevos a Nexora": "{n} file baru ditambahkan ke Nexora", "Recordar la última canción": "Ingat lagu terakhir", "Al abrir la app, vuelve a la canción y al minuto donde la dejaste.": "Saat membuka aplikasi, kembali ke lagu dan menit terakhir Anda berhenti."});
 const GREET = {en:['Good morning','Good afternoon','Good evening'], pt:['Bom dia','Boa tarde','Boa noite'], fr:['Bonjour','Bon après-midi','Bonsoir'], it:['Buongiorno','Buon pomeriggio','Buonasera'], de:['Guten Morgen','Guten Tag','Guten Abend'], id:['Selamat pagi','Selamat siang','Selamat malam']};
 ['en','pt','fr','it','de','id'].forEach(l=>{ const es=['Buenos días','Buenas tardes','Buenas noches']; es.forEach((g,i)=>{ I18N[l][g+' 👋']=GREET[l][i]+' 👋'; }); });
 function trText(src){
@@ -3355,6 +3539,7 @@ function setLang(l){
   document.documentElement.lang = S.lang;
   trBusy=true; trNode(document.body); trObs.takeRecords(); trBusy=false;
   document.title = S.lang==='es' ? 'Reproductor De Música Nexora Pro' : (trText('Reproductor De Música Nexora Pro')||document.title);
+  syncNotif();
   renderSettings();
 }
 trObs.observe(document.body, {subtree:true, childList:true, characterData:true, attributes:true, attributeFilter:TR_ATTRS});

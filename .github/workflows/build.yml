@@ -163,6 +163,11 @@ jobs:
                       android:exported="false" />
 
                   <service
+                      android:name=".NewMediaJobService"
+                      android:permission="android.permission.BIND_JOB_SERVICE"
+                      android:exported="false" />
+
+                  <service
                       android:name=".PlaybackService"
                       android:exported="false"
                       android:foregroundServiceType="mediaPlayback" />
@@ -899,6 +904,11 @@ jobs:
                   @JavascriptInterface fun naRate(r: Double) = runOnUiThread { nat.setRate(r) }
                   @JavascriptInterface fun naVolume(v: Double) = runOnUiThread { nat.setVolume(v) }
                   @JavascriptInterface fun naEq(on: Boolean, gains: String) = runOnUiThread { nat.setEq(on, gains) }
+                  // Aviso en la barra de estado cuando llega música o video nuevo (lo envía Android aunque la app esté cerrada)
+                  @JavascriptInterface fun setNewNotif(on: Boolean, json: String, names: Boolean) {
+                      NewMedia.configure(applicationContext, on, json, names)
+                      NewMedia.schedule(applicationContext)
+                  }
                   // Visualizador de música: datos reales del sonido (necesita el permiso de audio, solo para medir; no graba)
                   @JavascriptInterface fun naViz(on: Boolean) = runOnUiThread {
                       if (on && checkSelfPermission(Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
@@ -1030,6 +1040,14 @@ jobs:
                       if (keyCode == android.view.KeyEvent.KEYCODE_VOLUME_DOWN && boostLevel > 100) {
                           js("window.nxVolumeKey && nxVolumeKey('down')"); return true
                       }
+                      // Resto del recorrido (0–100 %): se ajusta sin el panel de Android y se muestra el de Nexora, un solo indicador
+                      val up = keyCode == android.view.KeyEvent.KEYCODE_VOLUME_UP
+                      am.adjustStreamVolume(android.media.AudioManager.STREAM_MUSIC,
+                          if (up) android.media.AudioManager.ADJUST_RAISE else android.media.AudioManager.ADJUST_LOWER, 0)
+                      val now = am.getStreamVolume(android.media.AudioManager.STREAM_MUSIC)
+                      val pct = if (max > 0) Math.round(now * 100f / max) else 0
+                      js("window.nxVolHud && nxVolHud($pct)")
+                      return true
                   }
                   return super.onKeyDown(keyCode, event)
               }
@@ -1075,11 +1093,16 @@ jobs:
               override fun onPause() {
                   super.onPause()
                   resumedNow = false
+                  NxState.foreground = false
+                  NewMedia.touch(this)
               }
 
               override fun onResume() {
                   super.onResume()
                   resumedNow = true
+                  NxState.foreground = true
+                  NewMedia.touch(this)
+                  NewMedia.schedule(applicationContext)
                   js("window.nxOnResume && nxOnResume()")
               }
 
@@ -1615,7 +1638,7 @@ jobs:
                   runCatching {
                       if (loud == null && boost > 100) loud = LoudnessEnhancer(sid)
                       loud?.let { l ->
-                          l.setTargetGain((2000 * log10(boost / 100.0)).toInt())
+                          l.setTargetGain((3320 * log10(boost / 100.0)).toInt())
                           l.enabled = boost > 100
                       }
                   }
@@ -1874,6 +1897,151 @@ jobs:
               }
 
               override fun onBind(intent: Intent?): IBinder? = null
+          }
+          NXEOF
+          cat > app/src/main/java/com/nexora/pro/NewMedia.kt <<'NXEOF'
+          package com.nexora.pro
+
+          import android.app.Notification
+          import android.app.NotificationChannel
+          import android.app.NotificationManager
+          import android.app.PendingIntent
+          import android.app.job.JobInfo
+          import android.app.job.JobParameters
+          import android.app.job.JobScheduler
+          import android.app.job.JobService
+          import android.content.ComponentName
+          import android.content.Context
+          import android.content.Intent
+          import android.content.pm.PackageManager
+          import android.os.Build
+          import android.provider.MediaStore
+          import org.json.JSONObject
+
+          /** Indica si Nexora Pro está abierta: en ese caso no se avisa, porque la persona ya la está viendo. */
+          object NxState { @Volatile var foreground = false }
+
+          /**
+           * Avisos de música y video nuevos. Android despierta este trabajo cuando cambia la biblioteca de medios
+           * (por ejemplo, al terminar una descarga de Download Nexora), aunque Nexora Pro esté cerrada.
+           * Solo se lee el título y la fecha de lo nuevo; no se guarda ni se envía nada.
+           */
+          object NewMedia {
+              private const val JOB_ID = 7421
+              private const val NOTIF_ID = 7421
+              private const val CHANNEL = "nexora_new_files"
+
+              private fun prefs(c: Context) = c.getSharedPreferences("nexora_new", Context.MODE_PRIVATE)
+
+              fun configure(c: Context, on: Boolean, strings: String, showNames: Boolean) {
+                  prefs(c).edit().putBoolean("on", on).putString("strings", strings).putBoolean("names", showNames).apply()
+              }
+
+              private fun maxId(c: Context, uri: android.net.Uri): Long {
+                  var m = -1L
+                  runCatching {
+                      val args = android.os.Bundle().apply {
+                          putInt(android.content.ContentResolver.QUERY_ARG_LIMIT, 1)
+                          putStringArray(android.content.ContentResolver.QUERY_ARG_SORT_COLUMNS, arrayOf("_id"))
+                          putInt(android.content.ContentResolver.QUERY_ARG_SORT_DIRECTION, android.content.ContentResolver.QUERY_SORT_DIRECTION_DESCENDING)
+                      }
+                      c.contentResolver.query(uri, arrayOf("_id"), args, null)?.use { q -> m = if (q.moveToFirst()) q.getLong(0) else 0L }
+                  }
+                  return m
+              }
+
+              /** Lo que ya existe cuenta como "visto": solo se avisa de los archivos que lleguen después. */
+              fun touch(c: Context) {
+                  val a = maxId(c, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)
+                  val v = maxId(c, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
+                  // Sin permiso de lectura no se guarda nada (así no avisaría de toda la biblioteca más tarde)
+                  if (a >= 0 && v >= 0) prefs(c).edit().putLong("maxA", a).putLong("maxV", v).apply()
+              }
+
+              fun schedule(c: Context) {
+                  runCatching {
+                      if (!prefs(c).contains("maxA")) touch(c)
+                      val js = c.getSystemService(JobScheduler::class.java)
+                      val b = JobInfo.Builder(JOB_ID, ComponentName(c, NewMediaJobService::class.java))
+                          .addTriggerContentUri(JobInfo.TriggerContentUri(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS))
+                          .addTriggerContentUri(JobInfo.TriggerContentUri(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS))
+                          .setTriggerContentUpdateDelay(5000)
+                          .setTriggerContentMaxDelay(20000)
+                      js.schedule(b.build())
+                  }
+              }
+
+              fun check(c: Context) {
+                  val p = prefs(c)
+                  if (!p.contains("maxA")) { touch(c); return }
+                  if (!p.getBoolean("on", true) || NxState.foreground) { touch(c); return }
+                  val seenA = p.getLong("maxA", 0L); val seenV = p.getLong("maxV", 0L)
+
+                  var na = 0; var nv = 0; var nameA = ""; var nameV = ""; var newA = seenA; var newV = seenV
+                  runCatching {
+                      c.contentResolver.query(
+                          MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                          arrayOf("_id", MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.IS_RINGTONE, MediaStore.Audio.Media.IS_NOTIFICATION, MediaStore.Audio.Media.IS_ALARM),
+                          "_id > ?", arrayOf(seenA.toString()), "_id DESC"
+                      )?.use { q ->
+                          while (q.moveToNext()) {
+                              newA = maxOf(newA, q.getLong(0))
+                              if (q.getInt(2) != 0 || q.getInt(3) != 0 || q.getInt(4) != 0) continue
+                              na++; if (nameA.isEmpty()) nameA = q.getString(1) ?: ""
+                          }
+                      }
+                  }
+                  runCatching {
+                      c.contentResolver.query(
+                          MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                          arrayOf("_id", MediaStore.Video.Media.TITLE),
+                          "_id > ?", arrayOf(seenV.toString()), "_id DESC"
+                      )?.use { q ->
+                          while (q.moveToNext()) { newV = maxOf(newV, q.getLong(0)); nv++; if (nameV.isEmpty()) nameV = q.getString(1) ?: "" }
+                      }
+                  }
+                  p.edit().putLong("maxA", newA).putLong("maxV", newV).apply()
+                  if (na + nv == 0) return
+
+                  val s = runCatching { JSONObject(p.getString("strings", "{}") ?: "{}") }.getOrDefault(JSONObject())
+                  val names = p.getBoolean("names", true)
+                  fun str(k: String, d: String) = s.optString(k, d)
+                  val text = when {
+                      nv == 0 && na == 1 -> if (names && nameA.isNotBlank()) str("aOne", "Se añadió nueva música: {name}").replace("{name}", nameA) else str("aOneG", "Se añadió nueva música")
+                      nv == 0 -> str("aMany", "Se añadieron {n} canciones nuevas").replace("{n}", na.toString())
+                      na == 0 && nv == 1 -> if (names && nameV.isNotBlank()) str("vOne", "Se añadió un video nuevo: {name}").replace("{name}", nameV) else str("vOneG", "Se añadió un video nuevo")
+                      na == 0 -> str("vMany", "Se añadieron {n} videos nuevos").replace("{n}", nv.toString())
+                      else -> str("mix", "Se añadieron {n} archivos nuevos a Nexora").replace("{n}", (na + nv).toString())
+                  }
+                  if (Build.VERSION.SDK_INT >= 33 && c.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return
+                  val nm = c.getSystemService(NotificationManager::class.java)
+                  nm.createNotificationChannel(NotificationChannel(CHANNEL, str("channel", "Nuevos archivos"), NotificationManager.IMPORTANCE_DEFAULT))
+                  val open = PendingIntent.getActivity(
+                      c, 0, Intent(c, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP),
+                      PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                  )
+                  val n = Notification.Builder(c, CHANNEL)
+                      .setSmallIcon(R.drawable.ic_stat_nexora)
+                      .setContentTitle(str("title", "Nexora Pro"))
+                      .setContentText(text)
+                      .setStyle(Notification.BigTextStyle().bigText(text))
+                      .setContentIntent(open)
+                      .setAutoCancel(true)
+                      .build()
+                  nm.notify(NOTIF_ID, n)
+              }
+          }
+
+          class NewMediaJobService : JobService() {
+              override fun onStartJob(params: JobParameters): Boolean {
+                  Thread {
+                      runCatching { NewMedia.check(applicationContext) }
+                      NewMedia.schedule(applicationContext)
+                      jobFinished(params, false)
+                  }.start()
+                  return true
+              }
+              override fun onStopJob(params: JobParameters): Boolean = false
           }
           NXEOF
           cat > app/src/main/java/com/nexora/pro/Updater.kt <<'NXEOF'
@@ -2193,9 +2361,19 @@ jobs:
           TAG="v$VER"
           if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then TAG="v$VER-build${{ github.run_number }}"; fi
           cp version-release.json version.json
-          gh release create "$TAG" NexoraPro.apk version.json \
-            --repo "$REPO" \
-            --target "${{ github.sha }}" \
-            --title "Nexora Pro v$VER" \
-            --notes-file release-notes.md \
-            --latest
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            gh release create "$TAG" NexoraPro.apk version.json \
+              --repo "$REPO" \
+              --target "${{ github.sha }}" \
+              --title "Nexora Pro v$VER" \
+              --notes-file release-notes.md \
+              --latest
+          else
+            # Versión de prueba (otra rama): se publica como pre-lanzamiento y NO llega como actualización a los usuarios
+            gh release create "prueba-$VER-build${{ github.run_number }}" NexoraPro.apk \
+              --repo "$REPO" \
+              --target "${{ github.sha }}" \
+              --title "PRUEBA Nexora Pro v$VER (no es la versión oficial)" \
+              --notes-file release-notes.md \
+              --prerelease
+          fi
