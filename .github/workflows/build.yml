@@ -905,6 +905,7 @@ jobs:
                   @JavascriptInterface fun naVolume(v: Double) = runOnUiThread { nat.setVolume(v) }
                   @JavascriptInterface fun naEq(on: Boolean, gains: String) = runOnUiThread { nat.setEq(on, gains) }
                   // Aviso en la barra de estado cuando llega música o video nuevo (lo envía Android aunque la app esté cerrada)
+                  @JavascriptInterface fun testNewNotif() = NewMedia.test(applicationContext)
                   @JavascriptInterface fun setNewNotif(on: Boolean, json: String, names: Boolean) {
                       NewMedia.configure(applicationContext, on, json, names)
                       NewMedia.schedule(applicationContext)
@@ -1094,14 +1095,12 @@ jobs:
                   super.onPause()
                   resumedNow = false
                   NxState.foreground = false
-                  NewMedia.touch(this)
               }
 
               override fun onResume() {
                   super.onResume()
                   resumedNow = true
                   NxState.foreground = true
-                  NewMedia.touch(this)
                   NewMedia.schedule(applicationContext)
                   js("window.nxOnResume && nxOnResume()")
               }
@@ -1965,8 +1964,8 @@ jobs:
                       val b = JobInfo.Builder(JOB_ID, ComponentName(c, NewMediaJobService::class.java))
                           .addTriggerContentUri(JobInfo.TriggerContentUri(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS))
                           .addTriggerContentUri(JobInfo.TriggerContentUri(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS))
-                          .setTriggerContentUpdateDelay(5000)
-                          .setTriggerContentMaxDelay(20000)
+                          .setTriggerContentUpdateDelay(1500)
+                          .setTriggerContentMaxDelay(6000)
                       js.schedule(b.build())
                   }
               }
@@ -1974,7 +1973,7 @@ jobs:
               fun check(c: Context) {
                   val p = prefs(c)
                   if (!p.contains("maxA")) { touch(c); return }
-                  if (!p.getBoolean("on", true) || NxState.foreground) { touch(c); return }
+                  if (!p.getBoolean("on", true)) { touch(c); return }
                   val seenA = p.getLong("maxA", 0L); val seenV = p.getLong("maxV", 0L)
 
                   var na = 0; var nv = 0; var nameA = ""; var nameV = ""; var newA = seenA; var newV = seenV
@@ -2003,26 +2002,36 @@ jobs:
                   p.edit().putLong("maxA", newA).putLong("maxV", newV).apply()
                   if (na + nv == 0) return
 
-                  val s = runCatching { JSONObject(p.getString("strings", "{}") ?: "{}") }.getOrDefault(JSONObject())
                   val names = p.getBoolean("names", true)
-                  fun str(k: String, d: String) = s.optString(k, d)
                   val text = when {
-                      nv == 0 && na == 1 -> if (names && nameA.isNotBlank()) str("aOne", "Se añadió nueva música: {name}").replace("{name}", nameA) else str("aOneG", "Se añadió nueva música")
-                      nv == 0 -> str("aMany", "Se añadieron {n} canciones nuevas").replace("{n}", na.toString())
-                      na == 0 && nv == 1 -> if (names && nameV.isNotBlank()) str("vOne", "Se añadió un video nuevo: {name}").replace("{name}", nameV) else str("vOneG", "Se añadió un video nuevo")
-                      na == 0 -> str("vMany", "Se añadieron {n} videos nuevos").replace("{n}", nv.toString())
-                      else -> str("mix", "Se añadieron {n} archivos nuevos a Nexora").replace("{n}", (na + nv).toString())
+                      nv == 0 && na == 1 -> if (names && nameA.isNotBlank()) str(c, "aOne", "Se añadió nueva música: {name}").replace("{name}", nameA) else str(c, "aOneG", "Se añadió nueva música")
+                      nv == 0 -> str(c, "aMany", "Se añadieron {n} canciones nuevas").replace("{n}", na.toString())
+                      na == 0 && nv == 1 -> if (names && nameV.isNotBlank()) str(c, "vOne", "Se añadió un video nuevo: {name}").replace("{name}", nameV) else str(c, "vOneG", "Se añadió un video nuevo")
+                      na == 0 -> str(c, "vMany", "Se añadieron {n} videos nuevos").replace("{n}", nv.toString())
+                      else -> str(c, "mix", "Se añadieron {n} archivos nuevos a Nexora").replace("{n}", (na + nv).toString())
                   }
+                  post(c, text)
+              }
+
+              private fun str(c: Context, k: String, d: String): String {
+                  val s = runCatching { JSONObject(prefs(c).getString("strings", "{}") ?: "{}") }.getOrDefault(JSONObject())
+                  return s.optString(k, d)
+              }
+
+              /** Notificación de prueba desde Ajustes → Notificaciones. */
+              fun test(c: Context) = post(c, str(c, "aOne", "Se añadió nueva música: {name}").replace("{name}", "Nexora Pro"))
+
+              private fun post(c: Context, text: String) {
                   if (Build.VERSION.SDK_INT >= 33 && c.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return
                   val nm = c.getSystemService(NotificationManager::class.java)
-                  nm.createNotificationChannel(NotificationChannel(CHANNEL, str("channel", "Nuevos archivos"), NotificationManager.IMPORTANCE_DEFAULT))
+                  nm.createNotificationChannel(NotificationChannel(CHANNEL, str(c, "channel", "Nuevos archivos"), NotificationManager.IMPORTANCE_DEFAULT))
                   val open = PendingIntent.getActivity(
                       c, 0, Intent(c, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP),
                       PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                   )
                   val n = Notification.Builder(c, CHANNEL)
                       .setSmallIcon(R.drawable.ic_stat_nexora)
-                      .setContentTitle(str("title", "Nexora Pro"))
+                      .setContentTitle(str(c, "title", "Nexora Pro"))
                       .setContentText(text)
                       .setStyle(Notification.BigTextStyle().bigText(text))
                       .setContentIntent(open)
