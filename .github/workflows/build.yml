@@ -1637,7 +1637,7 @@ jobs:
                   runCatching {
                       if (loud == null && boost > 100) loud = LoudnessEnhancer(sid)
                       loud?.let { l ->
-                          l.setTargetGain((3320 * log10(boost / 100.0)).toInt())
+                          l.setTargetGain((4000 * log10(boost / 100.0)).toInt())
                           l.enabled = boost > 100
                       }
                   }

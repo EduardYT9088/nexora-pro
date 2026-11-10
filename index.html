@@ -1270,7 +1270,7 @@ function render(){
 }
 
 /* ---------- playback ---------- */
-let ctx, analyser, srcNode, eqNodes=[], preamp, master, limiter, vNode=null, fx={};
+let ctx, analyser, srcNode, eqNodes=[], preamp, master, limiter, vNode=null, fx={}, bComp, bMk, bShape;
 const fxActive = () => S.fx.bass>0 || S.fx.surround>0 || S.fx.clarity>0 || S.fx.norm;
 function ensureVideoGraph(){
   if(S.boost<=100 && !fxActive() && !vNode) return;
@@ -1298,9 +1298,15 @@ function applyBoost(){
   nativeCall('naBoost', S.boost);
   if(master){
     // 300 % = el triple de volumen percibido (+10 dB por cada vez que se duplica) → ganancia ≈ 6,2×
-    master.gain.setTargetAtTime(Math.pow(S.boost/100,1.66), ctx.currentTime, .05);
-    // limitador solo activo cuando se amplifica: a 100 % la señal pasa intacta
-    if(S.boost>100){ limiter.threshold.value=-8; limiter.knee.value=6; limiter.ratio.value=20; } else { limiter.threshold.value=0; limiter.knee.value=2; limiter.ratio.value=1; }
+    // Las canciones modernas ya llegan casi al tope: solo subir la ganancia no suena más fuerte.
+    // Por eso se comprime la dinámica, se compensa y se recorta suavemente (se sube la fuerza real, no el pico).
+    const k=S.boost/100, u=Math.max(0,Math.min(1,(k-1)/2)), now=ctx.currentTime;
+    master.gain.setTargetAtTime(Math.pow(k,1.26), now, .05);
+    bComp.threshold.setTargetAtTime(-34*u, now, .05); bComp.ratio.setTargetAtTime(1+7*u, now, .05); bComp.knee.setTargetAtTime(24*u, now, .05);
+    bMk.gain.setTargetAtTime(1+2*u, now, .05);
+    if(u>0){ const d=0.2+2.4*u, cv=new Float32Array(2048), th=Math.tanh(d); for(let i=0;i<2048;i++){ cv[i]=Math.tanh((i/2047*2-1)*d)/th; } bShape.curve=cv; } else bShape.curve=null;
+    // limitador final: a 100 % la señal pasa intacta
+    if(u>0){ limiter.threshold.value=-2; limiter.knee.value=0; limiter.ratio.value=20; limiter.release.value=.1; } else { limiter.threshold.value=0; limiter.knee.value=2; limiter.ratio.value=1; limiter.release.value=.2; }
   }
   native('setBoost', S.boost, !!S.boostKeys);
 }
@@ -1358,7 +1364,9 @@ function ensureAudioGraph(force){
     master = ctx.createGain();
     limiter = ctx.createDynamicsCompressor();
     limiter.knee.value=2; limiter.attack.value=.002; limiter.release.value=.2;
-    fx.norm.connect(analyser); analyser.connect(master); master.connect(limiter); limiter.connect(ctx.destination);
+    bComp = ctx.createDynamicsCompressor(); bComp.attack.value=.005; bComp.release.value=.13; bComp.threshold.value=0; bComp.ratio.value=1; bComp.knee.value=0;
+    bMk = ctx.createGain(); bShape = ctx.createWaveShaper(); bShape.oversample='2x';
+    fx.norm.connect(analyser); analyser.connect(master); master.connect(bComp); bComp.connect(bMk); bMk.connect(bShape); bShape.connect(limiter); limiter.connect(ctx.destination);
     applyFx();
     applyBoost();
     applyEq();
