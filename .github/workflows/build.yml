@@ -2266,7 +2266,7 @@ jobs:
           NXEOF
           cat > app/src/main/res/values/strings.xml <<'NXEOF'
           <resources>
-              <string name="app_name">Reproductor De Música Nexora Pro</string>
+              <string name="app_name">Reproductor De Música NX Pro</string>
           </resources>
           NXEOF
           cat > app/src/main/res/values/themes.xml <<'NXEOF'

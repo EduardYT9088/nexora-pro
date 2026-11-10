@@ -2302,8 +2302,6 @@ function renderSettings(){
   $('setBody').innerHTML = `
     <div class="set-hero"><img src="${logo}" alt=""><div class="tx"><b>Nexora Pro</b><span>Reproductor de música y video</span><br><span class="vp">V${esc(ver)}</span></div></div>
     <div class="stiles"><div><b>${h}h ${m}m</b><span>Escuchado</span></div><div><b>${na}</b><span>Canciones</span></div><div><b>${nv}</b><span>Videos</span></div></div>
-    <div class="sec-t">Batería</div>
-    <div class="group">${tgRow('eco', IC_LEAF, 'Ahorro de energía', 'Reduce animaciones, desenfoques y el visualizador para gastar menos batería.')}${tgRow('ecoAuto', IC_BATT, 'Activar con batería baja', 'Se activa solo cuando queda 20 % o menos y se apaga al cargar.')}</div>
     <div class="sec-t">Personalizar</div>
     <div class="qtiles">
       ${qtile('theme', S.theme==='light'?I.sun:I.moon, 'Tema', themeName, 0)}
@@ -2317,7 +2315,9 @@ function renderSettings(){
     <div class="group">${setRow('notif',IC_BELL,'Notificaciones',S.notifNew!==false?'Activadas':'Desactivadas','',3)}${setRow('backup',IC_CLOUD,'Copia de seguridad', store.get('lastBackup',null)?new Date(store.get('lastBackup')).toLocaleDateString():'','',0)}${setRow('hidden',I.eye,'Archivos ocultos',`${hid2} archivo${hid2!==1?'s':''}`,'',9)}${setRow('deleted',I.trash,'Eliminado recientemente','','',5)}${NATIVE?setRow('rescan',I.music,'Buscar música de nuevo', scanning?'Buscando…':'','',2)+setRow('perms',I.gem,'Permisos de la app','','',9):''}</div>
     <div class="donate"><span class="heart">♥</span><b>Apoya a Nexora Pro</b><p>Nexora es gratis y sin anuncios. Si te gusta, puedes invitarme un café con una donación por PayPal. ¡Gracias por tu apoyo!</p><button data-set="donate">${IC_HEARTS}Donar con PayPal</button></div>
     <div class="sec-t">Más</div>
-    <div class="group">${setRow('reset',I.restore,'Restablecer estadísticas','','',4)}${setRow('about',I.info,'Acerca de','V'+ver,'',1)}</div>`;
+    <div class="group">${setRow('reset',I.restore,'Restablecer estadísticas','','',4)}${setRow('about',I.info,'Acerca de','V'+ver,'',1)}</div>
+    <div class="sec-t">Batería</div>
+    <div class="group">${tgRow('eco', IC_LEAF, 'Ahorro de energía', 'Reduce animaciones, desenfoques y el visualizador para gastar menos batería.')}${tgRow('ecoAuto', IC_BATT, 'Activar con batería baja', 'Se activa solo cuando queda 20 % o menos y se apaga al cargar.')}</div>`;
 }
 $('settings').addEventListener('click', e=>{
   const b=e.target.closest('[data-set]'); if(!b) return; const k=b.dataset.set;
