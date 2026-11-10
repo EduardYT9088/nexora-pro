@@ -1301,12 +1301,12 @@ function applyBoost(){
     // Las canciones modernas ya llegan casi al tope: solo subir la ganancia no suena más fuerte.
     // Por eso se comprime la dinámica, se compensa y se recorta suavemente (se sube la fuerza real, no el pico).
     const k=S.boost/100, u=Math.max(0,Math.min(1,(k-1)/2)), now=ctx.currentTime;
-    master.gain.setTargetAtTime(Math.pow(k,1.26), now, .05);
-    bComp.threshold.setTargetAtTime(-34*u, now, .05); bComp.ratio.setTargetAtTime(1+7*u, now, .05); bComp.knee.setTargetAtTime(24*u, now, .05);
+    master.gain.setTargetAtTime(Math.pow(k,1.46), now, .05);
+    bComp.threshold.setTargetAtTime(-38*u, now, .05); bComp.ratio.setTargetAtTime(1+5*u, now, .05); bComp.knee.setTargetAtTime(24*u, now, .05);
     bMk.gain.setTargetAtTime(1+2*u, now, .05);
-    if(u>0){ const d=0.2+2.4*u, cv=new Float32Array(2048), th=Math.tanh(d); for(let i=0;i<2048;i++){ cv[i]=Math.tanh((i/2047*2-1)*d)/th; } bShape.curve=cv; } else bShape.curve=null;
+    if(u>0){ const d=0.1+0.5*u, cv=new Float32Array(2048), th=Math.tanh(d); for(let i=0;i<2048;i++){ cv[i]=Math.tanh((i/2047*2-1)*d)/th; } bShape.curve=cv; } else bShape.curve=null;
     // limitador final: a 100 % la señal pasa intacta
-    if(u>0){ limiter.threshold.value=-2; limiter.knee.value=0; limiter.ratio.value=20; limiter.release.value=.1; } else { limiter.threshold.value=0; limiter.knee.value=2; limiter.ratio.value=1; limiter.release.value=.2; }
+    if(u>0){ limiter.threshold.value=-1; limiter.knee.value=0; limiter.ratio.value=20; limiter.release.value=.1; } else { limiter.threshold.value=0; limiter.knee.value=2; limiter.ratio.value=1; limiter.release.value=.2; }
   }
   native('setBoost', S.boost, !!S.boostKeys);
 }
