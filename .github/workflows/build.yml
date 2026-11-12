@@ -1913,8 +1913,12 @@ jobs:
           import android.content.Context
           import android.content.Intent
           import android.content.pm.PackageManager
+          import android.content.ContentUris
+          import android.graphics.Bitmap
+          import android.net.Uri
           import android.os.Build
           import android.provider.MediaStore
+          import android.util.Size
           import org.json.JSONObject
 
           /** Indica si Nexora Pro está abierta: en ese caso no se avisa, porque la persona ya la está viendo. */
@@ -1976,7 +1980,7 @@ jobs:
                   if (!p.getBoolean("on", true)) { touch(c); return }
                   val seenA = p.getLong("maxA", 0L); val seenV = p.getLong("maxV", 0L)
 
-                  var na = 0; var nv = 0; var nameA = ""; var nameV = ""; var newA = seenA; var newV = seenV
+                  var na = 0; var nv = 0; var nameA = ""; var nameV = ""; var newA = seenA; var newV = seenV; var idA = 0L; var idV = 0L
                   runCatching {
                       c.contentResolver.query(
                           MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -1986,7 +1990,7 @@ jobs:
                           while (q.moveToNext()) {
                               newA = maxOf(newA, q.getLong(0))
                               if (q.getInt(2) != 0 || q.getInt(3) != 0 || q.getInt(4) != 0) continue
-                              na++; if (nameA.isEmpty()) nameA = q.getString(1) ?: ""
+                              na++; if (nameA.isEmpty()) { nameA = q.getString(1) ?: ""; idA = q.getLong(0) }
                           }
                       }
                   }
@@ -1996,7 +2000,7 @@ jobs:
                           arrayOf("_id", MediaStore.Video.Media.TITLE),
                           "_id > ?", arrayOf(seenV.toString()), "_id DESC"
                       )?.use { q ->
-                          while (q.moveToNext()) { newV = maxOf(newV, q.getLong(0)); nv++; if (nameV.isEmpty()) nameV = q.getString(1) ?: "" }
+                          while (q.moveToNext()) { newV = maxOf(newV, q.getLong(0)); nv++; if (nameV.isEmpty()) { nameV = q.getString(1) ?: ""; idV = q.getLong(0) } }
                       }
                   }
                   p.edit().putLong("maxA", newA).putLong("maxV", newV).apply()
@@ -2010,7 +2014,11 @@ jobs:
                       na == 0 -> str(c, "vMany", "Se añadieron {n} videos nuevos").replace("{n}", nv.toString())
                       else -> str(c, "mix", "Se añadieron {n} archivos nuevos a Nexora").replace("{n}", (na + nv).toString())
                   }
-                  post(c, text)
+                  // Con un solo archivo nuevo: miniatura y, al tocar, se reproduce directamente.
+                  var uri: Uri? = null; var mime = ""; var title = ""
+                  if (nv == 0 && na == 1 && idA > 0) { uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, idA); mime = "audio/*"; title = nameA }
+                  else if (na == 0 && nv == 1 && idV > 0) { uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, idV); mime = "video/*"; title = nameV }
+                  post(c, text, uri, mime, title)
               }
 
               private fun str(c: Context, k: String, d: String): String {
@@ -2019,25 +2027,28 @@ jobs:
               }
 
               /** Notificación de prueba desde Ajustes → Notificaciones. */
-              fun test(c: Context) = post(c, str(c, "aOne", "Se añadió nueva música: {name}").replace("{name}", "Nexora Pro"))
+              fun test(c: Context) = post(c, str(c, "aOne", "Se añadió nueva música: {name}").replace("{name}", "Nexora Pro"), null, "", "")
 
-              private fun post(c: Context, text: String) {
+              private fun post(c: Context, text: String, uri: Uri?, mime: String, title: String) {
                   if (Build.VERSION.SDK_INT >= 33 && c.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return
                   val nm = c.getSystemService(NotificationManager::class.java)
                   nm.createNotificationChannel(NotificationChannel(CHANNEL, str(c, "channel", "Nuevos archivos"), NotificationManager.IMPORTANCE_DEFAULT))
-                  val open = PendingIntent.getActivity(
-                      c, 0, Intent(c, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP),
-                      PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                  )
-                  val n = Notification.Builder(c, CHANNEL)
+                  val it = Intent(c, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                  if (uri != null) it.setAction(Intent.ACTION_VIEW).setDataAndType(uri, mime).putExtra("nexora_title", title)
+                  val open = PendingIntent.getActivity(c, 0, it, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+                  var bmp: Bitmap? = null
+                  if (uri != null && Build.VERSION.SDK_INT >= 29) bmp = runCatching { c.contentResolver.loadThumbnail(uri, Size(640, 640), null) }.getOrNull()
+                  val tap = if (uri != null) str(c, "tap", "Toca para reproducirlo ahora") else ""
+                  val body = if (tap.isNotEmpty()) text + "\n" + tap else text
+                  val b = Notification.Builder(c, CHANNEL)
                       .setSmallIcon(R.drawable.ic_stat_nexora)
                       .setContentTitle(str(c, "title", "Nexora Pro"))
                       .setContentText(text)
-                      .setStyle(Notification.BigTextStyle().bigText(text))
                       .setContentIntent(open)
                       .setAutoCancel(true)
-                      .build()
-                  nm.notify(NOTIF_ID, n)
+                  if (bmp != null) b.setLargeIcon(bmp).setStyle(Notification.BigPictureStyle().bigPicture(bmp).bigLargeIcon(null as Bitmap?).setSummaryText(body))
+                  else b.setStyle(Notification.BigTextStyle().bigText(body))
+                  nm.notify(NOTIF_ID, b.build())
               }
           }
 
