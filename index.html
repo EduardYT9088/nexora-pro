@@ -1039,7 +1039,7 @@ const wantNative = (url, force) => !!(window.Nexora && (S.mixAudio || force) && 
 const NATIVE = typeof window.Nexora !== 'undefined';
 if(NATIVE){ audioEl.crossOrigin = 'anonymous'; video.crossOrigin = 'anonymous'; }
 const native = (fn,...a) => { try{ if(NATIVE && Nexora[fn]) return Nexora[fn](...a); }catch(e){} };
-const DEF = {vmode:'all', vscale:'fit', venh:0, covers:null, fx:{bass:0,surround:0,clarity:0,norm:false}, boost:100, boostKeys:true, mixAudio:false, gapless:false, crossfade:false, cfSec:5, hideVoice:true, lang:'es', autoLy:true, plView:'cover', vzStyle:'bars', eco:false, ecoAuto:false, notifNew:true, notifNames:true, resumeLast:true};
+const DEF = {vmode:'all', vscale:'fit', venh:0, covers:null, fx:{bass:0,surround:0,clarity:0,norm:false}, boost:100, boostKeys:true, mixAudio:false, gapless:false, crossfade:false, cfSec:5, hideVoice:true, lang:'es', autoLy:true, plView:'cover', vzStyle:'bars', eco:false, ecoAuto:false, notifNew:true, notifTime:true, notifNames:true, resumeLast:true};
 
 /* ---------- icons ---------- */
 const I = {
@@ -1871,6 +1871,7 @@ function syncNotif(){
   if(!NATIVE) return;
   const st={title:'Nexora Pro', channel:trs('Nuevos archivos'), aOne:trs('Se añadió nueva música: {name}'), aOneG:trs('Se añadió nueva música'), aMany:trs('Se añadieron {n} canciones nuevas'), vOne:trs('Se añadió un video nuevo: {name}'), vOneG:trs('Se añadió un video nuevo'), vMany:trs('Se añadieron {n} videos nuevos'), mix:trs('Se añadieron {n} archivos nuevos a Nexora'), tap:trs('Toca para reproducirlo ahora')};
   native('setNewNotif', S.notifNew!==false, JSON.stringify(st), S.notifNames!==false);
+  native('setMusicTime', S.notifTime!==false, JSON.stringify({title:trs('Hora de Música'), channel:trs('Hora de Música'), morning:trs('Empieza tu día con tu música favorita'), noon:trs('Es mediodía: ponle música a tu día')}));
 }
 let ntAsked=false;
 window.nxOnNotif = () => {
@@ -2978,6 +2979,7 @@ function renderSub(){
     h = subHead('Notificaciones') + `<div class="nt-hero"><span class="nt-ic">${IC_BELL}</span><div><b>Avisos de Nexora</b><small>Entérate al instante cuando llegue música o video nuevo a tu teléfono.</small></div></div>`
       + (NATIVE && !pm.notif ? `<div class="nt-warn"><b>Las notificaciones están bloqueadas</b><small>Actívalas para recibir los avisos de música y video nuevos.</small><button data-s="nt:perm">Activar notificaciones</button></div>` : '')
       + `<div class="group">${tgRow('notifNew', IC_BELL, 'Notificación de nuevos archivos', 'Te avisa en la barra de estado cuando se añade música o video a Nexora, por ejemplo al descargarlos con Download Nexora.')}${tgRow('notifNames', IC_TAGI, 'Mostrar el nombre del archivo', 'Si lo desactivas, el aviso solo dirá cuántos archivos nuevos hay.')}</div>`
+      + `<div class="group">${tgRow('notifTime', IC_BELL, 'Hora de Música', 'Un recordatorio a las 8:00 y a las 12:00 para que escuches tu música.')}</div>`
       + (NATIVE ? `<button class="alink" style="display:block;width:100%;text-align:left;padding:12px 16px" data-s="nt:test">Enviar notificación de prueba</button><p style="margin:2px 18px 10px;color:var(--muted);font-size:12.5px;line-height:1.45">Si la de prueba no aparece, en los ajustes de Android pon la batería de Nexora Pro en “Sin restricciones” y activa el inicio automático.</p>` : '')
       + `<button class="alink" style="display:block;width:100%;text-align:left;padding:12px 16px" data-s="nt:sys">Abrir ajustes de notificaciones de Android</button>`;
   }
@@ -3081,7 +3083,7 @@ $('sub').addEventListener('change', e=>{
   if(k==='hideVoice'){ render(); }
   if(k==='boostKeys') applyBoost();
   if(k==='autoLy' && t.checked && current) lyEnqueue(current,true);
-  if(k==='notifNew'||k==='notifNames') syncNotif();
+  if(k==='notifNew'||k==='notifNames'||k==='notifTime') syncNotif();
   if(k==='mixAudio' && current){
     const t=audio.currentTime, was=!audio.paused, want=wantNative(current.url);
     if(want!==audio.isNative){ setEngine(want); audio.src=current.url; audio.playbackRate=S.speed; audio.currentTime=t; setVol(); if(was) audio.play().catch(()=>{}); }
@@ -3516,6 +3518,12 @@ Object.assign(I18N.fr,{"Toca para reproducirlo ahora": "Touchez pour le lire mai
 Object.assign(I18N.it,{"Toca para reproducirlo ahora": "Tocca per riprodurlo ora"});
 Object.assign(I18N.de,{"Toca para reproducirlo ahora": "Tippen zum Abspielen"});
 Object.assign(I18N.id,{"Toca para reproducirlo ahora": "Ketuk untuk memutar sekarang"});
+Object.assign(I18N.en,{"Hora de Música": "Music Time", "Empieza tu día con tu música favorita": "Start your day with your favorite music", "Es mediodía: ponle música a tu día": "It's noon: put some music on your day", "Un recordatorio a las 8:00 y a las 12:00 para que escuches tu música.": "A reminder at 8:00 AM and 12:00 PM to listen to your music."});
+Object.assign(I18N.pt,{"Hora de Música": "Hora da Música", "Empieza tu día con tu música favorita": "Comece o seu dia com a sua música favorita", "Es mediodía: ponle música a tu día": "É meio-dia: coloque música no seu dia", "Un recordatorio a las 8:00 y a las 12:00 para que escuches tu música.": "Um lembrete às 8:00 e às 12:00 para ouvir a sua música."});
+Object.assign(I18N.fr,{"Hora de Música": "Heure de la Musique", "Empieza tu día con tu música favorita": "Commencez la journée avec votre musique préférée", "Es mediodía: ponle música a tu día": "Il est midi : mettez de la musique dans votre journée", "Un recordatorio a las 8:00 y a las 12:00 para que escuches tu música.": "Un rappel à 8 h et à 12 h pour écouter votre musique."});
+Object.assign(I18N.it,{"Hora de Música": "L'ora della Musica", "Empieza tu día con tu música favorita": "Inizia la giornata con la tua musica preferita", "Es mediodía: ponle música a tu día": "È mezzogiorno: metti un po' di musica nella tua giornata", "Un recordatorio a las 8:00 y a las 12:00 para que escuches tu música.": "Un promemoria alle 8:00 e alle 12:00 per ascoltare la tua musica."});
+Object.assign(I18N.de,{"Hora de Música": "Musikzeit", "Empieza tu día con tu música favorita": "Starte deinen Tag mit deiner Lieblingsmusik", "Es mediodía: ponle música a tu día": "Es ist Mittag: Bring Musik in deinen Tag", "Un recordatorio a las 8:00 y a las 12:00 para que escuches tu música.": "Eine Erinnerung um 8:00 und 12:00 Uhr, deine Musik zu hören."});
+Object.assign(I18N.id,{"Hora de Música": "Waktunya Musik", "Empieza tu día con tu música favorita": "Mulai harimu dengan musik favoritmu", "Es mediodía: ponle música a tu día": "Sudah siang: tambahkan musik di harimu", "Un recordatorio a las 8:00 y a las 12:00 para que escuches tu música.": "Pengingat pukul 8:00 dan 12:00 untuk mendengarkan musikmu."});
 const GREET = {en:['Good morning','Good afternoon','Good evening'], pt:['Bom dia','Boa tarde','Boa noite'], fr:['Bonjour','Bon après-midi','Bonsoir'], it:['Buongiorno','Buon pomeriggio','Buonasera'], de:['Guten Morgen','Guten Tag','Guten Abend'], id:['Selamat pagi','Selamat siang','Selamat malam']};
 ['en','pt','fr','it','de','id'].forEach(l=>{ const es=['Buenos días','Buenas tardes','Buenas noches']; es.forEach((g,i)=>{ I18N[l][g+' 👋']=GREET[l][i]+' 👋'; }); });
 function trText(src){
