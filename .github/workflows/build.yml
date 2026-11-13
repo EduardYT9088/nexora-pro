@@ -115,6 +115,8 @@ jobs:
               <!-- Controles en la notificación y música en segundo plano -->
               <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
               <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+              <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+              <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
               <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -914,6 +916,7 @@ jobs:
                   @JavascriptInterface fun naEq(on: Boolean, gains: String) = runOnUiThread { nat.setEq(on, gains) }
                   // Aviso en la barra de estado cuando llega música o video nuevo (lo envía Android aunque la app esté cerrada)
                   @JavascriptInterface fun testNewNotif() = NewMedia.test(applicationContext)
+                  @JavascriptInterface fun testMusicTime() = MusicTime.test(applicationContext)
                   @JavascriptInterface fun setMusicTime(on: Boolean, json: String) { MusicTime.configure(applicationContext, on, json); MusicTime.schedule(applicationContext) }
                   @JavascriptInterface fun setNewNotif(on: Boolean, json: String, names: Boolean) {
                       NewMedia.configure(applicationContext, on, json, names)
@@ -1957,9 +1960,16 @@ jobs:
                           set(Calendar.HOUR_OF_DAY, h); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
                           if (timeInMillis <= System.currentTimeMillis() + 60_000) add(Calendar.DAY_OF_YEAR, 1)
                       }
-                      runCatching { am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.timeInMillis, pi) }
+                      val exact = Build.VERSION.SDK_INT < 31 || runCatching { am.canScheduleExactAlarms() }.getOrDefault(false)
+                      runCatching {
+                          if (exact) am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.timeInMillis, pi)
+                          else am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.timeInMillis, pi)
+                      }
                   }
               }
+
+              /** Prueba desde Ajustes: muestra el aviso ahora mismo. */
+              fun test(c: Context) = show(c, 8)
 
               fun fire(c: Context, hour: Int) {
                   schedule(c)
