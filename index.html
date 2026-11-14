@@ -1528,6 +1528,7 @@ function lyParse(lrc){
   return out.sort((a,b)=>a.t-b.t);
 }
 const lyClean = s => String(s||'').replace(/\(.*?\)|\[.*?\]|【.*?】/g,' ').replace(/\b(official|lyrics?|letra|video|vídeo|audio|hd|4k|mp3|descargar|download|loop|slowed|reverb|sped up|nightcore|8d|extended)\b/ig,' ').replace(/\b\d+\s*(hours?|horas?|hrs?|h)\b/ig,' ').replace(/\s+(ft|feat)\.?\s.*$/i,'').replace(/\s+/g,' ').trim();
+const lyStale = (it,r) => !!(r && r.t==='ok' && !r.manual && !r.long && !r.v && (it.duration||0)>480);
 const lySleep = ms => new Promise(r=>setTimeout(r,ms));
 const lyLrc = lines => lines.map(l=>{ const m=Math.floor(l.t/60), s=l.t-m*60; return `[${String(m).padStart(2,'0')}:${s.toFixed(2).padStart(5,'0')}]${l.text}`; }).join('\n');
 async function lyHttp(url){
@@ -1541,7 +1542,7 @@ async function lyFind(it, q, loose){
   const dur=loose?0:Math.round(it.duration||0), base='https://lrclib.net/api/', enc=encodeURIComponent;
   if(!title) return null;
   let rec=null;
-  if(artist && dur){ const r=await lyHttp(`${base}get?track_name=${enc(title)}&artist_name=${enc(artist)}&duration=${dur}`); if(r && !r.code) rec=r; }
+  if(artist && dur){ const r=await lyHttp(`${base}get?track_name=${enc(title)}&artist_name=${enc(artist)}&duration=${dur}`); if(r && !r.code && (dur<=480 || (r.duration && Math.abs(r.duration-dur)<=15))) rec=r; }
   if(!rec){
     const urls=[`${base}search?track_name=${enc(title)}${artist?'&artist_name='+enc(artist):''}`, `${base}search?q=${enc((artist+' '+title).trim())}`];
     for(const u of urls){
@@ -1550,7 +1551,7 @@ async function lyFind(it, q, loose){
         const sc=x=>(x.syncedLyrics?2:x.plainLyrics?1:0)*1000-(dur&&x.duration?Math.min(999,Math.abs(x.duration-dur)):0);
         arr.sort((a,b)=>sc(b)-sc(a));
         const b=arr[0];
-        if((b.syncedLyrics||b.plainLyrics||b.instrumental) && (!dur||!b.duration||Math.abs(b.duration-dur)<=15)){ rec=b; break; }
+        if((b.syncedLyrics||b.plainLyrics||b.instrumental) && (!dur||(dur>480?(b.duration&&Math.abs(b.duration-dur)<=15):(!b.duration||Math.abs(b.duration-dur)<=15)))){ rec=b; break; }
       }
     }
   }
@@ -1576,9 +1577,11 @@ async function lyAlbum(it,q,D){
     await lySleep(1100);
     const d=await lyHttp(`${mb}release/${r.id}?inc=recordings+artist-credits&fmt=json`);
     const tr=[]; ((d&&d.media)||[]).forEach(md=>(md.tracks||[]).forEach(x=>tr.push({title:x.title,len:x.length||(x.recording&&x.recording.length)||0})));
-    if(!tr.length || tr.some(x=>!x.len)) continue;
+    if(!tr.length) continue;
+    const known=tr.filter(x=>x.len); if(known.length<tr.length*.7) continue;
+    const avg=known.reduce((s,x)=>s+x.len,0)/known.length; tr.forEach(x=>{ if(!x.len) x.len=avg; });
     const tot=tr.reduce((s,x)=>s+x.len,0)/1000, diff=Math.abs(tot-D)/D;
-    if(diff<=.12 && (!best||diff<best.diff)) best={tr,tot,diff,artist:(d['artist-credit']&&d['artist-credit'][0]&&d['artist-credit'][0].name)||artist};
+    if(diff<=.15 && (!best||diff<best.diff)) best={tr,tot,diff,artist:(d['artist-credit']&&d['artist-credit'][0]&&d['artist-credit'][0].name)||artist};
   }
   if(!best) return null;
   const sc=D/best.tot; let pos=0, found=0; const out=[];
@@ -1593,7 +1596,7 @@ async function lyAlbum(it,q,D){
   }
   if(!found) return null;
   out.sort((a,b)=>a.t-b.t);
-  return {t:'ok',synced:lyLrc(out),plain:'',ts:Date.now(),off:0,long:'album'};
+  return {t:'ok',synced:lyLrc(out),plain:'',ts:Date.now(),off:0,long:'album',v:2};
 }
 async function lyLong(it,q,D){
   const one=await lyFind(it,q,true);
@@ -1602,7 +1605,7 @@ async function lyLong(it,q,D){
     if(k>=2 && Math.abs(D-k*one.duration)<=Math.max(8,D*.04)){
       const base=lyParse(one.syncedLyrics), step=D/k, out=[];
       for(let j=0;j<k;j++) base.forEach(l=>out.push({t:l.t+j*step,text:l.text}));
-      return {t:'ok',synced:lyLrc(out),plain:'',ts:Date.now(),off:0,long:'loop'};
+      return {t:'ok',synced:lyLrc(out),plain:'',ts:Date.now(),off:0,long:'loop',v:2};
     }
   }
   return lyAlbum(it,q,D);
@@ -1612,10 +1615,10 @@ async function lyLookup(it, q){
   const rec=await lyFind(it,q,false);
   if(rec){
     if(rec.instrumental && !rec.syncedLyrics && !rec.plainLyrics) return {t:'inst',ts:Date.now()};
-    return {t:'ok', synced:rec.syncedLyrics||'', plain:rec.plainLyrics||'', ts:Date.now(), off:0};
+    return {t:'ok', synced:rec.syncedLyrics||'', plain:rec.plainLyrics||'', ts:Date.now(), off:0, v:2};
   }
-  if(D>600){ const lg=await lyLong(it,q,D); if(lg) return lg; }
-  return {t:'none',ts:Date.now()};
+  if(D>480){ const lg=await lyLong(it,q,D); if(lg) return lg; }
+  return {t:'none',ts:Date.now(),v:2};
 }
 const lyQ=[]; let lyRun=false, lyKey=null, lyBulk=null;
 function lyEnqueue(it, front){
@@ -1628,7 +1631,7 @@ async function lyPump(){
     const it=lyQ.shift();
     if(!navigator.onLine){ lyQ.length=0; if(lyBulk) lyBulk.off=true; break; }
     const had=await lyGet(it.key);
-    if(had && (had.t==='ok'||had.t==='inst'||had.manual||Date.now()-had.ts<3*864e5)){ if(lyBulk) lyBulk.done++; continue; }
+    if(had && !lyStale(it,had) && (had.t==='ok'||had.t==='inst'||had.manual||Date.now()-had.ts<3*864e5)){ if(lyBulk) lyBulk.done++; continue; }
     lyKey=it.key;
     try{ const r=await lyLookup(it); await lyPut(it.key,r); if(lyBulk){ lyBulk.done++; if(r.t==='ok') lyBulk.ok++; } if(current && current.key===it.key) lyShow(); }
     catch(e){ if(current && current.key===it.key) lyShow(true); }
@@ -1661,7 +1664,8 @@ function lyMsg(kind, extra){
 async function lyShow(failed){
   const it=current; if(!it) return; const tok=++lyTok;
   if(it.type!=='audio'){ lyMsg('none'); return; }
-  const rec=await lyGet(it.key); if(tok!==lyTok) return;
+  let rec=await lyGet(it.key); if(tok!==lyTok) return;
+  if(lyStale(it,rec)){ rec=null; lyEnqueue(it,true); }
   lyRec=rec||null; lyIdx=-1;
   if(!rec){ lyMsg(failed||!navigator.onLine ? 'off' : (lyQ.some(x=>x.key===it.key)||lyKey===it.key||S.autoLy!==false||plView==='lyrics') && !failed ? 'load' : 'none'); return; }
   if(rec.t==='inst'){ lyMsg('inst'); return; }
