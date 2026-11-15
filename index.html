@@ -248,23 +248,25 @@ body.pip .vp-layer,body.pip .vp-scrim,body.pip .vp-pill,body.pip .vp-unlock,body
 .opt .val{color:var(--muted);font-weight:500;font-size:14px;margin-left:8px;white-space:nowrap}
 .sheet hr{border:0;border-top:1px solid var(--line);margin:6px 16px}
 /* actualización obligatoria */
-.upd{position:fixed;inset:0;z-index:90;background:var(--bg);display:none;flex-direction:column;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 40px) 26px calc(env(safe-area-inset-bottom,0px) + 26px);overflow-y:auto}
+.upd{position:fixed;inset:0;z-index:90;background:var(--bg);display:none;flex-direction:column;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 26px) 22px calc(env(safe-area-inset-bottom,0px) + 18px);overflow:hidden}
+.upd>*{flex-shrink:0}
 .upd.on{display:flex}
-.upd img{width:96px;height:96px;border-radius:24px;box-shadow:0 18px 40px -12px rgba(108,76,245,.6)}
-.upd h1{font-family:Sora,Manrope,sans-serif;font-size:1.6rem;margin:22px 0 4px;text-align:center}
+.upd img{width:84px;height:84px;border-radius:22px;box-shadow:0 18px 40px -12px rgba(108,76,245,.6)}
+.upd h1{font-family:Sora,Manrope,sans-serif;font-size:1.5rem;margin:16px 0 2px;text-align:center}
 .upd .ver{font-family:Sora,Manrope,sans-serif;font-weight:800;font-size:clamp(52px,17vw,76px);line-height:1.05;letter-spacing:-.02em;background:linear-gradient(90deg,var(--accent2),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent;margin:10px 0 6px}
-.upd .mine{color:var(--muted);font-size:16px;margin-bottom:22px}
+.upd .mine{color:var(--muted);font-size:15px;margin-bottom:16px}
 .upd .web{background:none;color:var(--accent2);font-weight:800;font-size:16px;height:44px}
 .upd .acts .btn svg{width:22px;height:22px}
-.upd .box{width:100%;max-width:440px;background:var(--surface);border-radius:22px;padding:18px 20px;margin-bottom:20px}
+.upd .box{width:100%;max-width:440px;background:var(--surface);border-radius:22px;padding:16px 18px;margin-bottom:14px;flex:0 1 auto;min-height:90px;overflow-y:auto}
 .upd .box li{margin-bottom:6px}
 .upd .box b{display:block;margin-bottom:8px}
-.upd ul{margin:0;padding-left:20px;line-height:1.6;color:var(--text)}
+.upd ul{margin:0;padding-left:20px;line-height:1.45;font-size:15px;color:var(--text)}
 .upd p{color:var(--muted);text-align:center;max-width:36ch;line-height:1.5;margin:0 0 18px}
 .upd .acts{width:100%;max-width:440px;display:flex;flex-direction:column;gap:10px;margin-top:auto}
 .upd .pbar{width:100%;max-width:440px;height:10px;border-radius:5px;background:var(--surface2);overflow:hidden;display:none;margin-bottom:8px}
 .upd .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .2s}
-.upd .pmsg{font-size:14px;color:var(--muted);min-height:20px;text-align:center;margin-bottom:8px}
+.upd .pmsg{font-size:14px;color:var(--muted);text-align:center}
+.upd .pmsg:empty{display:none}
 .upd .acts .btn{justify-content:center;height:52px;border-radius:26px;font-size:16px}
 /* página de privacidad dentro de la app */
 .privpage{position:fixed;inset:0;z-index:80;background:var(--bg);display:none;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
