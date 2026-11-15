@@ -2593,6 +2593,7 @@ jobs:
               --title "Nexora Pro v$VER" \
               --notes-file release-notes.md \
               --latest
+            echo "REL_TAG=$TAG" >> "$GITHUB_ENV"
           else
             # Versión de prueba (otra rama): se publica como pre-lanzamiento y NO llega como actualización a los usuarios
             gh release create "prueba-$VER-build${{ github.run_number }}" NexoraPro.apk \
@@ -2601,4 +2602,71 @@ jobs:
               --title "PRUEBA Nexora Pro v$VER (no es la versión oficial)" \
               --notes-file release-notes.md \
               --prerelease
+            echo "REL_TAG=prueba-$VER-build${{ github.run_number }}" >> "$GITHUB_ENV"
           fi
+
+      # ---------- Versión para Google Play (.aab) ----------
+      # Va después de publicar el APK: si algo de Play falla, la versión de GitHub ya salió igual.
+      - name: Preparar versión para Google Play
+        id: play
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -e
+          python3 - <<'PYEOF'
+          import re, pathlib
+          P = pathlib.Path('proyecto')
+          def sub(f, old, new):
+              p = P / f; t = p.read_text(encoding='utf-8')
+              if old not in t: raise SystemExit('No encontrado en ' + f + ': ' + old[:60])
+              p.write_text(t.replace(old, new, 1), encoding='utf-8')
+          # Play exige apuntar a Android 16 (API 36)
+          sub('build.gradle.kts', 'version "8.5.2"', 'version "8.9.1"')
+          sub('build.gradle.kts', 'version "1.9.24"', 'version "2.0.21"')
+          sub('app/build.gradle.kts', 'compileSdk = 34', 'compileSdk = 36')
+          sub('app/build.gradle.kts', 'targetSdk = 34', 'targetSdk = 36')
+          # Permisos que Play no acepta en un reproductor: autoactualización, alarma exacta y servicio especial
+          m = P / 'app/src/main/AndroidManifest.xml'; t = m.read_text(encoding='utf-8')
+          for perm in ['USE_EXACT_ALARM', 'SCHEDULE_EXACT_ALARM', 'REQUEST_INSTALL_PACKAGES', 'FOREGROUND_SERVICE_SPECIAL_USE']:
+              t = re.sub(r'\s*<uses-permission android:name="android\.permission\.' + perm + r'"[^>]*/>', '', t)
+          t = re.sub(r'\s*<service\s+android:name="\.NewMediaWatchService".*?</service>', '', t, flags=re.S)
+          m.write_text(t, encoding='utf-8')
+          k = 'app/src/main/java/com/nexora/pro/'
+          # En Play las actualizaciones las entrega la tienda
+          sub(k + 'MainActivity.kt', 'fun checkUpdate(repo: String) {', 'fun checkUpdate(repo: String) {\n        if (repo.isNotEmpty()) return')
+          # Sin vigilante fijo: los avisos de archivos nuevos usan los trabajos de Android
+          sub(k + 'NewMedia.kt', 'fun watch(c: Context) {', 'fun watch(c: Context) {\n        if (c.packageName.isNotEmpty()) return')
+          # Android 15+ dibuja detrás de las barras: se deja el espacio de la barra de estado, de navegación y del teclado
+          sub(k + 'MainActivity.kt', '        setContentView(root)\n', """        setContentView(root)
+                  if (Build.VERSION.SDK_INT >= 35) root.setOnApplyWindowInsetsListener { v, ins ->
+                      val b = ins.getInsets(android.view.WindowInsets.Type.systemBars() or android.view.WindowInsets.Type.displayCutout() or android.view.WindowInsets.Type.ime())
+                      v.setPadding(b.left, b.top, b.right, b.bottom)
+                      ins
+                  }
+          """)
+          print('Proyecto preparado para Google Play')
+          PYEOF
+
+      - name: Instalar Gradle para Google Play
+        if: steps.play.outcome == 'success'
+        continue-on-error: true
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Compilar AAB para Google Play
+        id: aab
+        if: steps.play.outcome == 'success'
+        continue-on-error: true
+        working-directory: proyecto
+        run: gradle clean bundleRelease --no-daemon --stacktrace
+
+      - name: Subir AAB para Google Play
+        if: steps.aab.outcome == 'success'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          cp proyecto/app/build/outputs/bundle/release/app-release.aab NexoraPro-Play.aab
+          gh release upload "$REL_TAG" NexoraPro-Play.aab --repo "$REPO" --clobber
