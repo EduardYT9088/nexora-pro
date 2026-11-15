@@ -119,6 +119,7 @@ jobs:
               <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
               <uses-permission android:name="android.permission.WAKE_LOCK" />
               <!-- Solo para el visualizador de música: lee la intensidad del sonido que reproduce Nexora; no graba ni guarda nada -->
               <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -176,6 +177,13 @@ jobs:
                       android:name=".NewMediaJobService"
                       android:permission="android.permission.BIND_JOB_SERVICE"
                       android:exported="false" />
+
+                  <service
+                      android:name=".NewMediaWatchService"
+                      android:exported="false"
+                      android:foregroundServiceType="specialUse">
+                      <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="media_library_watcher" />
+                  </service>
 
                   <service
                       android:name=".PlaybackService"
@@ -921,6 +929,12 @@ jobs:
                   @JavascriptInterface fun setNewNotif(on: Boolean, json: String, names: Boolean) {
                       NewMedia.configure(applicationContext, on, json, names)
                       NewMedia.schedule(applicationContext)
+                      NewMedia.periodic(applicationContext)
+                      NewMedia.watch(applicationContext)
+                  }
+                  @JavascriptInterface fun setNewWatch(on: Boolean) {
+                      NewMedia.setWatch(applicationContext, on)
+                      NewMedia.watch(applicationContext)
                   }
                   // Visualizador de música: datos reales del sonido (necesita el permiso de audio, solo para medir; no graba)
                   @JavascriptInterface fun naViz(on: Boolean) = runOnUiThread {
@@ -1114,6 +1128,8 @@ jobs:
                   resumedNow = true
                   NxState.foreground = true
                   NewMedia.schedule(applicationContext)
+                  NewMedia.periodic(applicationContext)
+                  NewMedia.watch(applicationContext)
                   MusicTime.schedule(applicationContext)
                   js("window.nxOnResume && nxOnResume()")
               }
@@ -2002,6 +2018,9 @@ jobs:
               override fun onReceive(c: Context, i: Intent) {
                   if (i.action == "com.nexora.pro.MUSIC_TIME") MusicTime.fire(c, i.getIntExtra("hour", 8))
                   else MusicTime.schedule(c)
+                  // Tras reiniciar el teléfono o actualizar la app se reactivan también los avisos de archivos nuevos
+                  NewMedia.schedule(c); NewMedia.periodic(c); NewMedia.watch(c)
+                  Thread { runCatching { NewMedia.check(c) } }.start()
               }
           }
           NXEOF
@@ -2017,6 +2036,12 @@ jobs:
           import android.app.job.JobParameters
           import android.app.job.JobScheduler
           import android.app.job.JobService
+          import android.app.Service
+          import android.content.pm.ServiceInfo
+          import android.database.ContentObserver
+          import android.os.Handler
+          import android.os.IBinder
+          import android.os.Looper
           import android.content.ComponentName
           import android.content.Context
           import android.content.Intent
@@ -2061,6 +2086,46 @@ jobs:
                   return m
               }
 
+              fun setWatch(c: Context, on: Boolean) { prefs(c).edit().putBoolean("watch", on).apply() }
+
+              /** Respaldo: revisa cada 15 minutos por si el teléfono canceló el aviso inmediato. Sobrevive a reinicios. */
+              fun periodic(c: Context) {
+                  runCatching {
+                      val js = c.getSystemService(JobScheduler::class.java)
+                      if (js.getPendingJob(JOB_ID + 1) != null) return
+                      js.schedule(
+                          JobInfo.Builder(JOB_ID + 1, ComponentName(c, NewMediaJobService::class.java))
+                              .setPeriodic(15 * 60 * 1000L).setPersisted(true).build()
+                      )
+                  }
+              }
+
+              /** Vigilante con notificación fija: mantiene la app viva para avisar al instante aunque esté cerrada. */
+              fun watch(c: Context) {
+                  val p = prefs(c)
+                  val want = p.getBoolean("on", true) && p.getBoolean("watch", true)
+                  runCatching {
+                      val i = Intent(c, NewMediaWatchService::class.java)
+                      if (want) c.startForegroundService(i) else c.stopService(i)
+                  }
+              }
+
+              fun watchNotif(c: Context): Notification {
+                  val nm = c.getSystemService(NotificationManager::class.java)
+                  nm.createNotificationChannel(NotificationChannel("nexora_watch", str(c, "watchCh", "Avisos en segundo plano"), NotificationManager.IMPORTANCE_MIN).apply { setShowBadge(false) })
+                  val open = PendingIntent.getActivity(
+                      c, 2, Intent(c, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP),
+                      PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                  )
+                  return Notification.Builder(c, "nexora_watch")
+                      .setSmallIcon(R.drawable.ic_stat_nexora)
+                      .setContentTitle(str(c, "title", "Nexora Pro"))
+                      .setContentText(str(c, "watch", "Toca para abrir tu música"))
+                      .setContentIntent(open)
+                      .setOngoing(true)
+                      .build()
+              }
+
               /** Lo que ya existe cuenta como "visto": solo se avisa de los archivos que lleguen después. */
               fun touch(c: Context) {
                   val a = maxId(c, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)
@@ -2082,7 +2147,7 @@ jobs:
                   }
               }
 
-              fun check(c: Context) {
+              @Synchronized fun check(c: Context) {
                   val p = prefs(c)
                   if (!p.contains("maxA")) { touch(c); return }
                   if (!p.getBoolean("on", true)) { touch(c); return }
@@ -2165,11 +2230,42 @@ jobs:
                   Thread {
                       runCatching { NewMedia.check(applicationContext) }
                       NewMedia.schedule(applicationContext)
+                      runCatching { NewMedia.watch(applicationContext) }
                       jobFinished(params, false)
                   }.start()
                   return true
               }
               override fun onStopJob(params: JobParameters): Boolean = false
+          }
+
+          class NewMediaWatchService : Service() {
+              private val h = Handler(Looper.getMainLooper())
+              private val run = Runnable { Thread { runCatching { NewMedia.check(applicationContext) } }.start() }
+              private val obs = object : ContentObserver(h) {
+                  override fun onChange(selfChange: Boolean) { h.removeCallbacks(run); h.postDelayed(run, 2500) }
+              }
+              override fun onBind(i: Intent?): IBinder? = null
+              override fun onCreate() {
+                  super.onCreate()
+                  runCatching {
+                      contentResolver.registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, obs)
+                      contentResolver.registerContentObserver(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, true, obs)
+                  }
+              }
+              override fun onStartCommand(i: Intent?, flags: Int, startId: Int): Int {
+                  runCatching {
+                      val n = NewMedia.watchNotif(this)
+                      if (Build.VERSION.SDK_INT >= 34) startForeground(7422, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+                      else startForeground(7422, n)
+                  }.onFailure { stopSelf() }
+                  h.removeCallbacks(run); h.postDelayed(run, 2500)
+                  return START_STICKY
+              }
+              override fun onDestroy() {
+                  runCatching { contentResolver.unregisterContentObserver(obs) }
+                  h.removeCallbacks(run)
+                  super.onDestroy()
+              }
           }
           NXEOF
           cat > app/src/main/java/com/nexora/pro/Updater.kt <<'NXEOF'
