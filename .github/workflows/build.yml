@@ -671,6 +671,7 @@ jobs:
                       // La música y los videos llegan desde el servidor local 127.0.0.1
                       mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
                       setSupportZoom(false)
+                      textZoom = 100
                   }
                   // Evita que Android detenga la música cuando la app está en segundo plano.
                   webView.setRendererPriorityPolicy(WebView.RENDERER_PRIORITY_IMPORTANT, false)
@@ -767,17 +768,8 @@ jobs:
               private fun js(code: String) = runOnUiThread { webView.evaluateJavascript(code, null) }
 
               // ---- Inicio de sesión con Google (permiso para Drive) ----
-              private fun googleFail(msg: String?) {
-                  // Si Google no reconoce la app, mostramos la firma real instalada para compararla en Google Cloud
-                  val m = if ((msg ?: "").contains("UNREGISTERED")) "${msg} | SHA-1 de esta app: ${sigSha1()}" else (msg ?: "error")
-                  js("window.nxOnGoogle && nxOnGoogle(null, ${JSONObject.quote(m)})")
-              }
-
-              private fun sigSha1(): String = runCatching {
-                  val pi = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES)
-                  val sig = pi.signingInfo?.apkContentsSigners?.firstOrNull() ?: return@runCatching "?"
-                  java.security.MessageDigest.getInstance("SHA-1").digest(sig.toByteArray()).joinToString(":") { "%02X".format(it) }
-              }.getOrDefault("?")
+              private fun googleFail(msg: String?) =
+                  js("window.nxOnGoogle && nxOnGoogle(null, ${JSONObject.quote(msg ?: "error")})")
 
               private fun googleDone(r: AuthorizationResult) {
                   val tok = r.accessToken
@@ -2648,13 +2640,23 @@ jobs:
           sub(k + 'NewMedia.kt', 'if (want) c.startForegroundService(i) else c.stopService(i)', 'if (want || !want) c.stopService(i)')
           sub(k + 'MusicTime.kt', 'NewMedia.schedule(c); NewMedia.periodic(c); NewMedia.watch(c)', 'NewMedia.schedule(c); NewMedia.periodic(c)')
           # Android 15+ dibuja detrás de las barras: se deja el espacio de la barra de estado, de navegación y del teclado
+          # Solo el teclado empuja la vista; la barra de estado y la de navegación las maneja el diseño con --sat/--sab
           sub(k + 'MainActivity.kt', '        setContentView(root)\n', """        setContentView(root)
                   if (Build.VERSION.SDK_INT >= 35) root.setOnApplyWindowInsetsListener { v, ins ->
-                      val b = ins.getInsets(android.view.WindowInsets.Type.systemBars() or android.view.WindowInsets.Type.displayCutout() or android.view.WindowInsets.Type.ime())
-                      v.setPadding(b.left, b.top, b.right, b.bottom)
+                      val T = android.view.WindowInsets.Type
+                      val bars = ins.getInsets(T.systemBars() or T.displayCutout())
+                      val ime = ins.getInsets(T.ime())
+                      val kb = ime.bottom > bars.bottom
+                      v.setPadding(bars.left, 0, bars.right, if (kb) ime.bottom else 0)
+                      val d = resources.displayMetrics.density
+                      NxInsets.css = "document.documentElement.style.setProperty('--sat','" + (bars.top / d) + "px');" +
+                          "document.documentElement.style.setProperty('--sab','" + (if (kb) 0f else bars.bottom / d) + "px');"
+                      webView.evaluateJavascript(NxInsets.css, null)
                       ins
                   }
           """)
+          sub(k + 'MainActivity.kt', '        pageReady = true\n', '        pageReady = true\n        if (NxInsets.css.isNotEmpty()) view.evaluateJavascript(NxInsets.css, null)\n')
+          m = P / (k + 'MainActivity.kt'); m.write_text(m.read_text(encoding='utf-8') + '\nobject NxInsets { var css = "" }\n', encoding='utf-8')
           print('Proyecto preparado para Google Play')
           PYEOF
 
