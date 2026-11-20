@@ -767,8 +767,17 @@ jobs:
               private fun js(code: String) = runOnUiThread { webView.evaluateJavascript(code, null) }
 
               // ---- Inicio de sesión con Google (permiso para Drive) ----
-              private fun googleFail(msg: String?) =
-                  js("window.nxOnGoogle && nxOnGoogle(null, ${JSONObject.quote(msg ?: "error")})")
+              private fun googleFail(msg: String?) {
+                  // Si Google no reconoce la app, mostramos la firma real instalada para compararla en Google Cloud
+                  val m = if ((msg ?: "").contains("UNREGISTERED")) "${msg} | SHA-1 de esta app: ${sigSha1()}" else (msg ?: "error")
+                  js("window.nxOnGoogle && nxOnGoogle(null, ${JSONObject.quote(m)})")
+              }
+
+              private fun sigSha1(): String = runCatching {
+                  val pi = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES)
+                  val sig = pi.signingInfo?.apkContentsSigners?.firstOrNull() ?: return@runCatching "?"
+                  java.security.MessageDigest.getInstance("SHA-1").digest(sig.toByteArray()).joinToString(":") { "%02X".format(it) }
+              }.getOrDefault("?")
 
               private fun googleDone(r: AuthorizationResult) {
                   val tok = r.accessToken
