@@ -2635,7 +2635,9 @@ jobs:
           # En Play las actualizaciones las entrega la tienda
           sub(k + 'MainActivity.kt', 'fun checkUpdate(repo: String) {', 'fun checkUpdate(repo: String) {\n        if (repo.isNotEmpty()) return')
           # Sin vigilante fijo: los avisos de archivos nuevos usan los trabajos de Android
-          sub(k + 'NewMedia.kt', 'fun watch(c: Context) {', 'fun watch(c: Context) {\n        if (c.packageName.isNotEmpty()) return')
+          # Sin servicio fijo: ni se arranca desde la app ni desde el reinicio (BOOT_COMPLETED)
+          sub(k + 'NewMedia.kt', 'if (want) c.startForegroundService(i) else c.stopService(i)', 'if (want || !want) c.stopService(i)')
+          sub(k + 'MusicTime.kt', 'NewMedia.schedule(c); NewMedia.periodic(c); NewMedia.watch(c)', 'NewMedia.schedule(c); NewMedia.periodic(c)')
           # Android 15+ dibuja detrás de las barras: se deja el espacio de la barra de estado, de navegación y del teclado
           sub(k + 'MainActivity.kt', '        setContentView(root)\n', """        setContentView(root)
                   if (Build.VERSION.SDK_INT >= 35) root.setOnApplyWindowInsetsListener { v, ins ->
