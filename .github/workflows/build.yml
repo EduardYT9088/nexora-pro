@@ -2643,9 +2643,8 @@ jobs:
           # Solo el teclado empuja la vista; la barra de estado y la de navegación las maneja el diseño con --sat/--sab
           sub(k + 'MainActivity.kt', '        setContentView(root)\n', """        setContentView(root)
                   if (Build.VERSION.SDK_INT >= 35) root.setOnApplyWindowInsetsListener { v, ins ->
-                      val T = android.view.WindowInsets.Type
-                      val bars = ins.getInsets(T.systemBars() or T.displayCutout())
-                      val ime = ins.getInsets(T.ime())
+                      val bars = ins.getInsets(android.view.WindowInsets.Type.systemBars() or android.view.WindowInsets.Type.displayCutout())
+                      val ime = ins.getInsets(android.view.WindowInsets.Type.ime())
                       val kb = ime.bottom > bars.bottom
                       v.setPadding(bars.left, 0, bars.right, if (kb) ime.bottom else 0)
                       val d = resources.displayMetrics.density
