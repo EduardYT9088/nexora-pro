@@ -2809,6 +2809,7 @@ const IC_G = '<svg viewBox="0 0 24 24" width="22" height="22"><path fill="#4285F
 function gErr(e){
   e=String(e||'');
   if(e==='perm') return 'Debes permitir el acceso a Google Drive para guardar tu copia';
+  { const m=e.match(/SHA-1 de esta app: ([0-9A-F:?]+)/); if(m) return 'Google no reconoce esta versión de la app. SHA-1 de esta app: '+m[1]; }
   if(/(^|\D)10(\D|$)|DEVELOPER_ERROR|12500/.test(e)) return 'Google aún no está configurado para esta app (falta el ID de cliente)';
   if(/^cancel/i.test(e)){ const d=e.replace(/^cancel:?/i,'').trim(); return d && !/sin detalle/.test(d) ? 'Google no completó el inicio de sesión ('+d.slice(0,90)+'). Revisa que la pantalla de consentimiento esté publicada o que tu cuenta sea usuario de prueba' : 'Inicio de sesión cancelado'; }
   if(/12501|(^|\D)16:/.test(e)) return 'Inicio de sesión cancelado';
