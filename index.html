@@ -845,7 +845,10 @@ body.eco .ly-l,body.eco .sheet-full{transition-duration:.15s!important}
 
 /* Encabezado adaptable: no se parte ni se monta en pantallas angostas */
 .brand .hi{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.brand h1{font-size:clamp(1.15rem,5.6vw,1.5rem);overflow:hidden;text-overflow:ellipsis}
+.brand img{flex:none;display:block;object-fit:cover;aspect-ratio:1/1;border-radius:23%!important}
+.brand .bt{flex:1 1 auto;min-width:0;overflow:visible}
+.brand h1{font-size:clamp(1.1rem,5.4vw,1.5rem);line-height:1.25;padding-top:.12em;overflow:visible;white-space:nowrap}
+.brand h1 small{vertical-align:.3em}
 .top>.ibtn,.top button{flex:none}
 @media (max-width:380px){
   .top{padding-left:14px;padding-right:14px;gap:6px}
@@ -1234,7 +1237,7 @@ function probe(it){
 
 /* ---------- views ---------- */
 const IC_FORYOU='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15.5l-1.9-4.6L5.5 9l4.6-1.4z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>';
-const TABS = [['videos','Videos',I.video],['canciones','Canciones',I.music],['parati','Para ti',IC_FORYOU],['favoritos','Favoritos',I.star],['playlists','Playlists',I.list],['carpetas','Carpetas',I.folder]];
+const TABS = [['videos','Videos',I.video],['canciones','Canciones',I.music],['favoritos','Favoritos',I.star],['playlists','Playlists',I.list],['carpetas','Carpetas',I.folder],['parati','Para ti',IC_FORYOU]];
 function renderTabs(){
   $('tabs').innerHTML = TABS.map(([k,l,ic])=>`<button class="tab ${tab===k?'on':''}" data-tab="${k}">${ic||''}${l}</button>`).join('');
 }

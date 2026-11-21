@@ -1,9 +1,8 @@
-Versión: 1.8.5
-- Nuevo botón de Ahorro de energía en Ajustes
-- Recuerda tu última canción y el minuto exacto
-- Etiqueta LETRAS en las canciones que tienen letra
-- Letras para canciones largas y álbumes completos
-- Aviso con miniatura cuando llega música o video nuevo
-- Recordatorio «Hora de Música» a las 8:00 y 12:00
-- Nuevo indicador de volumen y 300 % más fuerte
-- Reproductor corregido y más estable
+Versión: 1.8.8
+- Nueva pestaña "Para ti" con listas automáticas: Más escuchadas, Agregadas recientemente, Tus favoritas y Escuchadas hace poco
+- Widget en la pantalla de inicio para controlar tu música
+- Edita el título, artista y portada de tus canciones
+- Ecualizador que cambia solo según la salida: audífonos, Bluetooth o parlante
+- Temporizador de apagado que baja el volumen poco a poco
+- Botón para calificar Nexora en Google Play
+- Logo y encabezado mejor adaptados a cada pantalla
