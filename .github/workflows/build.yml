@@ -93,6 +93,8 @@ jobs:
           dependencies {
               // Inicio de sesión con Google y permiso para guardar la copia de seguridad en Drive
               implementation("com.google.android.gms:play-services-auth:21.2.0")
+              // Ventana oficial para calificar la app sin salir de ella
+              implementation("com.google.android.play:review:2.0.2")
           }
           NXEOF
           cat > app/proguard-rules.pro <<'NXEOF'
@@ -184,6 +186,20 @@ jobs:
                       android:foregroundServiceType="specialUse">
                       <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="media_library_watcher" />
                   </service>
+
+                  <receiver android:name=".NexoraWidget" android:exported="true" android:label="Nexora">
+                      <intent-filter>
+                          <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                      </intent-filter>
+                      <meta-data android:name="android.appwidget.provider" android:resource="@xml/nx_widget_info" />
+                  </receiver>
+
+                  <receiver android:name=".NexoraWidgetSmall" android:exported="true" android:label="Nexora (barra)">
+                      <intent-filter>
+                          <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                      </intent-filter>
+                      <meta-data android:name="android.appwidget.provider" android:resource="@xml/nx_widget_small_info" />
+                  </receiver>
 
                   <service
                       android:name=".PlaybackService"
@@ -684,6 +700,7 @@ jobs:
                       override fun onPageFinished(view: WebView, url: String?) {
                           pageReady = true
                           pendingExternal?.let { j -> pendingExternal = null; js("window.nxOpenExternal && nxOpenExternal($j)") }
+                          pendingWidget?.let { a -> pendingWidget = null; js("window.nxWidget && nxWidget(${JSONObject.quote(a)})") }
                       }
 
                       override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
@@ -763,6 +780,9 @@ jobs:
                   if (savedInstanceState != null) webView.restoreState(savedInstanceState)
                   else webView.loadUrl(START_URL)
                   handleExternal(intent)
+                  handleWidget(intent)
+                  NxWidget.refresh(applicationContext)
+                  runCatching { getSystemService(android.media.AudioManager::class.java).registerAudioDeviceCallback(outCb, android.os.Handler(android.os.Looper.getMainLooper())) }
               }
 
               private fun js(code: String) = runOnUiThread { webView.evaluateJavascript(code, null) }
@@ -865,6 +885,25 @@ jobs:
 
                   @JavascriptInterface
                   fun mediaBase(): String = MediaHttpServer.base(applicationContext)
+
+                  @JavascriptInterface
+                  fun outputType(): String = outType()
+
+                  @JavascriptInterface
+                  fun setWidgetStr(tap: String) { NxWidget.setTap(applicationContext, tap) }
+
+                  /** Ventana oficial de Google Play para calificar; si no aparece y se pidió desde Ajustes, abre la ficha. */
+                  @JavascriptInterface
+                  fun askReview(fromSettings: Boolean) = runOnUiThread {
+                      val store = "https://play.google.com/store/apps/details?id=" + packageName
+                      runCatching {
+                          val m = com.google.android.play.core.review.ReviewManagerFactory.create(this@MainActivity)
+                          m.requestReviewFlow().addOnCompleteListener { t ->
+                              if (t.isSuccessful) m.launchReviewFlow(this@MainActivity, t.result)
+                              else if (fromSettings) runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(store))) }
+                          }
+                      }.onFailure { if (fromSettings) runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(store))) } }
+                  }
 
                   @JavascriptInterface
                   fun setOrientation(mode: String) = runOnUiThread {
@@ -1093,6 +1132,30 @@ jobs:
                   super.onNewIntent(intent)
                   setIntent(intent)
                   handleExternal(intent)
+                  handleWidget(intent)
+              }
+
+              // ---- Widget de la pantalla de inicio ----
+              private var pendingWidget: String? = null
+              private fun handleWidget(i: Intent?) {
+                  val a = i?.getStringExtra("nx_widget") ?: return
+                  i.removeExtra("nx_widget")
+                  if (pageReady) js("window.nxWidget && nxWidget(${JSONObject.quote(a)})") else pendingWidget = a
+              }
+
+              // ---- Salida de audio (Bluetooth / cable / altavoz) para el ecualizador ----
+              private fun outType(): String {
+                  val ds = runCatching { getSystemService(android.media.AudioManager::class.java).getDevices(android.media.AudioManager.GET_DEVICES_OUTPUTS) }.getOrNull() ?: return "speaker"
+                  val ty = ds.map { it.type }
+                  // 8 = A2DP, 26/27 = audífonos/altavoz Bluetooth LE
+                  if (ty.any { it == 8 || it == 26 || it == 27 }) return "bt"
+                  // 3/4 = audífonos de cable, 22 = audífonos USB, 11 = dispositivo USB
+                  if (ty.any { it == 3 || it == 4 || it == 22 || it == 11 }) return "wired"
+                  return "speaker"
+              }
+              private val outCb = object : android.media.AudioDeviceCallback() {
+                  override fun onAudioDevicesAdded(d: Array<out android.media.AudioDeviceInfo>?) { if (pageReady) js("window.nxOnOutput && nxOnOutput('${outType()}')") }
+                  override fun onAudioDevicesRemoved(d: Array<out android.media.AudioDeviceInfo>?) { if (pageReady) js("window.nxOnOutput && nxOnOutput('${outType()}')") }
               }
 
               /** Abre un video o canción que otra app (Nexora Download, un explorador de archivos…) le pasó a Nexora Pro. */
@@ -1152,6 +1215,8 @@ jobs:
               override fun onDestroy() {
                   PlaybackService.listener = null
                   Updater.listener = null
+                  runCatching { getSystemService(android.media.AudioManager::class.java).unregisterAudioDeviceCallback(outCb) }
+                  NxWidget.refresh(applicationContext)
                   runCatching { unregisterReceiver(pipReceiver) }
                   nat.release()
                   if (isFinishing) stopService(Intent(this, PlaybackService::class.java))
@@ -1865,6 +1930,7 @@ jobs:
                           posMs, if (playing) speed else 0f)
                       .build())
 
+                  NxWidget.push(this, title, artist, playing, art)
                   val n = build(title, artist, playing)
                   try {
                       startForeground(NOTIF_ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
@@ -1908,6 +1974,7 @@ jobs:
               }
 
               fun stopAll() {
+                  NxWidget.stopped(this)
                   stopForeground(STOP_FOREGROUND_REMOVE)
                   stopSelf()
               }
@@ -1926,6 +1993,102 @@ jobs:
               }
 
               override fun onBind(intent: Intent?): IBinder? = null
+          }
+          NXEOF
+          cat > app/src/main/java/com/nexora/pro/NexoraWidget.kt <<'NXEOF'
+          package com.nexora.pro
+
+          import android.app.PendingIntent
+          import android.appwidget.AppWidgetManager
+          import android.appwidget.AppWidgetProvider
+          import android.content.ComponentName
+          import android.content.Context
+          import android.content.Intent
+          import android.graphics.Bitmap
+          import android.widget.RemoteViews
+
+          /** Estado y dibujo de los widgets de la pantalla de inicio. */
+          object NxWidget {
+              private var title = ""
+              private var artist = ""
+              private var playing = false
+              private var art: Bitmap? = null
+              private fun prefs(c: Context) = c.getSharedPreferences("nexora_widget", Context.MODE_PRIVATE)
+
+              fun setTap(c: Context, tap: String) { prefs(c).edit().putString("tap", tap).apply(); refresh(c) }
+
+              fun push(c: Context, t: String, a: String, p: Boolean, bmp: Bitmap?) {
+                  val changed = t != title || a != artist || p != playing || bmp !== art
+                  title = t; artist = a; playing = p; art = bmp?.let { small(it) }
+                  prefs(c).edit().putString("t", t).putString("a", a).apply()
+                  if (changed) refresh(c)
+              }
+
+              fun stopped(c: Context) { playing = false; refresh(c) }
+
+              private fun small(b: Bitmap): Bitmap {
+                  val m = 300
+                  if (b.width <= m && b.height <= m) return b
+                  val s = m.toFloat() / maxOf(b.width, b.height)
+                  return Bitmap.createScaledBitmap(b, maxOf(1, (b.width * s).toInt()), maxOf(1, (b.height * s).toInt()), true)
+              }
+
+              fun refresh(c: Context) {
+                  runCatching {
+                      val m = AppWidgetManager.getInstance(c)
+                      val big = m.getAppWidgetIds(ComponentName(c, NexoraWidget::class.java))
+                      if (big.isNotEmpty()) m.updateAppWidget(big, views(c, R.layout.nx_widget))
+                      val sm = m.getAppWidgetIds(ComponentName(c, NexoraWidgetSmall::class.java))
+                      if (sm.isNotEmpty()) m.updateAppWidget(sm, views(c, R.layout.nx_widget_small))
+                  }
+              }
+
+              private fun pi(c: Context, action: String, code: Int): PendingIntent =
+                  if (PlaybackService.listener != null)
+                      PendingIntent.getBroadcast(c, code, Intent(c, NexoraWidget::class.java).setAction("com.nexora.pro.W_" + action),
+                          PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+                  else
+                      PendingIntent.getActivity(c, 100 + code,
+                          Intent(c, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra("nx_widget", action),
+                          PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+              private fun views(c: Context, layout: Int): RemoteViews {
+                  val p = prefs(c)
+                  val t = title.ifEmpty { p.getString("t", "") ?: "" }
+                  val a = if (title.isNotEmpty()) artist else (p.getString("a", "") ?: "")
+                  val v = RemoteViews(c.packageName, layout)
+                  v.setTextViewText(R.id.w_title, if (t.isEmpty()) "Nexora Pro" else t)
+                  v.setTextViewText(R.id.w_artist, if (t.isEmpty()) (p.getString("tap", "Toca ▶ para reproducir") ?: "") else a)
+                  if (layout == R.layout.nx_widget) {
+                      val b = art
+                      if (b != null) v.setImageViewBitmap(R.id.w_art, b) else v.setImageViewResource(R.id.w_art, R.drawable.ic_launcher_art)
+                  }
+                  v.setImageViewResource(R.id.w_play, if (playing) R.drawable.ic_n_pause else R.drawable.ic_n_play)
+                  v.setOnClickPendingIntent(R.id.w_prev, pi(c, "prev", 1))
+                  v.setOnClickPendingIntent(R.id.w_play, pi(c, if (playing) "pause" else "play", 2))
+                  v.setOnClickPendingIntent(R.id.w_next, pi(c, "next", 3))
+                  v.setOnClickPendingIntent(R.id.w_root, PendingIntent.getActivity(c, 9,
+                      Intent(c, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP),
+                      PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
+                  return v
+              }
+          }
+
+          /** Widget grande: portada, título y controles. */
+          class NexoraWidget : AppWidgetProvider() {
+              override fun onUpdate(c: Context, m: AppWidgetManager, ids: IntArray) = NxWidget.refresh(c)
+              override fun onReceive(c: Context, i: Intent) {
+                  super.onReceive(c, i)
+                  val a = i.action ?: return
+                  if (!a.startsWith("com.nexora.pro.W_")) return
+                  val l = PlaybackService.listener
+                  if (l != null) l.invoke(a.removePrefix("com.nexora.pro.W_")) else NxWidget.refresh(c)
+              }
+          }
+
+          /** Widget en barra: título y controles. */
+          class NexoraWidgetSmall : AppWidgetProvider() {
+              override fun onUpdate(c: Context, m: AppWidgetManager, ids: IntArray) = NxWidget.refresh(c)
           }
           NXEOF
           cat > app/src/main/java/com/nexora/pro/MusicTime.kt <<'NXEOF'
@@ -2462,6 +2625,101 @@ jobs:
                       android:fillColor="#00000000" />
               </group>
           </vector>
+          NXEOF
+          mkdir -p app/src/main/res/layout app/src/main/res/xml
+          cat > app/src/main/res/drawable/nx_w_bg.xml <<'NXEOF'
+          <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+              <gradient android:angle="315" android:startColor="#F2241A55" android:endColor="#F2161236" />
+              <corners android:radius="26dp" />
+              <stroke android:width="1dp" android:color="#22FFFFFF" />
+          </shape>
+          NXEOF
+          cat > app/src/main/res/drawable/nx_w_btn.xml <<'NXEOF'
+          <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+              <gradient android:angle="315" android:startColor="#FF7B5CFF" android:endColor="#FF2EC5D6" />
+          </shape>
+          NXEOF
+          cat > app/src/main/res/drawable/nx_w_art.xml <<'NXEOF'
+          <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+              <solid android:color="#FF2A2260" />
+              <corners android:radius="18dp" />
+          </shape>
+          NXEOF
+          cat > app/src/main/res/layout/nx_widget.xml <<'NXEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/w_root" android:layout_width="match_parent" android:layout_height="match_parent"
+              android:orientation="horizontal" android:gravity="center_vertical"
+              android:background="@drawable/nx_w_bg" android:padding="12dp">
+              <ImageView android:id="@+id/w_art" android:layout_width="92dp" android:layout_height="92dp"
+                  android:background="@drawable/nx_w_art" android:clipToOutline="true"
+                  android:scaleType="centerCrop" android:src="@drawable/ic_launcher_art" android:contentDescription="Portada" />
+              <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                  android:layout_marginStart="14dp" android:orientation="vertical">
+                  <TextView android:id="@+id/w_title" android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:text="Nexora Pro" android:textColor="#FFFFFFFF" android:textSize="16sp" android:textStyle="bold"
+                      android:maxLines="1" android:ellipsize="end" />
+                  <TextView android:id="@+id/w_artist" android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:textColor="#FFB9B3E6" android:textSize="13sp" android:maxLines="1" android:ellipsize="end" />
+                  <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                      android:layout_marginTop="10dp" android:orientation="horizontal" android:gravity="center_vertical">
+                      <ImageButton android:id="@+id/w_prev" android:layout_width="44dp" android:layout_height="44dp"
+                          android:background="@android:color/transparent" android:src="@drawable/ic_n_prev" android:contentDescription="Anterior" />
+                      <ImageButton android:id="@+id/w_play" android:layout_width="52dp" android:layout_height="52dp"
+                          android:layout_marginStart="8dp" android:layout_marginEnd="8dp"
+                          android:background="@drawable/nx_w_btn" android:src="@drawable/ic_n_play" android:contentDescription="Reproducir" />
+                      <ImageButton android:id="@+id/w_next" android:layout_width="44dp" android:layout_height="44dp"
+                          android:background="@android:color/transparent" android:src="@drawable/ic_n_next" android:contentDescription="Siguiente" />
+                  </LinearLayout>
+              </LinearLayout>
+          </LinearLayout>
+          NXEOF
+          cat > app/src/main/res/layout/nx_widget_small.xml <<'NXEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/w_root" android:layout_width="match_parent" android:layout_height="match_parent"
+              android:orientation="horizontal" android:gravity="center_vertical"
+              android:background="@drawable/nx_w_bg" android:paddingStart="10dp" android:paddingEnd="8dp">
+              <ImageView android:layout_width="40dp" android:layout_height="40dp"
+                  android:background="@drawable/nx_w_art" android:clipToOutline="true"
+                  android:scaleType="centerCrop" android:src="@drawable/ic_launcher_art" android:contentDescription="Nexora" />
+              <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                  android:layout_marginStart="10dp" android:orientation="vertical">
+                  <TextView android:id="@+id/w_title" android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:text="Nexora Pro" android:textColor="#FFFFFFFF" android:textSize="14sp" android:textStyle="bold"
+                      android:maxLines="1" android:ellipsize="end" />
+                  <TextView android:id="@+id/w_artist" android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:textColor="#FFB9B3E6" android:textSize="12sp" android:maxLines="1" android:ellipsize="end" />
+              </LinearLayout>
+              <ImageButton android:id="@+id/w_prev" android:layout_width="40dp" android:layout_height="40dp"
+                  android:background="@android:color/transparent" android:src="@drawable/ic_n_prev" android:contentDescription="Anterior" />
+              <ImageButton android:id="@+id/w_play" android:layout_width="44dp" android:layout_height="44dp"
+                  android:background="@drawable/nx_w_btn" android:src="@drawable/ic_n_play" android:contentDescription="Reproducir" />
+              <ImageButton android:id="@+id/w_next" android:layout_width="40dp" android:layout_height="40dp"
+                  android:background="@android:color/transparent" android:src="@drawable/ic_n_next" android:contentDescription="Siguiente" />
+          </LinearLayout>
+          NXEOF
+          cat > app/src/main/res/xml/nx_widget_info.xml <<'NXEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+              android:minWidth="250dp" android:minHeight="110dp"
+              android:targetCellWidth="4" android:targetCellHeight="2"
+              android:minResizeWidth="180dp" android:minResizeHeight="100dp"
+              android:resizeMode="horizontal|vertical" android:widgetCategory="home_screen"
+              android:updatePeriodMillis="0" android:initialLayout="@layout/nx_widget"
+              android:previewLayout="@layout/nx_widget" android:previewImage="@drawable/ic_launcher_art"
+              android:description="@string/app_name" />
+          NXEOF
+          cat > app/src/main/res/xml/nx_widget_small_info.xml <<'NXEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+              android:minWidth="250dp" android:minHeight="40dp"
+              android:targetCellWidth="4" android:targetCellHeight="1"
+              android:minResizeWidth="180dp" android:minResizeHeight="40dp"
+              android:resizeMode="horizontal" android:widgetCategory="home_screen"
+              android:updatePeriodMillis="0" android:initialLayout="@layout/nx_widget_small"
+              android:previewLayout="@layout/nx_widget_small" android:previewImage="@drawable/ic_launcher_art"
+              android:description="@string/app_name" />
           NXEOF
           mkdir -p app/src/main/res/mipmap-anydpi-v26
           cat > app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml <<'NXEOF'
