@@ -10,4 +10,5 @@ Versión: 1.8.8
 - Temporizador de apagado que baja el volumen poco a poco
 - La copia de seguridad ahora también guarda tu resumen, tus letras y los datos que editaste
 - El amplificador de volumen empieza siempre en 100 % al abrir la app
+- Nueva ventana "¿Te gusta Nexora?" para calificar la app en Google Play
 - Logo y encabezado mejor adaptados a cada pantalla

@@ -905,6 +905,13 @@ jobs:
                       } else applyTone(n, kind)
                   }
 
+                  /** Desde dónde se instaló la app ("com.android.vending" = Google Play). */
+                  @JavascriptInterface
+                  fun installer(): String = runCatching {
+                      if (Build.VERSION.SDK_INT >= 30) packageManager.getInstallSourceInfo(packageName).installingPackageName ?: ""
+                      else @Suppress("DEPRECATION") (packageManager.getInstallerPackageName(packageName) ?: "")
+                  }.getOrDefault("")
+
                   /** Ventana oficial de Google Play para calificar; si no aparece y se pidió desde Ajustes, abre la ficha. */
                   @JavascriptInterface
                   fun askReview(fromSettings: Boolean) = runOnUiThread {

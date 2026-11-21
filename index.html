@@ -927,6 +927,24 @@ body.eco .ly-l,body.eco .sheet-full{transition-duration:.15s!important}
 .gr-head h2{font-family:Sora,sans-serif;margin:0;font-size:1.4rem;word-break:break-word}.gr-head small{color:var(--muted)}
 .gr-big{position:relative;width:96px;height:96px;flex:none;border-radius:22px;overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:800;font-size:2.2rem}
 .gr-big.circ{border-radius:50%}.gr-big img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* Ventana "¿Te gusta Nexora?" */
+.ratebox{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(6,5,16,.62);backdrop-filter:blur(6px)}
+.ratebox.on{display:flex;animation:rbIn .25s ease}
+@keyframes rbIn{from{opacity:0}to{opacity:1}}
+.rate-card{width:min(100%,380px);background:#1d1838;color:#fff;border:1px solid rgba(255,255,255,.08);border-radius:28px;padding:26px 20px 20px;text-align:center;box-shadow:0 30px 70px -20px rgba(0,0,0,.8);animation:rbUp .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes rbUp{from{transform:translateY(24px) scale(.96)}to{transform:none}}
+.rate-card img{width:84px;height:84px;border-radius:22px;display:block;margin:0 auto 14px;box-shadow:0 12px 30px -10px #7C5CFF}
+.rate-card h3{font-family:Sora,Manrope,sans-serif;font-size:1.45rem;margin:0 0 6px}
+.rate-card p{margin:0 0 14px;color:rgba(255,255,255,.65);font-size:15px;line-height:1.4}
+.rate-stars{display:flex;justify-content:center;gap:6px;margin-bottom:8px}
+.rate-stars button{width:48px;height:48px;display:grid;place-items:center;background:none}
+.rate-stars svg{width:42px;height:42px;fill:#FFC83D;filter:drop-shadow(0 4px 10px rgba(255,200,61,.35))}
+.rate-card small{display:block;color:rgba(255,255,255,.55);font-size:13px;margin-bottom:18px}
+.rate-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rate-btns button{height:54px;border-radius:18px;font-weight:800;font-size:16px;color:#fff}
+.rate-btns .no{background:rgba(255,255,255,.1)}
+.rate-btns .go{background:linear-gradient(135deg,var(--accent),var(--accent2))}
 </style>
 </head>
 <body>
@@ -1058,6 +1076,7 @@ body.eco .ly-l,body.eco .sheet-full{transition-duration:.15s!important}
 <input class="hidden-input" type="file" id="bgIn" accept="image/*">
 <input class="hidden-input" type="file" id="restoreIn" accept=".json,application/json">
 <section class="recap" id="recap" aria-label="Tu resumen musical"><div class="recap-in" id="recapIn"></div></section>
+<div class="ratebox" id="rateBox" role="dialog" aria-modal="true" aria-label="Calificar Nexora"><div class="rate-card"><img id="rateLogo" alt=""><h3>¿Te gusta Nexora?</h3><p>Tu calificación nos ayuda a llegar a más personas</p><div class="rate-stars"><button data-rate="go" aria-label="Calificar"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z"/></svg></button><button data-rate="go" aria-label="Calificar"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z"/></svg></button><button data-rate="go" aria-label="Calificar"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z"/></svg></button><button data-rate="go" aria-label="Calificar"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z"/></svg></button><button data-rate="go" aria-label="Calificar"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z"/></svg></button></div><small>Se abrirá Google Play para calificar</small><div class="rate-btns"><button data-rate="no" class="no">Ahora no</button><button data-rate="go" class="go">Calificar</button></div></div></div>
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div id="sheetBody"></div></div>
 <div class="toast" id="toast" role="status"></div>
@@ -2086,14 +2105,28 @@ function toggleFav(it){
 }
 
 /* sleep timer */
+/* Ventana "¿Te gusta Nexora?": 1.ª vez tras 3 días, 5 aperturas y 10 canciones; si dice "Ahora no", una 2.ª y última vez 10 días después */
 function maybeReview(){
   if(!NATIVE) return;
   const rv=store.get('rv',null)||{first:Date.now(),opens:0,done:0};
-  if(rv.done) return;
+  if(rv.done || rv.rated || (rv.asks|0)>=2) return;
   if(Date.now()-rv.first < 3*864e5 || rv.opens<5 || Object.keys(plays).length<10) return;
-  rv.done=Date.now(); store.set('rv',rv);
-  setTimeout(()=>native('askReview', false), 4000);
+  if(rv.next && Date.now()<rv.next) return;
+  rv.asks=(rv.asks|0)+1; rv.next=Date.now()+10*864e5; store.set('rv',rv);
+  setTimeout(()=>{ if(!document.querySelector('.sheet.on,#vplayer.on')) rateOpen(); else { rv.asks--; rv.next=0; store.set('rv',rv); } }, 4000);
 }
+function rateOpen(){
+  const logo=document.querySelector('.brand img'); $('rateLogo').src=logo?logo.src:'';
+  $('rateBox').classList.add('on');
+}
+function rateClose(){ $('rateBox').classList.remove('on'); }
+function rateGo(){
+  const rv=store.get('rv',null)||{first:Date.now(),opens:0,done:0}; rv.rated=Date.now(); store.set('rv',rv);
+  rateClose();
+  const store_='https://play.google.com/store/apps/details?id=com.nexora.pro';
+  if(native('installer')==='com.android.vending') native('askReview', true); else native('openUrl', store_);
+}
+$('rateBox').addEventListener('click', e=>{ const b=e.target.closest('[data-rate]'); if(!b){ if(e.target.id==='rateBox') rateClose(); return; } if(b.dataset.rate==='go') rateGo(); else rateClose(); });
 { const rv=store.get('rv',null)||{first:Date.now(),opens:0,done:0}; rv.opens++; store.set('rv',rv); }
 function cancelSleep(){ clearInterval(sleepTimer); sleepTimer=null; sleepMode='off'; $('sleepLbl').textContent='Dormir'; if(!cfActive && fadeF<1){ fadeF=1; setVol(); } }
 function setSleep(mode){
@@ -2688,7 +2721,7 @@ $('settings').addEventListener('click', e=>{
   if(k==='backup') openSub('backup');
   if(k==='notif') openSub('notif');
   if(k==='sleep') sleepSheet();
-  if(k==='rate') native('openUrl','https://play.google.com/store/apps/details?id=com.nexora.pro');
+  if(k==='rate') rateOpen();
   if(k==='fixmeta') unknownSheet();
   if(k==='recap') openRecap();
   if(k==='pro') toast('Todas las funciones Pro están activadas');
@@ -3957,6 +3990,12 @@ Object.assign(I18N.fr,{"Artistas": "Artistes", "Álbumes": "Albums", "‹ Artist
 Object.assign(I18N.it,{"Artistas": "Artisti", "Álbumes": "Album", "‹ Artistas": "‹ Artisti", "‹ Álbumes": "‹ Album", "Tu resumen musical": "Il tuo riepilogo musicale", "Tus canciones y artistas más escuchados": "I brani e gli artisti che ascolti di più", "Este mes": "Questo mese", "Mes pasado": "Mese scorso", "Siempre": "Sempre", "minutos escuchados": "minuti ascoltati", "reproducciones": "riproduzioni", "canciones distintas": "brani diversi", "Tu artista n.º 1": "Il tuo artista n. 1", "Tus canciones más escuchadas": "I brani più ascoltati", "Tus artistas": "I tuoi artisti", "Compartir mi resumen": "Condividi il mio riepilogo", "Aún no hay datos": "Ancora nessun dato", "Usar como tono": "Usa come suoneria", "Tono de llamada": "Suoneria", "Alarma": "Sveglia", "Sonido de notificación": "Suono di notifica", "Canciones repetidas": "Brani duplicati", "¡Todo en orden!": "Tutto a posto!", "No encontramos canciones repetidas en tu teléfono.": "Nessun brano duplicato nel telefono.", "Conservar": "Tieni", "Modo carro": "Modalità auto", "Salir": "Esci", "Colores según la portada": "Colori dalla copertina", "El reproductor toma el color de la portada de cada canción.": "Il lettore usa il colore della copertina di ogni brano.", "Sin álbum": "Senza album", "Desde que usas Nexora": "Da quando usi Nexora", "Creando tu imagen…": "Creazione dell’immagine…", "Reproduciendo tu top": "Riproduco la tua top", "Activa \"Permitir modificar ajustes\" y vuelve a Nexora": "Attiva \"Consenti modifica impostazioni\" e torna su Nexora", "No se pudo cambiar el tono": "Impossibile cambiare la suoneria", "No se pudo crear la imagen": "Impossibile creare l’immagine", "Solo funciona con canciones del teléfono": "Funziona solo con i brani del telefono", "No hay canciones para reproducir": "Nessun brano da riprodurre", "Sin artistas": "Nessun artista", "Sin álbumes": "Nessun album", "Cuando tengas canciones en tu teléfono las verás agrupadas aquí.": "Quando avrai brani nel telefono li vedrai raggruppati qui.", "Toca ▶ para reproducir": "Tocca ▶ per riprodurre"});
 Object.assign(I18N.de,{"Artistas": "Künstler", "Álbumes": "Alben", "‹ Artistas": "‹ Künstler", "‹ Álbumes": "‹ Alben", "Tu resumen musical": "Dein Musik-Rückblick", "Tus canciones y artistas más escuchados": "Deine meistgehörten Songs und Künstler", "Este mes": "Dieser Monat", "Mes pasado": "Letzter Monat", "Siempre": "Immer", "minutos escuchados": "Minuten gehört", "reproducciones": "Wiedergaben", "canciones distintas": "verschiedene Songs", "Tu artista n.º 1": "Dein Künstler Nr. 1", "Tus canciones más escuchadas": "Deine meistgehörten Songs", "Tus artistas": "Deine Künstler", "Compartir mi resumen": "Rückblick teilen", "Aún no hay datos": "Noch keine Daten", "Usar como tono": "Als Klingelton verwenden", "Tono de llamada": "Klingelton", "Alarma": "Wecker", "Sonido de notificación": "Benachrichtigungston", "Canciones repetidas": "Doppelte Songs", "¡Todo en orden!": "Alles in Ordnung!", "No encontramos canciones repetidas en tu teléfono.": "Keine doppelten Songs auf deinem Handy gefunden.", "Conservar": "Behalten", "Modo carro": "Automodus", "Salir": "Beenden", "Colores según la portada": "Farben vom Cover", "El reproductor toma el color de la portada de cada canción.": "Der Player übernimmt die Farbe des Covers jedes Songs.", "Sin álbum": "Kein Album", "Desde que usas Nexora": "Seit du Nexora nutzt", "Creando tu imagen…": "Bild wird erstellt…", "Reproduciendo tu top": "Deine Top-Songs werden abgespielt", "Activa \"Permitir modificar ajustes\" y vuelve a Nexora": "Aktiviere „Änderung von Systemeinstellungen zulassen“ und kehre zu Nexora zurück", "No se pudo cambiar el tono": "Klingelton konnte nicht geändert werden", "No se pudo crear la imagen": "Bild konnte nicht erstellt werden", "Solo funciona con canciones del teléfono": "Funktioniert nur mit Songs auf dem Handy", "No hay canciones para reproducir": "Keine Songs zum Abspielen", "Sin artistas": "Keine Künstler", "Sin álbumes": "Keine Alben", "Cuando tengas canciones en tu teléfono las verás agrupadas aquí.": "Sobald du Songs auf dem Handy hast, siehst du sie hier gruppiert.", "Toca ▶ para reproducir": "Tippe ▶ zum Abspielen"});
 Object.assign(I18N.id,{"Artistas": "Artis", "Álbumes": "Album", "‹ Artistas": "‹ Artis", "‹ Álbumes": "‹ Album", "Tu resumen musical": "Ringkasan musikmu", "Tus canciones y artistas más escuchados": "Lagu dan artis yang paling sering kamu putar", "Este mes": "Bulan ini", "Mes pasado": "Bulan lalu", "Siempre": "Sepanjang waktu", "minutos escuchados": "menit didengarkan", "reproducciones": "kali diputar", "canciones distintas": "lagu berbeda", "Tu artista n.º 1": "Artis no. 1 kamu", "Tus canciones más escuchadas": "Lagu yang paling sering diputar", "Tus artistas": "Artis kamu", "Compartir mi resumen": "Bagikan ringkasanku", "Aún no hay datos": "Belum ada data", "Usar como tono": "Jadikan nada dering", "Tono de llamada": "Nada dering", "Alarma": "Alarm", "Sonido de notificación": "Suara notifikasi", "Canciones repetidas": "Lagu duplikat", "¡Todo en orden!": "Semua beres!", "No encontramos canciones repetidas en tu teléfono.": "Tidak ada lagu duplikat di ponselmu.", "Conservar": "Simpan", "Modo carro": "Mode mobil", "Salir": "Keluar", "Colores según la portada": "Warna dari sampul", "El reproductor toma el color de la portada de cada canción.": "Pemutar mengambil warna dari sampul setiap lagu.", "Sin álbum": "Tanpa album", "Desde que usas Nexora": "Sejak kamu memakai Nexora", "Creando tu imagen…": "Membuat gambarmu…", "Reproduciendo tu top": "Memutar lagu teratasmu", "Activa \"Permitir modificar ajustes\" y vuelve a Nexora": "Aktifkan \"Izinkan ubah setelan sistem\" lalu kembali ke Nexora", "No se pudo cambiar el tono": "Gagal mengubah nada dering", "No se pudo crear la imagen": "Gagal membuat gambar", "Solo funciona con canciones del teléfono": "Hanya untuk lagu di ponsel", "No hay canciones para reproducir": "Tidak ada lagu untuk diputar", "Sin artistas": "Tidak ada artis", "Sin álbumes": "Tidak ada album", "Cuando tengas canciones en tu teléfono las verás agrupadas aquí.": "Saat ada lagu di ponselmu, kamu akan melihatnya dikelompokkan di sini.", "Toca ▶ para reproducir": "Ketuk ▶ untuk memutar"});
+Object.assign(I18N.en,{"¿Te gusta Nexora?": "Do you like Nexora?", "Tu calificación nos ayuda a llegar a más personas": "Your rating helps us reach more people", "Se abrirá Google Play para calificar": "Google Play will open so you can rate", "Ahora no": "Not now", "Calificar": "Rate"});
+Object.assign(I18N.pt,{"¿Te gusta Nexora?": "Você gosta do Nexora?", "Tu calificación nos ayuda a llegar a más personas": "Sua avaliação nos ajuda a chegar a mais pessoas", "Se abrirá Google Play para calificar": "O Google Play vai abrir para você avaliar", "Ahora no": "Agora não", "Calificar": "Avaliar"});
+Object.assign(I18N.fr,{"¿Te gusta Nexora?": "Tu aimes Nexora ?", "Tu calificación nos ayuda a llegar a más personas": "Ta note nous aide à toucher plus de monde", "Se abrirá Google Play para calificar": "Google Play va s’ouvrir pour noter", "Ahora no": "Pas maintenant", "Calificar": "Noter"});
+Object.assign(I18N.it,{"¿Te gusta Nexora?": "Ti piace Nexora?", "Tu calificación nos ayuda a llegar a más personas": "La tua valutazione ci aiuta a raggiungere più persone", "Se abrirá Google Play para calificar": "Si aprirà Google Play per valutare", "Ahora no": "Non ora", "Calificar": "Valuta"});
+Object.assign(I18N.de,{"¿Te gusta Nexora?": "Gefällt dir Nexora?", "Tu calificación nos ayuda a llegar a más personas": "Deine Bewertung hilft uns, mehr Menschen zu erreichen", "Se abrirá Google Play para calificar": "Google Play wird zum Bewerten geöffnet", "Ahora no": "Jetzt nicht", "Calificar": "Bewerten"});
+Object.assign(I18N.id,{"¿Te gusta Nexora?": "Suka Nexora?", "Tu calificación nos ayuda a llegar a más personas": "Penilaianmu membantu kami menjangkau lebih banyak orang", "Se abrirá Google Play para calificar": "Google Play akan terbuka untuk memberi nilai", "Ahora no": "Nanti saja", "Calificar": "Beri nilai"});
 const GREET = {en:['Good morning','Good afternoon','Good evening'], pt:['Bom dia','Boa tarde','Boa noite'], fr:['Bonjour','Bon après-midi','Bonsoir'], it:['Buongiorno','Buon pomeriggio','Buonasera'], de:['Guten Morgen','Guten Tag','Guten Abend'], id:['Selamat pagi','Selamat siang','Selamat malam']};
 ['en','pt','fr','it','de','id'].forEach(l=>{ const es=['Buenos días','Buenas tardes','Buenas noches']; es.forEach((g,i)=>{ I18N[l][g+' 👋']=GREET[l][i]+' 👋'; }); });
 function trText(src){
@@ -4119,6 +4158,7 @@ window.nxUpd = (st, pct) => {
 window.nxBack = () => {
   if($('upd').classList.contains('on')){ if($('upd').dataset.forced) return false; $('upd').classList.remove('on'); return true; }
   if($('privPage').classList.contains('on')){ closePriv(); return true; }
+  if($('rateBox').classList.contains('on')){ rateClose(); return true; }
   if($('sheet').classList.contains('on')){ closeSheet(); return true; }
   if($('recap').classList.contains('on')){ closeRecap(); return true; }
   if(sel){ exitSel(); return true; }
