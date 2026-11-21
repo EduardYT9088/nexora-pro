@@ -916,40 +916,6 @@ body.eco .ly-l,body.eco .sheet-full{transition-duration:.15s!important}
 .ap-recap .ic{width:50px;height:50px;border-radius:16px;background:rgba(255,255,255,.16);display:grid;place-items:center;flex:none}
 .ap-recap .ic svg{width:26px;height:26px}
 .ap-recap b{display:block;font-size:1.05rem}.ap-recap small{opacity:.85;font-size:13px}
-.carmode{position:fixed;inset:0;z-index:24;background:#0b0a16;color:#fff;display:none;flex-direction:column;padding:calc(var(--sat,env(safe-area-inset-top)) + 12px) 20px calc(var(--sab,env(safe-area-inset-bottom)) + 20px);gap:14px;transition:background-color .5s}
-.carmode.on{display:flex}
-.car-top{display:flex;align-items:center;gap:10px}
-.car-x{display:flex;align-items:center;gap:6px;height:52px;padding:0 18px;border-radius:18px;background:rgba(255,255,255,.12);color:#fff;font-weight:800;font-size:16px}
-.car-x svg{width:22px;height:22px}
-.car-time{flex:1;text-align:center;font-family:Sora,sans-serif;font-size:1.4rem}
-.car-lbl{display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px;opacity:.8}.car-lbl svg{width:20px;height:20px}
-.car-art{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
-.car-art .art{position:relative;height:min(100%,46vh,82vw);aspect-ratio:1;width:auto;border-radius:28px;overflow:hidden;display:grid;place-items:center;box-shadow:0 30px 60px -20px rgba(0,0,0,.8)}
-.car-art .art .letter{font-size:5rem;font-weight:800}.car-art .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.car-meta{text-align:center;min-width:0}
-.car-meta b,.car-meta span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.car-meta b{font-family:Sora,sans-serif;font-size:clamp(1.4rem,6.5vw,2.1rem)}.car-meta span{opacity:.75;font-size:1.1rem;margin-top:4px}
-.car-prog{height:6px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}.car-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px}
-.car-ctrl{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:14px;align-items:center}
-.car-ctrl button{height:min(24vw,110px);border-radius:28px;background:rgba(255,255,255,.12);color:#fff;display:grid;place-items:center}
-.car-ctrl button svg{width:44%;height:44%}
-.car-ctrl .big{height:min(30vw,130px);background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 18px 40px -16px var(--accent)}
-.car-ctrl2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.car-ctrl2 button{height:64px;border-radius:22px;background:rgba(255,255,255,.1);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:800;font-size:16px}
-.car-ctrl2 button svg{width:28px;height:28px}.car-ctrl2 button.on{color:var(--accent);background:rgba(255,255,255,.18)}
-@media (orientation:landscape){.carmode{display:none}.carmode.on{display:grid;grid-template-columns:40% 1fr;grid-template-rows:auto 1fr auto auto auto;column-gap:24px}.car-top{grid-column:1/-1}.car-art{grid-row:2/6}.car-art .art{height:min(100%,70vh)}}
-.dup-sub{margin:-4px 18px 10px;color:var(--muted);font-size:14px;line-height:1.45}
-.dup-box{max-height:56vh;overflow-y:auto;padding:0 10px}
-.dup-g{background:var(--surface2);border-radius:18px;padding:4px;margin-bottom:10px}
-.dup-r{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border-radius:14px;text-align:left;color:var(--text)}
-.dup-r .ck{width:22px;height:22px;border-radius:50%;border:2px solid var(--muted);flex:none;display:grid;place-items:center}
-.dup-r.on .ck{background:var(--danger);border-color:var(--danger)}.dup-r.on .ck::after{content:"";width:8px;height:8px;border-radius:50%;background:#fff}
-.dup-r.on .m b{text-decoration:line-through;opacity:.7}
-.dup-r .art{width:44px;height:44px;flex:none}
-.dup-r .m{flex:1;min-width:0}.dup-r .m b,.dup-r .m span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dup-r .m span{font-size:12.5px;color:var(--muted)}
-.dup-r em{font-style:normal;font-size:11.5px;font-weight:800;color:#16A34A;background:rgba(22,163,74,.14);padding:4px 8px;border-radius:999px}
-.dup-act{padding:10px 18px 4px;display:flex}.dup-act .btn{flex:1;justify-content:center}.dup-act .btn svg{width:20px;height:20px;flex:none}.dup-act .btn{white-space:nowrap;height:52px;color:#fff;gap:8px;display:flex;align-items:center}.dup-act .btn:disabled{opacity:.5}
-.dup-ok{text-align:center;padding:18px 20px 26px;color:var(--muted)}.dup-ok svg{width:46px;height:46px;color:#16A34A;padding:10px;background:rgba(22,163,74,.14);border-radius:50%}.dup-ok b{display:block;color:var(--text);font-size:1.1rem;margin:10px 0 4px}
 .grgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
 .grgrid button{text-align:left;color:var(--text);min-width:0}
 .grgrid .gr-pic{position:relative;aspect-ratio:1;border-radius:20px;overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:800;font-size:2.2rem;margin-bottom:8px;box-shadow:0 14px 26px -18px rgba(0,0,0,.7)}
@@ -1092,14 +1058,6 @@ body.eco .ly-l,body.eco .sheet-full{transition-duration:.15s!important}
 <input class="hidden-input" type="file" id="bgIn" accept="image/*">
 <input class="hidden-input" type="file" id="restoreIn" accept=".json,application/json">
 <section class="recap" id="recap" aria-label="Tu resumen musical"><div class="recap-in" id="recapIn"></div></section>
-<section class="carmode" id="carMode" aria-label="Modo carro">
-  <div class="car-top"><button class="car-x" id="carClose" aria-label="Salir del modo carro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg><span>Salir</span></button><b class="car-time" id="carTime"></b><span class="car-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M6 17l1.5-6.5A2 2 0 0 1 9.4 9h5.2a2 2 0 0 1 1.9 1.5L18 17"/><circle cx="8" cy="17" r="2"/><circle cx="16" cy="17" r="2"/></svg>Modo carro</span></div>
-  <div class="car-art" id="carArt"></div>
-  <div class="car-meta"><b id="carT"></b><span id="carA"></span></div>
-  <div class="car-prog"><i id="carBar"></i></div>
-  <div class="car-ctrl"><button id="carPrev" aria-label="Anterior"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 5.5v13l-9-6.5zM9 5.5v13H6v-13z"/></svg></button><button id="carPlay" class="big" aria-label="Reproducir o pausar"></button><button id="carNext" aria-label="Siguiente"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 5.5v13l9-6.5zM15 5.5v13h3v-13z"/></svg></button></div>
-  <div class="car-ctrl2"><button id="carShuf" aria-label="Aleatorio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h4v4M4 20 20 4M20 16v4h-4M15 15l5 5M4 4l5 5"/></svg><span>Aleatorio</span></button><button id="carFav" aria-label="Favorito"></button></div>
-</section>
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div id="sheetBody"></div></div>
 <div class="toast" id="toast" role="status"></div>
@@ -1213,6 +1171,7 @@ function hexToHsl(h){ h=h.replace('#',''); const r=parseInt(h.substr(0,2),16)/25
 const accentPair = () => S.accent==='custom' && S.accentCustom ? (()=>{ const [h,sx,l]=hexToHsl(S.accentCustom); return [S.accentCustom, S.accent2Custom || `hsl(${(h+40)%360} ${Math.min(100,sx+10)}% ${Math.min(70,l+12)}%)`]; })() : (ACCENTS[S.accent]||ACCENTS[0]);
 const S = Object.assign({accent:0,theme:'auto',sortV:'recent',sortA:'recent',playMs:0,shuffle:false,repeat:0,speed:1,lang:'es'}, store.get('settings',{}));
 for(const k in DEF) if(S[k]===undefined) S[k]=DEF[k];
+S.boost=100;   // al abrir la app el amplificador siempre empieza en 100 %
 if(S.gradOn===undefined) S.gradOn=true;
 if(S.coverColor===undefined) S.coverColor=true;
 const shownKeys = new Set(store.get('shown',[]));
@@ -1330,7 +1289,7 @@ function probe(it){
 /* ---------- views ---------- */
 const IC_FORYOU='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15.5l-1.9-4.6L5.5 9l4.6-1.4z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>';
 const STAB_IC={artist:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>',album:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/></svg>'};
-const TABS = [['videos','Videos',I.video],['canciones','Canciones',I.music],['favoritos','Favoritos',I.star],['playlists','Playlists',I.list],['artistas','Artistas',STAB_IC.artist],['albumes','Álbumes',STAB_IC.album],['carpetas','Carpetas',I.folder],['parati','Para ti',IC_FORYOU]];
+const TABS = [['videos','Videos',I.video],['canciones','Canciones',I.music],['favoritos','Favoritos',I.star],['playlists','Playlists',I.list],['parati','Para ti',IC_FORYOU],['albumes','Álbumes',STAB_IC.album],['carpetas','Carpetas',I.folder]];
 function renderTabs(){
   $('tabs').innerHTML = TABS.map(([k,l,ic])=>`<button class="tab ${tab===k?'on':''}" data-tab="${k}">${ic||''}${l}</button>`).join('');
 }
@@ -1630,7 +1589,7 @@ audio.addEventListener('timeupdate',()=>{
   const p = d? t/d*1000 : 0;
   if(!seeking){ $('seek').value=p; $('seek').style.setProperty('--p',p/10+'%'); }
   $('tCur').textContent=fmt(t); $('tDur').textContent=fmt(d);
-  $('miniProg').style.width = p/10+'%'; $('miniPlay').style.setProperty('--mp', p/10+'%'); carProg(p/10);
+  $('miniProg').style.width = p/10+'%'; $('miniPlay').style.setProperty('--mp', p/10+'%');
   if(lastT!==null && !audio.paused){ const dt=t-lastT; if(dt>0&&dt<2){ S.playMs+=dt*1000; monAdd(null,dt*1000); monSave(); if(Math.random()<.05) save(); } }
   lastT=t;
 });
@@ -1640,7 +1599,6 @@ function fillPlayState(){
   const p = !audio.paused;
   $('bPlay').innerHTML = p?I.pause:I.play; $('bPlay').setAttribute('aria-label',p?'Pausar':'Reproducir');
   $('miniPlay').innerHTML = p?I.pause:I.play; $('miniPlay').setAttribute('aria-label',p?'Pausar':'Reproducir');
-  if($('carPlay')) $('carPlay').innerHTML = p?I.pause:I.play;
 }
 function fillPlayer(){
   if(!current) return;
@@ -1661,7 +1619,7 @@ function fillPlayer(){
   $('bRepeat').innerHTML = S.repeat===2?I.rep1:I.rep0; $('bRepeat').classList.toggle('on',S.repeat>0);
   $('bRepeat').setAttribute('aria-label',['Repetir: desactivado','Repetir: todo','Repetir: una'][S.repeat]);
   $('speedLbl').textContent = S.speed+'x';
-  fillPlayState(); carSync();
+  fillPlayState();
 }
 function updateMini(){
   const m=$('mini');
@@ -1679,11 +1637,13 @@ const lyMem={};
 const lyDB = new Promise(res=>{ try{ const r=indexedDB.open('nx_lyrics',1); r.onupgradeneeded=()=>r.result.createObjectStore('l'); r.onsuccess=()=>res(r.result); r.onerror=()=>res(null); }catch(e){ res(null); } });
 async function lyIdb(mode, fn){ const d=await lyDB; if(!d) return undefined; return new Promise(r=>{ try{ const q=fn(d.transaction('l',mode).objectStore('l')); q.onsuccess=()=>r(q.result); q.onerror=()=>r(undefined); }catch(e){ r(undefined); } }); }
 const lyHave = new Set(); let lyRt=0;
+const lyUser = {};   // letras escritas a mano o con sincronía ajustada: van en la copia de seguridad
+const lyMine = v => !!(v && v.t==='ok' && (v.manual || v.off));
 const lyTouch = () => { clearTimeout(lyRt); lyRt=setTimeout(()=>{ try{ render(); }catch(e){} },900); };
-lyDB.then(d=>{ if(!d) return; try{ const q=d.transaction('l').objectStore('l').openCursor(); q.onsuccess=()=>{ const c=q.result; if(c){ if(c.value && c.value.t==='ok') lyHave.add(c.key); c.continue(); } else lyTouch(); }; }catch(e){} });
+lyDB.then(d=>{ if(!d) return; try{ const q=d.transaction('l').objectStore('l').openCursor(); q.onsuccess=()=>{ const c=q.result; if(c){ if(c.value && c.value.t==='ok') lyHave.add(c.key); if(lyMine(c.value)) lyUser[c.key]=c.value; c.continue(); } else lyTouch(); }; }catch(e){} });
 const lyGet = async k => { const v = await lyIdb('readonly',s=>s.get(k)); return v!==undefined ? v : lyMem[k]; };
-const lyPut = async (k,v) => { lyMem[k]=v; await lyIdb('readwrite',s=>s.put(v,k)); if(v && v.t==='ok'){ if(!lyHave.has(k)){ lyHave.add(k); lyTouch(); } } else if(lyHave.delete(k)) lyTouch(); };
-const lyDel = async k => { delete lyMem[k]; await lyIdb('readwrite',s=>s.delete(k)); if(lyHave.delete(k)) lyTouch(); };
+const lyPut = async (k,v) => { lyMem[k]=v; if(lyMine(v)) lyUser[k]=v; else delete lyUser[k]; await lyIdb('readwrite',s=>s.put(v,k)); if(v && v.t==='ok'){ if(!lyHave.has(k)){ lyHave.add(k); lyTouch(); } } else if(lyHave.delete(k)) lyTouch(); };
+const lyDel = async k => { delete lyMem[k]; delete lyUser[k]; await lyIdb('readwrite',s=>s.delete(k)); if(lyHave.delete(k)) lyTouch(); };
 function lyParse(lrc){
   const out=[];
   for(const raw of String(lrc||'').split(/\r?\n/)){
@@ -2487,7 +2447,6 @@ function itemMenu(it){
     ${covers[it.key]?row('uncover','Quitar portada',I.restore,''):''}
     ${isA?row('edit','Editar información',PENCIL,'Internet'):''}
     ${isA&&r&&NATIVE?row('tone','Usar como tono',IC_BELL,''):''}
-    ${isA&&current&&current.key===it.key?row('car','Modo carro',CAR_IC,''):''}
     ${r?row('rename','Renombrar',PENCIL,''):''}
     ${row('info','Información',I.info,'')}
     <div class="vm-bottom"><button data-v="hide">${I.eye}<span>Ocultar</span></button><button data-v="del">${I.restore}<span>Quitar de la lista</span></button></div>
@@ -2499,7 +2458,6 @@ function itemMenu(it){
       if(v==='rename'){ setTimeout(()=>renameSheet(it),250); }
       if(v==='edit'){ setTimeout(()=>metaSheet(it),250); }
       if(v==='tone'){ setTimeout(()=>toneSheet(it),250); }
-      if(v==='car'){ carOpen(); }
       if(v==='cover'){ coverTarget=it; $('coverIn').click(); }
       if(v==='uncover'){ delete covers[it.key]; store.set('covers',covers); it.art = r?`${location.origin}/thumb/audio/${r.id}`:null; render(); if(current&&current.key===it.key) fillPlayer(); toast('Portada quitada'); }
       if(v==='next'){ if(!queue.length){ playItem(it); } else { queue.splice(qi+1,0,it); toast('Se reproducirá a continuación'); } }
@@ -2546,7 +2504,7 @@ function rgbHsl(r,g,b){ r/=255; g/=255; b/=255; const mx=Math.max(r,g,b), mn=Mat
 let tintNow=null;
 function coverTint(img){
   const pl=$('player');
-  const reset=()=>{ tintNow=null; ['--accent','--accent2','--pbg'].forEach(p=>pl.style.removeProperty(p)); pl.style.removeProperty('background'); pl.classList.remove('tinted'); carTint(); };
+  const reset=()=>{ tintNow=null; ['--accent','--accent2','--pbg'].forEach(p=>pl.style.removeProperty(p)); pl.style.removeProperty('background'); pl.classList.remove('tinted'); };
   if(S.coverColor===false || !img || !img.naturalWidth){ reset(); return; }
   try{
     const c=document.createElement('canvas'); c.width=c.height=28; const x=c.getContext('2d',{willReadFrequently:true}); x.drawImage(img,0,0,28,28);
@@ -2559,7 +2517,7 @@ function coverTint(img){
     pl.style.setProperty('--accent',`hsl(${h} ${ss}% 60%)`);
     pl.style.setProperty('--accent2',`hsl(${(h+32)%360} ${ss}% 52%)`);
     pl.style.background=`hsl(${h} ${Math.min(55,ss)}% 9%)`;
-    pl.classList.add('tinted'); carTint();
+    pl.classList.add('tinted');
   }catch(e){ reset(); }
 }
 
@@ -2642,7 +2600,6 @@ async function shareRecap(){
 }
 
 /* --- Poner como tono --- */
-const CAR_IC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M6 17l1.5-6.5A2 2 0 0 1 9.4 9h5.2a2 2 0 0 1 1.9 1.5L18 17"/><circle cx="8" cy="17" r="2"/><circle cx="16" cy="17" r="2"/></svg>';
 function toneSheet(it){
   const r=msRef(it); if(!r||r.type!=='audio'){ toast('Solo funciona con canciones del teléfono'); return; }
   const ic=(p)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
@@ -2656,67 +2613,6 @@ window.nxOnTone = (kind, ok) => {
   const n={ring:'tono de llamada',alarm:'alarma',notif:'sonido de notificación'}[kind]||'tono';
   toast(ok?`Listo, ahora es tu ${n}`:'No se pudo cambiar el tono');
 };
-
-/* --- Canciones repetidas --- */
-const normT = t => (t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
-  .replace(/\((?:[^)]*?(?:official|oficial|video|audio|lyric|letra|visualizer|hd|4k|mp3)[^)]*)\)|\[[^\]]*\]/g,' ')
-  .replace(/\(\d+\)|\bcopy\b|\bcopia\b|-\s*\d+$/g,' ').replace(/[^a-z0-9]+/g,' ').trim();
-function findDups(){
-  const by=new Map();
-  live().filter(i=>i.type==='audio'&&i.duration>5).forEach(i=>{ const k=normT(i.title)+'|'+normT(mainArtist(i.artist)); if(k.length<3) return; if(!by.has(k)) by.set(k,[]); by.get(k).push(i); });
-  const groups=[];
-  by.forEach(arr=>{ if(arr.length<2) return; arr.sort((a,b)=>a.duration-b.duration);
-    let cur=[arr[0]]; for(let j=1;j<arr.length;j++){ if(Math.abs(arr[j].duration-cur[0].duration)<=3) cur.push(arr[j]); else { if(cur.length>1) groups.push(cur); cur=[arr[j]]; } } if(cur.length>1) groups.push(cur); });
-  groups.forEach(g=>g.sort((a,b)=>(b.size||0)-(a.size||0)));
-  return groups;
-}
-let dupSel=new Set();
-function dupSheet(){
-  const groups=findDups();
-  if(!groups.length){ openSheet(`<h3>Canciones repetidas</h3><div class="dup-ok">${IC_CHECK}<b>¡Todo en orden!</b><p>No encontramos canciones repetidas en tu teléfono.</p></div>`, ()=>{}); return; }
-  dupSel=new Set(); groups.forEach(g=>g.slice(1).forEach(i=>dupSel.add(i.key)));
-  const draw=()=>{
-    const n=dupSel.size, mb=groups.flat().filter(i=>dupSel.has(i.key)).reduce((s,i)=>s+(i.size||0),0)/1048576;
-    $('sheetBody').innerHTML=`<h3>Canciones repetidas</h3><p class="dup-sub">${groups.length} grupo${groups.length===1?'':'s'} · se conserva la copia de mejor calidad. Toca para cambiar.</p>
-      <div class="dup-box">${groups.map(g=>`<div class="dup-g">${g.map((it,j)=>`<button class="dup-r ${dupSel.has(it.key)?'on':''}" data-v="d:${esc(it.key)}"><span class="ck"></span>${artHTML(it)}<div class="m"><b>${esc(it.title)}</b><span>${esc(it.folder||'')} · ${it.size?(it.size/1048576).toFixed(1)+' MB':''} · ${fmt(it.duration)}</span></div>${j===0&&!dupSel.has(it.key)?'<em>Conservar</em>':''}</button>`).join('')}</div>`).join('')}</div>
-      <div class="dup-act"><button class="btn" data-v="del" ${n?'':'disabled'} style="background:var(--danger)">${I.trash}Borrar ${n} ${n===1?'copia':'copias'}${mb>=.1?` (${mb.toFixed(1)} MB)`:''}</button></div>`;
-  };
-  openSheet('', v=>{
-    if(v.startsWith('d:')){ const k=v.slice(2); dupSel.has(k)?dupSel.delete(k):dupSel.add(k); draw(); return false; }
-    if(v==='del'){ const arr=groups.flat().filter(i=>dupSel.has(i.key)); if(arr.length) setTimeout(()=>confirmDelete(arr),250); }
-  });
-  draw();
-}
-
-/* --- Modo carro --- */
-function carOpen(){
-  if(!current){ const a=live().filter(i=>i.type==='audio'); if(!a.length){ toast('No hay canciones para reproducir'); return; } }
-  $('carMode').classList.add('on'); native('keepScreenOn', true); carSync(); carTint(); carClock();
-}
-function carClose(){ $('carMode').classList.remove('on'); native('keepScreenOn', false); }
-function carClock(){ if(!$('carMode').classList.contains('on')) return; const d=new Date(); $('carTime').textContent=d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); clearTimeout(window.__carCk); window.__carCk=setTimeout(carClock, 15000); }
-function carTint(){ const cm=$('carMode'); if(!cm) return; if(tintNow){ cm.style.setProperty('--accent',`hsl(${tintNow.h} ${tintNow.s}% 60%)`); cm.style.setProperty('--accent2',`hsl(${(tintNow.h+32)%360} ${tintNow.s}% 52%)`); cm.style.background=`hsl(${tintNow.h} ${Math.min(55,tintNow.s)}% 8%)`; } else { ['--accent','--accent2'].forEach(p=>cm.style.removeProperty(p)); cm.style.removeProperty('background'); } }
-function carSync(){
-  const cm=$('carMode'); if(!cm||!cm.classList.contains('on')) return;
-  const it=current;
-  $('carT').textContent = it?it.title:'Toca ▶ para reproducir'; $('carA').textContent = it?(it.artist||''):'';
-  $('carArt').innerHTML = it ? `<div class="art" style="background:${grad(it.title)}"><span class="letter">${letterOf(it)}</span>${coverImg(it.art)}</div>` : `<div class="art" style="background:var(--surface2)"><span class="letter">♪</span></div>`;
-  $('carPlay').innerHTML = (it&&!audio.paused)?I.pause:I.play;
-  $('carFav').innerHTML = it&&favKeys.has(it.key)?I.heartF:I.heart; $('carFav').classList.toggle('on', !!(it&&favKeys.has(it.key)));
-  $('carShuf').classList.toggle('on', !!S.shuffle);
-}
-function carProg(p){ const b=$('carBar'); if(b && $('carMode').classList.contains('on')) b.style.width=p+'%'; }
-function carWire(){
-  $('carClose').onclick=carClose;
-  $('carPlay').onclick=()=>{ if(!current){ const a=live().filter(i=>i.type==='audio'); a.length&&playItem(a[0],a); return; } ensureAudioGraph(); audio.paused?audio.play():audio.pause(); };
-  $('carPrev').onclick=()=>current&&step(-1);
-  $('carNext').onclick=()=>current&&step(1);
-  $('carFav').onclick=()=>{ if(current){ toggleFav(current); fillPlayer(); carSync(); } };
-  $('carShuf').onclick=()=>{ $('bShuffle').click(); carSync(); };
-  let sx=null; const art=$('carArt');
-  art.addEventListener('touchstart',e=>{ sx=e.touches[0].clientX; },{passive:true});
-  art.addEventListener('touchend',e=>{ if(sx===null||!current) return; const dx=e.changedTouches[0].clientX-sx; sx=null; if(Math.abs(dx)>60) step(dx<0?1:-1); },{passive:true});
-}
 
 /* --- Artistas y álbumes --- */
 let openGroup=null;
@@ -2748,7 +2644,6 @@ $('recap').addEventListener('click', e=>{
   if(v==='close') closeRecap(); else if(v==='share') shareRecap(); else if(v){ recapWhich=v; renderRecap(); }
   if(b.dataset.rcplay){ const list=recapData(recapWhich).songs.map(x=>x.it), it=list.find(i=>i.key===b.dataset.rcplay); if(it){ playItem(it,list); toast('Reproduciendo tu top'); } }
 });
-carWire();
 
 /* ---------- settings ---------- */
 const IBC=['#7C5CFF','#FF5C8A','#12B5CB','#F59E0B','#16A34A','#EF4444','#3B82F6','#A855F7','#14B8A6','#64748B'];
@@ -2776,9 +2671,9 @@ function renderSettings(){
       ${qtile('lang', I.globe, 'Idioma', LANGS[S.lang]||'Español', 3)}
     </div>
     <div class="sec-t">Sonido y reproducción</div>
-    <div class="group">${setRow('playback',I.head,'Ajustes de reproducción','','',0)}${setRow('fx',I.music,'Mejoras de sonido', fxActive()?'Activadas':'Calidad original','',8)}${setRow('boost',IC_BOOST,'Amplificador de volumen',S.boost+'%','',5)}${setRow('speed',I.head,'Velocidad predeterminada',S.speed+'x','',6)}${setRow('sleep',I.moon,'Temporizador para dormir',sleepMode==='off'?'Apagado':sleepMode==='end'?'Al terminar':$('sleepLbl').textContent,'',7)}${setRow('car',CAR_IC,'Modo carro','','',3)}</div>
+    <div class="group">${setRow('playback',I.head,'Ajustes de reproducción','','',0)}${setRow('fx',I.music,'Mejoras de sonido', fxActive()?'Activadas':'Calidad original','',8)}${setRow('boost',IC_BOOST,'Amplificador de volumen',S.boost+'%','',5)}${setRow('speed',I.head,'Velocidad predeterminada',S.speed+'x','',6)}${setRow('sleep',I.moon,'Temporizador para dormir',sleepMode==='off'?'Apagado':sleepMode==='end'?'Al terminar':$('sleepLbl').textContent,'',7)}</div>
     <div class="sec-t">Biblioteca</div>
-    <div class="group">${setRow('recap',SORT_IC.plays,'Tu resumen musical','','',1)}${setRow('dups',I.music,'Canciones repetidas','','',5)}</div>
+    <div class="group">${setRow('recap',SORT_IC.plays,'Tu resumen musical','','',1)}</div>
     <div class="group">${setRow('notif',IC_BELL,'Notificaciones',S.notifNew!==false?'Activadas':'Desactivadas','',3)}${setRow('backup',IC_CLOUD,'Copia de seguridad', store.get('lastBackup',null)?new Date(store.get('lastBackup')).toLocaleDateString():'','',0)}${setRow('hidden',I.eye,'Archivos ocultos',`${hid2} archivo${hid2!==1?'s':''}`,'',9)}${setRow('deleted',I.trash,'Eliminado recientemente','','',5)}${NATIVE?setRow('rescan',I.music,'Buscar música de nuevo', scanning?'Buscando…':'','',2)+setRow('perms',I.gem,'Permisos de la app','','',9):''}</div>
     <div class="donate"><span class="heart">♥</span><b>Apoya a Nexora Pro</b><p>Nexora es gratis y sin anuncios. Si te gusta, puedes invitarme un café con una donación por PayPal. ¡Gracias por tu apoyo!</p><button data-set="donate">${IC_HEARTS}Donar con PayPal</button></div>
     <div class="sec-t">Más</div>
@@ -2796,8 +2691,6 @@ $('settings').addEventListener('click', e=>{
   if(k==='rate') native('openUrl','https://play.google.com/store/apps/details?id=com.nexora.pro');
   if(k==='fixmeta') unknownSheet();
   if(k==='recap') openRecap();
-  if(k==='dups') dupSheet();
-  if(k==='car'){ $('settings').classList.remove('on'); carOpen(); }
   if(k==='pro') toast('Todas las funciones Pro están activadas');
   if(k==='speed') speedSheet(v=>{ S.speed=v; save(); audio.playbackRate=v; renderSettings(); });
   if(k==='lang') openSub('lang');
@@ -3237,7 +3130,10 @@ function buildBackup(){
   return {app:'Nexora Pro', v:1, fecha:new Date().toISOString(), version:native('version')||'',
     settings:S, playlists:playlists.map(p=>({name:p.name, items:mapKeys(p.keys)})), favs:mapKeys([...favKeys]),
     hidden:mapKeys([...hiddenKeys]), shown:mapKeys([...shownKeys]), plays:playsM, vpos:Object.entries(vpos).map(([k,v])=>({...meta(k),p:v})),
-    covers:Object.entries(covers).map(([k,d])=>({...meta(k),d})), bg};
+    covers:Object.entries(covers).map(([k,d])=>({...meta(k),d})), bg,
+    mon:Object.fromEntries(Object.entries(mon).map(([ym,m])=>[ym,{ms:m.ms||0,p:Object.entries(m.p||{}).map(([k,c])=>({...meta(k),c}))}])),
+    lastp:Object.entries(lastp).map(([k,t])=>({...meta(k),t})), metaOv:Object.entries(metaOv).map(([k,o])=>({...meta(k),o})),
+    lyrics:Object.entries(lyUser).map(([k,v])=>({...meta(k),v}))};
 }
 function resolveKey(m){
   if(!m) return null;
@@ -3263,6 +3159,10 @@ function restoreBackup(d){
   (d.vpos||[]).forEach(m=>{ const k=resolveKey(m); if(k&&m.p) vpos[k]=m.p; }); store.set('vpos',vpos);
   (d.covers||[]).forEach(m=>{ const k=resolveKey(m); if(k&&m.d) covers[k]=m.d; }); try{ store.set('covers',covers); }catch(e){}
   if(d.bg){ try{ localStorage.setItem('nx_bg', d.bg); }catch(e){} }
+  Object.entries(d.mon||{}).forEach(([ym,m])=>{ const cur=mon[ym]||(mon[ym]={p:{},ms:0}); cur.ms=Math.max(cur.ms||0,m.ms||0); (m.p||[]).forEach(x=>{ const k=resolveKey(x); if(k) cur.p[k]=Math.max(cur.p[k]||0,x.c||0); }); }); store.set('mon',mon);
+  (d.lastp||[]).forEach(m=>{ const k=resolveKey(m); if(k&&m.t) lastp[k]=Math.max(lastp[k]||0,m.t); }); store.set('lastp',lastp);
+  (d.metaOv||[]).forEach(m=>{ const k=resolveKey(m); if(k&&m.o) metaOv[k]=m.o; }); store.set('metaOv',metaOv);
+  (d.lyrics||[]).forEach(m=>{ const k=resolveKey(m); if(k&&m.v) lyPut(k,m.v); });
   store.set('lastBackup', store.get('lastBackup',null));
 }
 let lastBackupUri='';
@@ -4220,7 +4120,6 @@ window.nxBack = () => {
   if($('upd').classList.contains('on')){ if($('upd').dataset.forced) return false; $('upd').classList.remove('on'); return true; }
   if($('privPage').classList.contains('on')){ closePriv(); return true; }
   if($('sheet').classList.contains('on')){ closeSheet(); return true; }
-  if($('carMode').classList.contains('on')){ carClose(); return true; }
   if($('recap').classList.contains('on')){ closeRecap(); return true; }
   if(sel){ exitSel(); return true; }
   if($('sub').classList.contains('on')){ closeSub(); return true; }

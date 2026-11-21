@@ -1,13 +1,13 @@
 Versión: 1.8.8
-- Nuevas pestañas de Artistas y Álbumes
+- Nueva pestaña de Álbumes
 - Tu resumen musical: tus canciones y artistas más escuchados del mes, para compartir
-- Modo carro con botones grandes para usar mientras manejas
 - Pon cualquier canción como tono de llamada, alarma o notificación
-- Encuentra y borra canciones repetidas para liberar espacio
 - El reproductor toma los colores de la portada de cada canción
 - Nueva pestaña "Para ti" con listas automáticas
 - Widget en la pantalla de inicio para controlar tu música
 - Edita el título, artista y portada de tus canciones
 - Ecualizador que cambia solo según la salida: audífonos, Bluetooth o parlante
 - Temporizador de apagado que baja el volumen poco a poco
+- La copia de seguridad ahora también guarda tu resumen, tus letras y los datos que editaste
+- El amplificador de volumen empieza siempre en 100 % al abrir la app
 - Logo y encabezado mejor adaptados a cada pantalla
