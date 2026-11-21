@@ -123,6 +123,8 @@ jobs:
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
               <uses-permission android:name="android.permission.WAKE_LOCK" />
+              <!-- Poner una canción como tono de llamada, alarma o notificación -->
+              <uses-permission android:name="android.permission.WRITE_SETTINGS" />
               <!-- Solo para el visualizador de música: lee la intensidad del sonido que reproduce Nexora; no graba ni guarda nada -->
               <uses-permission android:name="android.permission.RECORD_AUDIO" />
               <!-- Necesario para el servidor local 127.0.0.1 que entrega la música al reproductor; la app no usa internet -->
@@ -892,6 +894,17 @@ jobs:
                   @JavascriptInterface
                   fun setWidgetStr(tap: String) { NxWidget.setTap(applicationContext, tap) }
 
+                  /** Usa una canción del teléfono como tono; si falta el permiso, abre la pantalla para darlo. */
+                  @JavascriptInterface
+                  fun setRingtone(id: String, kind: String) = runOnUiThread {
+                      val n = id.toLongOrNull() ?: return@runOnUiThread
+                      if (!android.provider.Settings.System.canWrite(this@MainActivity)) {
+                          pendingTone = n to kind
+                          js("window.nxOnTone && nxOnTone('perm', false)")
+                          runCatching { startActivity(Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:" + packageName))) }
+                      } else applyTone(n, kind)
+                  }
+
                   /** Ventana oficial de Google Play para calificar; si no aparece y se pidió desde Ajustes, abre la ficha. */
                   @JavascriptInterface
                   fun askReview(fromSettings: Boolean) = runOnUiThread {
@@ -1033,6 +1046,25 @@ jobs:
                               .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                           startActivity(Intent.createChooser(send, "Guardar copia de seguridad"))
                       }
+                  }
+
+                  /** Guarda una imagen (PNG en base64) en Imágenes/Nexora y abre Compartir. */
+                  @JavascriptInterface
+                  fun shareImage(b64: String, name: String) = runOnUiThread {
+                      runCatching {
+                          val bytes = android.util.Base64.decode(b64.substringAfter(","), android.util.Base64.DEFAULT)
+                          val values = android.content.ContentValues().apply {
+                              put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, name)
+                              put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "image/png")
+                              put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, android.os.Environment.DIRECTORY_PICTURES + "/Nexora")
+                          }
+                          val uri = contentResolver.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)!!
+                          contentResolver.openOutputStream(uri)!!.use { it.write(bytes) }
+                          val send = Intent(Intent.ACTION_SEND).setType("image/png")
+                              .putExtra(Intent.EXTRA_STREAM, uri)
+                              .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                          startActivity(Intent.createChooser(send, "Compartir"))
+                      }.onFailure { js("window.nxToast && nxToast('No se pudo compartir')") }
                   }
 
                   /** Descarga e instala la nueva versión dentro de la app. */
@@ -1196,6 +1228,26 @@ jobs:
                   NewMedia.watch(applicationContext)
                   MusicTime.schedule(applicationContext)
                   js("window.nxOnResume && nxOnResume()")
+                  pendingTone?.let { t ->
+                      if (android.provider.Settings.System.canWrite(this)) { pendingTone = null; applyTone(t.first, t.second) }
+                  }
+              }
+
+              // ---- Tono de llamada / alarma / notificación ----
+              private var pendingTone: Pair<Long, String>? = null
+              private fun applyTone(id: Long, kind: String) {
+                  val type = when (kind) {
+                      "alarm" -> android.media.RingtoneManager.TYPE_ALARM
+                      "notif" -> android.media.RingtoneManager.TYPE_NOTIFICATION
+                      else -> android.media.RingtoneManager.TYPE_RINGTONE
+                  }
+                  val uri = android.content.ContentUris.withAppendedId(android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+                  runCatching {
+                      val col = when (kind) { "alarm" -> android.provider.MediaStore.Audio.AudioColumns.IS_ALARM; "notif" -> android.provider.MediaStore.Audio.AudioColumns.IS_NOTIFICATION; else -> android.provider.MediaStore.Audio.AudioColumns.IS_RINGTONE }
+                      contentResolver.update(uri, android.content.ContentValues().apply { put(col, 1) }, null, null)
+                  }
+                  val ok = runCatching { android.media.RingtoneManager.setActualDefaultRingtoneUri(this, type, uri); true }.getOrDefault(false)
+                  js("window.nxOnTone && nxOnTone(${JSONObject.quote(kind)}, $ok)")
               }
 
               @Deprecated("Deprecated in Java")

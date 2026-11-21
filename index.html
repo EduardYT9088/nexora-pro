@@ -880,6 +880,87 @@ body.eco .ly-l,body.eco .sheet-full{transition-duration:.15s!important}
 .field{width:100%;height:48px;border-radius:14px;background:var(--surface2);border:1px solid rgba(255,255,255,.08);color:var(--text);padding:0 14px;font:inherit;font-size:15px}
 .mt-art{width:48px;height:48px;border-radius:12px;background:var(--surface2);flex:none;overflow:hidden}
 .mt-art img{width:100%;height:100%;object-fit:cover}
+
+/* ====== Tu resumen, modo carro, repetidas, artistas y álbumes ====== */
+#player.tinted .pl-shade{background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.3) 45%,rgba(0,0,0,.75) 100%)}
+#player{transition:background-color .5s}
+.recap{position:fixed;inset:0;z-index:22;background:var(--bg);color:var(--text);transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1);overflow-y:auto;padding:calc(var(--sat,env(safe-area-inset-top)) + 10px) 16px calc(var(--sab,env(safe-area-inset-bottom)) + 24px)}
+.recap.on{transform:none}
+.recap-in{max-width:620px;margin:0 auto}
+.rc-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.rc-top h2{font-family:Sora,Manrope,sans-serif;font-size:1.35rem;margin:0}
+.rc-seg{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto}
+.rc-seg button{flex:none;height:38px;padding:0 16px;border-radius:999px;background:var(--surface);color:var(--muted);font-weight:700;font-size:14px;border:1px solid var(--line)}
+.rc-seg button.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+.rc-hero{border-radius:26px;padding:22px 20px;color:#fff;background:radial-gradient(120% 120% at 0% 0%,var(--accent) 0,transparent 60%),radial-gradient(120% 120% at 100% 100%,var(--accent2) 0,transparent 60%),#15112e;box-shadow:0 20px 40px -24px var(--accent)}
+.rc-hero small{font-weight:700;opacity:.85;font-size:14px}
+.rc-hero>b{display:block;font-family:Sora,sans-serif;font-size:3.4rem;line-height:1.05;margin-top:6px;letter-spacing:-.02em}
+.rc-hero>span{opacity:.9;font-weight:600}
+.rc-kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.rc-kpi div{background:rgba(255,255,255,.12);border-radius:16px;padding:10px 12px}
+.rc-kpi b{display:block;font-size:1.3rem;font-family:Sora,sans-serif}.rc-kpi span{font-size:12.5px;opacity:.85}
+.rc-sec{font-weight:800;font-size:15px;margin:22px 4px 10px}
+.rc-artist{display:flex;align-items:center;gap:16px;background:var(--surface);border-radius:22px;padding:14px;border:1px solid var(--line)}
+.rc-artist b{display:block;font-size:1.25rem;font-family:Sora,sans-serif}.rc-artist span{color:var(--muted);font-size:14px}
+.rc-art{position:relative;width:52px;height:52px;flex:none;border-radius:14px;overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:800}
+.rc-artist .rc-art{width:76px;height:76px;font-size:1.5rem}
+.rc-art.circ{border-radius:50%}.rc-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rc-list{display:flex;flex-direction:column;gap:6px}
+.rc-row{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:18px;padding:8px 12px 8px 8px;text-align:left;width:100%;border:1px solid var(--line);color:var(--text)}
+.rc-row>i{font-style:normal;font-weight:800;width:22px;text-align:center;color:var(--accent);font-family:Sora,sans-serif}
+.rc-row .m{flex:1;min-width:0}.rc-row .m b,.rc-row .m span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-row .m span{color:var(--muted);font-size:13px}.rc-row em{font-style:normal;font-weight:800;color:var(--muted);font-size:13px}
+.rc-share{margin-top:22px}
+.rc-empty{text-align:center;padding:60px 20px;color:var(--muted)}.rc-empty b{display:block;color:var(--text);font-size:1.2rem;margin-bottom:6px}
+.ap-recap{grid-column:1/-1;display:flex!important;align-items:center;gap:14px;padding:16px!important;color:#fff!important;border:0!important;background:radial-gradient(120% 140% at 0% 0%,var(--accent) 0,transparent 65%),radial-gradient(120% 140% at 100% 100%,var(--accent2) 0,transparent 65%),#15112e!important}
+.ap-recap .ic{width:50px;height:50px;border-radius:16px;background:rgba(255,255,255,.16);display:grid;place-items:center;flex:none}
+.ap-recap .ic svg{width:26px;height:26px}
+.ap-recap b{display:block;font-size:1.05rem}.ap-recap small{opacity:.85;font-size:13px}
+.carmode{position:fixed;inset:0;z-index:24;background:#0b0a16;color:#fff;display:none;flex-direction:column;padding:calc(var(--sat,env(safe-area-inset-top)) + 12px) 20px calc(var(--sab,env(safe-area-inset-bottom)) + 20px);gap:14px;transition:background-color .5s}
+.carmode.on{display:flex}
+.car-top{display:flex;align-items:center;gap:10px}
+.car-x{display:flex;align-items:center;gap:6px;height:52px;padding:0 18px;border-radius:18px;background:rgba(255,255,255,.12);color:#fff;font-weight:800;font-size:16px}
+.car-x svg{width:22px;height:22px}
+.car-time{flex:1;text-align:center;font-family:Sora,sans-serif;font-size:1.4rem}
+.car-lbl{display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px;opacity:.8}.car-lbl svg{width:20px;height:20px}
+.car-art{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+.car-art .art{position:relative;height:min(100%,46vh,82vw);aspect-ratio:1;width:auto;border-radius:28px;overflow:hidden;display:grid;place-items:center;box-shadow:0 30px 60px -20px rgba(0,0,0,.8)}
+.car-art .art .letter{font-size:5rem;font-weight:800}.car-art .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.car-meta{text-align:center;min-width:0}
+.car-meta b,.car-meta span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.car-meta b{font-family:Sora,sans-serif;font-size:clamp(1.4rem,6.5vw,2.1rem)}.car-meta span{opacity:.75;font-size:1.1rem;margin-top:4px}
+.car-prog{height:6px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}.car-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px}
+.car-ctrl{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:14px;align-items:center}
+.car-ctrl button{height:min(24vw,110px);border-radius:28px;background:rgba(255,255,255,.12);color:#fff;display:grid;place-items:center}
+.car-ctrl button svg{width:44%;height:44%}
+.car-ctrl .big{height:min(30vw,130px);background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 18px 40px -16px var(--accent)}
+.car-ctrl2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.car-ctrl2 button{height:64px;border-radius:22px;background:rgba(255,255,255,.1);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:800;font-size:16px}
+.car-ctrl2 button svg{width:28px;height:28px}.car-ctrl2 button.on{color:var(--accent);background:rgba(255,255,255,.18)}
+@media (orientation:landscape){.carmode{display:none}.carmode.on{display:grid;grid-template-columns:40% 1fr;grid-template-rows:auto 1fr auto auto auto;column-gap:24px}.car-top{grid-column:1/-1}.car-art{grid-row:2/6}.car-art .art{height:min(100%,70vh)}}
+.dup-sub{margin:-4px 18px 10px;color:var(--muted);font-size:14px;line-height:1.45}
+.dup-box{max-height:56vh;overflow-y:auto;padding:0 10px}
+.dup-g{background:var(--surface2);border-radius:18px;padding:4px;margin-bottom:10px}
+.dup-r{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border-radius:14px;text-align:left;color:var(--text)}
+.dup-r .ck{width:22px;height:22px;border-radius:50%;border:2px solid var(--muted);flex:none;display:grid;place-items:center}
+.dup-r.on .ck{background:var(--danger);border-color:var(--danger)}.dup-r.on .ck::after{content:"";width:8px;height:8px;border-radius:50%;background:#fff}
+.dup-r.on .m b{text-decoration:line-through;opacity:.7}
+.dup-r .art{width:44px;height:44px;flex:none}
+.dup-r .m{flex:1;min-width:0}.dup-r .m b,.dup-r .m span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dup-r .m span{font-size:12.5px;color:var(--muted)}
+.dup-r em{font-style:normal;font-size:11.5px;font-weight:800;color:#16A34A;background:rgba(22,163,74,.14);padding:4px 8px;border-radius:999px}
+.dup-act{padding:10px 18px 4px;display:flex}.dup-act .btn{flex:1;justify-content:center}.dup-act .btn svg{width:20px;height:20px;flex:none}.dup-act .btn{white-space:nowrap;height:52px;color:#fff;gap:8px;display:flex;align-items:center}.dup-act .btn:disabled{opacity:.5}
+.dup-ok{text-align:center;padding:18px 20px 26px;color:var(--muted)}.dup-ok svg{width:46px;height:46px;color:#16A34A;padding:10px;background:rgba(22,163,74,.14);border-radius:50%}.dup-ok b{display:block;color:var(--text);font-size:1.1rem;margin:10px 0 4px}
+.grgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
+.grgrid button{text-align:left;color:var(--text);min-width:0}
+.grgrid .gr-pic{position:relative;aspect-ratio:1;border-radius:20px;overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:800;font-size:2.2rem;margin-bottom:8px;box-shadow:0 14px 26px -18px rgba(0,0,0,.7)}
+.grgrid.circ .gr-pic{border-radius:50%}.grgrid.circ{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:16px 12px}.grgrid.circ .gr-pic{font-size:1.8rem}
+.grgrid .gr-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.grgrid b,.grgrid small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.grgrid.circ b,.grgrid.circ small{text-align:center}
+.grgrid small{color:var(--muted);font-size:13px;margin-top:2px}
+.gr-head{display:flex;align-items:center;gap:16px;margin:6px 0 16px}
+.gr-head h2{font-family:Sora,sans-serif;margin:0;font-size:1.4rem;word-break:break-word}.gr-head small{color:var(--muted)}
+.gr-big{position:relative;width:96px;height:96px;flex:none;border-radius:22px;overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:800;font-size:2.2rem}
+.gr-big.circ{border-radius:50%}.gr-big img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 </style>
 </head>
 <body>
@@ -1010,6 +1091,15 @@ body.eco .ly-l,body.eco .sheet-full{transition-duration:.15s!important}
 <input class="hidden-input" type="file" id="coverIn" accept="image/*">
 <input class="hidden-input" type="file" id="bgIn" accept="image/*">
 <input class="hidden-input" type="file" id="restoreIn" accept=".json,application/json">
+<section class="recap" id="recap" aria-label="Tu resumen musical"><div class="recap-in" id="recapIn"></div></section>
+<section class="carmode" id="carMode" aria-label="Modo carro">
+  <div class="car-top"><button class="car-x" id="carClose" aria-label="Salir del modo carro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg><span>Salir</span></button><b class="car-time" id="carTime"></b><span class="car-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M6 17l1.5-6.5A2 2 0 0 1 9.4 9h5.2a2 2 0 0 1 1.9 1.5L18 17"/><circle cx="8" cy="17" r="2"/><circle cx="16" cy="17" r="2"/></svg>Modo carro</span></div>
+  <div class="car-art" id="carArt"></div>
+  <div class="car-meta"><b id="carT"></b><span id="carA"></span></div>
+  <div class="car-prog"><i id="carBar"></i></div>
+  <div class="car-ctrl"><button id="carPrev" aria-label="Anterior"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 5.5v13l-9-6.5zM9 5.5v13H6v-13z"/></svg></button><button id="carPlay" class="big" aria-label="Reproducir o pausar"></button><button id="carNext" aria-label="Siguiente"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 5.5v13l9-6.5zM15 5.5v13h3v-13z"/></svg></button></div>
+  <div class="car-ctrl2"><button id="carShuf" aria-label="Aleatorio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h4v4M4 20 20 4M20 16v4h-4M15 15l5 5M4 4l5 5"/></svg><span>Aleatorio</span></button><button id="carFav" aria-label="Favorito"></button></div>
+</section>
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div id="sheetBody"></div></div>
 <div class="toast" id="toast" role="status"></div>
@@ -1124,6 +1214,7 @@ const accentPair = () => S.accent==='custom' && S.accentCustom ? (()=>{ const [h
 const S = Object.assign({accent:0,theme:'auto',sortV:'recent',sortA:'recent',playMs:0,shuffle:false,repeat:0,speed:1,lang:'es'}, store.get('settings',{}));
 for(const k in DEF) if(S[k]===undefined) S[k]=DEF[k];
 if(S.gradOn===undefined) S.gradOn=true;
+if(S.coverColor===undefined) S.coverColor=true;
 const shownKeys = new Set(store.get('shown',[]));
 const covers = store.get('covers',{});
 const save = () => store.set('settings',S);
@@ -1238,7 +1329,8 @@ function probe(it){
 
 /* ---------- views ---------- */
 const IC_FORYOU='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15.5l-1.9-4.6L5.5 9l4.6-1.4z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>';
-const TABS = [['videos','Videos',I.video],['canciones','Canciones',I.music],['favoritos','Favoritos',I.star],['playlists','Playlists',I.list],['carpetas','Carpetas',I.folder],['parati','Para ti',IC_FORYOU]];
+const STAB_IC={artist:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>',album:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/></svg>'};
+const TABS = [['videos','Videos',I.video],['canciones','Canciones',I.music],['favoritos','Favoritos',I.star],['playlists','Playlists',I.list],['artistas','Artistas',STAB_IC.artist],['albumes','Álbumes',STAB_IC.album],['carpetas','Carpetas',I.folder],['parati','Para ti',IC_FORYOU]];
 function renderTabs(){
   $('tabs').innerHTML = TABS.map(([k,l,ic])=>`<button class="tab ${tab===k?'on':''}" data-tab="${k}">${ic||''}${l}</button>`).join('');
 }
@@ -1313,7 +1405,7 @@ function render(){
       const pl = plById(openPlaylist), arr = pl ? pl.keys.map(k=>all.find(i=>i.key===k)).filter(Boolean) : []; shown=arr;
       h = `<div class="count"><button class="btn ghost" data-act="backpl" style="height:36px;padding:0 14px;font-size:13px">‹ Para ti</button>${arr.length?`<span style="display:flex;gap:8px"><button class="btn ghost soft" data-act="shuffleall" style="height:36px;padding:0 12px;font-size:13px" aria-label="Aleatorio">${I.shuffle}</button><button class="btn ghost" data-act="playall" style="height:36px;padding:0 14px;font-size:13px">${I.play.replace('<svg','<svg width="16" height="16"')}Reproducir todo</button></span>`:''}</div><h2 style="font-family:Sora,sans-serif;margin:4px 0 12px">${esc(pl?pl.name:'')}</h2>${arr.length?selAllHTML(arr)+songList(arr):`<p style="color:var(--muted)">${AUTO_EMPTY[openPlaylist]||''}</p>`}`;
     } else {
-      h = `<div class="autopl">${AUTO_PL.map(([id,n,ic,g])=>{ const ks=autoKeys(id), c=ks.length;
+      h = `<div class="autopl"><button class="ap-recap" data-act="recap"><span class="ic">${SORT_IC.plays}</span><div><b>Tu resumen musical</b><small>Tus canciones y artistas más escuchados</small></div></button>${AUTO_PL.map(([id,n,ic,g])=>{ const ks=autoKeys(id), c=ks.length;
         const arts=ks.map(k=>all.find(i=>i.key===k)).filter(i=>i&&i.art).slice(0,3);
         return `<button data-openpl="${id}"><div class="ap-art" style="background:${g}"><i class="ap-glow"></i><span class="ap-ic">${AP_IC[ic]}</span>${arts.length?`<span class="ap-stack">${arts.map((i,j)=>`<img src="${i.art}" alt="" style="--j:${j}" onerror="this.remove()">`).join('')}</span>`:''}</div><div class="ap-t">${n}</div><div class="ap-s">${c} ${c===1?'canción':'canciones'}</div></button>`; }).join('')}</div>`;
     }
@@ -1326,6 +1418,8 @@ function render(){
       h = `<button class="row" data-act="newpl"><div class="art" style="background:var(--surface2);color:var(--accent)">${I.plus.replace('<svg','<svg width="26" height="26"')}</div><div class="meta"><div class="t">Nueva playlist</div></div></button>` +
         playlists.map(p=>{ const n=p.keys.filter(k=>all.some(i=>i.key===k)).length; return `<button class="row" data-openpl="${p.id}"><div class="art" style="background:${grad(p.name)}">${I.list.replace('<svg','<svg width="24" height="24"')}</div><div class="meta"><div class="t">${esc(p.name)}</div><div class="s">${n} elemento${n!==1?'s':''}</div></div></button>`; }).join('');
     }
+  } else if(tab==='artistas'||tab==='albumes'){
+    h = groupView(tab, all);
   } else if(tab==='carpetas'){
     if(openFolder){
       const arr = filt(all.filter(i=>i.folder===openFolder)); shown=arr;
@@ -1466,7 +1560,7 @@ function loadAudio(it){
   setEngine(wantNative(it.url, it.type==='video' || it.solo));
   audio.src = it.url; audio.playbackRate = S.speed;
   audio.play().catch(()=>{});
-  plays[it.key]=(plays[it.key]||0)+1; store.set('plays',plays); touchLast(it); maybeReview();
+  plays[it.key]=(plays[it.key]||0)+1; store.set('plays',plays); monAdd(it.key); monSave(true); touchLast(it); maybeReview();
   fillPlayer(); render(); lyOnTrack(it); saveNpq(); saveNp(true);
   if('mediaSession' in navigator){
     navigator.mediaSession.metadata = new MediaMetadata({title:it.title, artist:it.artist, album:'Nexora Pro'});
@@ -1536,8 +1630,8 @@ audio.addEventListener('timeupdate',()=>{
   const p = d? t/d*1000 : 0;
   if(!seeking){ $('seek').value=p; $('seek').style.setProperty('--p',p/10+'%'); }
   $('tCur').textContent=fmt(t); $('tDur').textContent=fmt(d);
-  $('miniProg').style.width = p/10+'%'; $('miniPlay').style.setProperty('--mp', p/10+'%');
-  if(lastT!==null && !audio.paused){ const dt=t-lastT; if(dt>0&&dt<2){ S.playMs+=dt*1000; if(Math.random()<.05) save(); } }
+  $('miniProg').style.width = p/10+'%'; $('miniPlay').style.setProperty('--mp', p/10+'%'); carProg(p/10);
+  if(lastT!==null && !audio.paused){ const dt=t-lastT; if(dt>0&&dt<2){ S.playMs+=dt*1000; monAdd(null,dt*1000); monSave(); if(Math.random()<.05) save(); } }
   lastT=t;
 });
 
@@ -1546,6 +1640,7 @@ function fillPlayState(){
   const p = !audio.paused;
   $('bPlay').innerHTML = p?I.pause:I.play; $('bPlay').setAttribute('aria-label',p?'Pausar':'Reproducir');
   $('miniPlay').innerHTML = p?I.pause:I.play; $('miniPlay').setAttribute('aria-label',p?'Pausar':'Reproducir');
+  if($('carPlay')) $('carPlay').innerHTML = p?I.pause:I.play;
 }
 function fillPlayer(){
   if(!current) return;
@@ -1555,8 +1650,8 @@ function fillPlayer(){
   const sized=(u,n)=>!u?'':/^data:/.test(u)?u:u.replace(/\?.*$/,'')+'?s='+n;
   const oi=$('orbImg'), big=sized(current.art,720);
   $('orb').classList.remove('has-art'); oi.hidden=true;
-  if(big){ oi.onload=()=>{ oi.hidden=false; $('orb').classList.add('has-art'); }; oi.onerror=()=>{ oi.hidden=true; $('orb').classList.remove('has-art'); }; if(oi.getAttribute('src')!==big) oi.src=big; else if(oi.complete&&oi.naturalWidth) oi.onload(); }
-  else oi.removeAttribute('src');
+  if(big){ oi.onload=()=>{ oi.hidden=false; $('orb').classList.add('has-art'); coverTint(oi); }; oi.onerror=()=>{ oi.hidden=true; $('orb').classList.remove('has-art'); coverTint(null); }; if(oi.getAttribute('src')!==big) oi.src=big; else if(oi.complete&&oi.naturalWidth) oi.onload(); }
+  else { oi.removeAttribute('src'); coverTint(null); }
   const h = hash(current.title)%360;
   $('player').style.setProperty('--pbg',`hsl(${h} 45% 16%)`);
   $('plSource').textContent = queue.length>1 ? `Reproduciendo · ${qi+1}/${queue.length}` : 'Reproduciendo';
@@ -1566,7 +1661,7 @@ function fillPlayer(){
   $('bRepeat').innerHTML = S.repeat===2?I.rep1:I.rep0; $('bRepeat').classList.toggle('on',S.repeat>0);
   $('bRepeat').setAttribute('aria-label',['Repetir: desactivado','Repetir: todo','Repetir: una'][S.repeat]);
   $('speedLbl').textContent = S.speed+'x';
-  fillPlayState();
+  fillPlayState(); carSync();
 }
 function updateMini(){
   const m=$('mini');
@@ -2391,6 +2486,8 @@ function itemMenu(it){
     ${isA?row('cover', covers[it.key]?'Cambiar portada':'Poner portada', IC_COVER, 'Galería'):''}
     ${covers[it.key]?row('uncover','Quitar portada',I.restore,''):''}
     ${isA?row('edit','Editar información',PENCIL,'Internet'):''}
+    ${isA&&r&&NATIVE?row('tone','Usar como tono',IC_BELL,''):''}
+    ${isA&&current&&current.key===it.key?row('car','Modo carro',CAR_IC,''):''}
     ${r?row('rename','Renombrar',PENCIL,''):''}
     ${row('info','Información',I.info,'')}
     <div class="vm-bottom"><button data-v="hide">${I.eye}<span>Ocultar</span></button><button data-v="del">${I.restore}<span>Quitar de la lista</span></button></div>
@@ -2401,6 +2498,8 @@ function itemMenu(it){
       if(v==='share'){ native('share', JSON.stringify([r])); }
       if(v==='rename'){ setTimeout(()=>renameSheet(it),250); }
       if(v==='edit'){ setTimeout(()=>metaSheet(it),250); }
+      if(v==='tone'){ setTimeout(()=>toneSheet(it),250); }
+      if(v==='car'){ carOpen(); }
       if(v==='cover'){ coverTarget=it; $('coverIn').click(); }
       if(v==='uncover'){ delete covers[it.key]; store.set('covers',covers); it.art = r?`${location.origin}/thumb/audio/${r.id}`:null; render(); if(current&&current.key===it.key) fillPlayer(); toast('Portada quitada'); }
       if(v==='next'){ if(!queue.length){ playItem(it); } else { queue.splice(qi+1,0,it); toast('Se reproducirá a continuación'); } }
@@ -2439,6 +2538,218 @@ function plMenu(id){
   });
 }
 
+/* ====== 1.8.8+: colores de portada, resumen, tonos, repetidas, modo carro, artistas y álbumes ====== */
+/* --- Colores según la portada --- */
+function rgbHsl(r,g,b){ r/=255; g/=255; b/=255; const mx=Math.max(r,g,b), mn=Math.min(r,g,b), l=(mx+mn)/2; let h=0, s=0;
+  if(mx!==mn){ const d=mx-mn; s=l>.5?d/(2-mx-mn):d/(mx+mn); h=mx===r?(g-b)/d+(g<b?6:0):mx===g?(b-r)/d+2:(r-g)/d+4; h*=60; }
+  return [Math.round(h), s, l]; }
+let tintNow=null;
+function coverTint(img){
+  const pl=$('player');
+  const reset=()=>{ tintNow=null; ['--accent','--accent2','--pbg'].forEach(p=>pl.style.removeProperty(p)); pl.style.removeProperty('background'); pl.classList.remove('tinted'); carTint(); };
+  if(S.coverColor===false || !img || !img.naturalWidth){ reset(); return; }
+  try{
+    const c=document.createElement('canvas'); c.width=c.height=28; const x=c.getContext('2d',{willReadFrequently:true}); x.drawImage(img,0,0,28,28);
+    const d=x.getImageData(0,0,28,28).data; let r=0,g=0,b=0,w=0,sat=0,n=0;
+    for(let i=0;i<d.length;i+=4){ const R=d[i],G=d[i+1],B=d[i+2],mx=Math.max(R,G,B),mn=Math.min(R,G,B),l=(mx+mn)/510,s=mx?(mx-mn)/mx:0;
+      n++; sat+=s; if(l<.1||l>.94) continue; const k=s*s*s+.01; r+=R*k; g+=G*k; b+=B*k; w+=k; }
+    if(!w || sat/n<.08){ reset(); return; }
+    const [h,s]=rgbHsl(r/w,g/w,b/w), ss=Math.round(Math.min(.9,Math.max(.5,s))*100);
+    tintNow={h,s:ss};
+    pl.style.setProperty('--accent',`hsl(${h} ${ss}% 60%)`);
+    pl.style.setProperty('--accent2',`hsl(${(h+32)%360} ${ss}% 52%)`);
+    pl.style.background=`hsl(${h} ${Math.min(55,ss)}% 9%)`;
+    pl.classList.add('tinted'); carTint();
+  }catch(e){ reset(); }
+}
+
+/* --- Estadísticas por mes (para "Tu resumen") --- */
+const mon = store.get('mon',{});
+const monKey = (d=new Date()) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+function monAdd(key, ms){ const k=monKey(); const m=mon[k]||(mon[k]={p:{},ms:0}); if(key) m.p[key]=(m.p[key]||0)+1; if(ms) m.ms+=ms; }
+let monT=0; function monSave(force){ if(force||Date.now()-monT>15000){ monT=Date.now(); store.set('mon',mon); } }
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const mainArtist = a => { a=(a||'').trim(); if(!a||/desconocid|unknown|<unknown>/i.test(a)) return 'Artista desconocido'; return a.split(/\s*(?:,|;|&|\/| feat\.?| ft\.?| featuring | x )\s*/i)[0].trim()||a; };
+function recapData(which){
+  const all=items.filter(i=>i.type==='audio'), byKey=new Map(all.map(i=>[i.key,i]));
+  let p, ms, label;
+  if(which==='all'){ p=plays; ms=S.playMs; label='Desde que usas Nexora'; }
+  else { const d=new Date(); if(which==='prev') d.setMonth(d.getMonth()-1); const m=mon[monKey(d)]||{p:{},ms:0}; p=m.p; ms=m.ms; label=MESES[d.getMonth()][0].toUpperCase()+MESES[d.getMonth()].slice(1)+' '+d.getFullYear(); }
+  const songs=Object.entries(p).map(([k,c])=>({it:byKey.get(k),c})).filter(x=>x.it).sort((a,b)=>b.c-a.c);
+  const art=new Map(); songs.forEach(({it,c})=>{ const a=mainArtist(it.artist); if(a==='Artista desconocido') return; const o=art.get(a)||{name:a,c:0,it}; o.c+=c; art.set(a,o); });
+  const artists=[...art.values()].sort((a,b)=>b.c-a.c);
+  const total=songs.reduce((s,x)=>s+x.c,0);
+  return {label, songs:songs.slice(0,5), artists:artists.slice(0,3), total, distinct:songs.length, min:Math.round(ms/60000)};
+}
+let recapWhich='month';
+function openRecap(){ recapWhich='month'; const r=recapData('month'); if(!r.total){ const a=recapData('all'); if(a.total) recapWhich='all'; } $('recap').classList.add('on'); renderRecap(); }
+function closeRecap(){ $('recap').classList.remove('on'); }
+const recArt = (it,cls='') => `<div class="rc-art ${cls}" style="background:${grad(it.title)}"><span>${letterOf(it)}</span>${it.art?`<img src="${it.art}" alt="" onerror="this.remove()">`:''}</div>`;
+function renderRecap(){
+  const r=recapData(recapWhich), top=r.artists[0];
+  const seg=[['month','Este mes'],['prev','Mes pasado'],['all','Siempre']].map(([k,l])=>`<button data-rc="${k}" class="${recapWhich===k?'on':''}">${l}</button>`).join('');
+  $('recapIn').innerHTML = `<div class="rc-top"><button class="icon-btn" data-rc="close" aria-label="Cerrar">${IC_BACK}</button><h2>Tu resumen musical</h2></div>
+    <div class="rc-seg">${seg}</div>
+    ${!r.total ? `<div class="rc-empty"><b>Aún no hay datos</b><p>Escucha música y aquí verás tus canciones y artistas favoritos de ${recapWhich==='prev'?'ese mes':'este mes'}.</p></div>` : `
+    <div class="rc-hero"><small>${esc(r.label)}</small><b>${r.min.toLocaleString()}</b><span>minutos escuchados</span>
+      <div class="rc-kpi"><div><b>${r.total}</b><span>reproducciones</span></div><div><b>${r.distinct}</b><span>canciones distintas</span></div></div></div>
+    ${top?`<div class="rc-sec">Tu artista n.º 1</div><div class="rc-artist">${recArt(top.it,'circ')}<div><b>${esc(top.name)}</b><span>${top.c} reproducciones</span></div></div>`:''}
+    <div class="rc-sec">Tus canciones más escuchadas</div>
+    <div class="rc-list">${r.songs.map((x,i)=>`<button class="rc-row" data-rcplay="${esc(x.it.key)}"><i>${i+1}</i>${recArt(x.it)}<div class="m"><b>${esc(x.it.title)}</b><span>${esc(x.it.artist||'')}</span></div><em>${x.c}</em></button>`).join('')}</div>
+    ${r.artists.length>1?`<div class="rc-sec">Tus artistas</div><div class="rc-list">${r.artists.map((a,i)=>`<div class="rc-row"><i>${i+1}</i>${recArt(a.it,'circ')}<div class="m"><b>${esc(a.name)}</b><span>${a.c} reproducciones</span></div></div>`).join('')}</div>`:''}
+    <button class="bk-share rc-share" data-rc="share">${IC_SHARE}Compartir mi resumen</button>`}`;
+}
+function loadImg(src){ return new Promise(res=>{ if(!src){ res(null); return; } const im=new Image(); im.onload=()=>res(im); im.onerror=()=>res(null); im.src=src; setTimeout(()=>res(null),4000); }); }
+async function recapImage(withImgs){
+  const r=recapData(recapWhich), W=1080, H=1920, c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d');
+  const cs=getComputedStyle(document.documentElement), A=cs.getPropertyValue('--accent').trim()||'#7C5CFF', B=cs.getPropertyValue('--accent2').trim()||'#12B5CB';
+  x.fillStyle='#0D0B1F'; x.fillRect(0,0,W,H);
+  let g=x.createRadialGradient(200,260,40,200,260,900); g.addColorStop(0,A); g.addColorStop(1,'rgba(13,11,31,0)'); x.globalAlpha=.55; x.fillStyle=g; x.fillRect(0,0,W,H);
+  g=x.createRadialGradient(950,1700,40,950,1700,900); g.addColorStop(0,B); g.addColorStop(1,'rgba(13,11,31,0)'); x.fillStyle=g; x.fillRect(0,0,W,H); x.globalAlpha=1;
+  const F='Sora,Manrope,system-ui,sans-serif';
+  x.fillStyle='#fff'; x.font=`800 64px ${F}`; x.fillText('Mi resumen musical',80,170);
+  x.fillStyle='rgba(255,255,255,.7)'; x.font=`600 40px ${F}`; x.fillText(r.label,80,232);
+  x.fillStyle='#fff'; x.font=`800 190px ${F}`; x.fillText(r.min.toLocaleString(),76,450);
+  x.fillStyle='rgba(255,255,255,.8)'; x.font=`600 44px ${F}`; x.fillText(`minutos escuchados · ${r.total} reproducciones`,80,520);
+  const rr=(X,Y,w,h,rad)=>{ x.beginPath(); x.moveTo(X+rad,Y); x.arcTo(X+w,Y,X+w,Y+h,rad); x.arcTo(X+w,Y+h,X,Y+h,rad); x.arcTo(X,Y+h,X,Y,rad); x.arcTo(X,Y,X+w,Y,rad); x.closePath(); };
+  const pic=async(it,X,Y,s,round)=>{ x.save(); if(round){ x.beginPath(); x.arc(X+s/2,Y+s/2,s/2,0,7); } else rr(X,Y,s,s,s*.18); x.clip();
+    const gg=x.createLinearGradient(X,Y,X+s,Y+s); gg.addColorStop(0,A); gg.addColorStop(1,B); x.fillStyle=gg; x.fillRect(X,Y,s,s);
+    x.fillStyle='#fff'; x.font=`800 ${s*.42}px ${F}`; x.textAlign='center'; x.textBaseline='middle'; x.fillText((it.title.trim()[0]||'♪').toUpperCase(),X+s/2,Y+s/2+2); x.textAlign='left'; x.textBaseline='alphabetic';
+    if(withImgs&&it.art){ const im=await loadImg(it.art); if(im) x.drawImage(im,X,Y,s,s); } x.restore(); };
+  const fit=(t,max)=>{ t=String(t||''); if(x.measureText(t).width<=max) return t; while(t.length>1&&x.measureText(t+'…').width>max) t=t.slice(0,-1); return t+'…'; };
+  let y=620; const top=r.artists[0];
+  if(top){ x.fillStyle='rgba(255,255,255,.08)'; rr(60,y,W-120,250,40); x.fill();
+    await pic(top.it,100,y+35,180,true);
+    x.fillStyle='rgba(255,255,255,.7)'; x.font=`700 36px ${F}`; x.fillText('Mi artista n.º 1',320,y+100);
+    x.fillStyle='#fff'; x.font=`800 62px ${F}`; x.fillText(fit(top.name,W-420),320,y+172);
+    x.fillStyle='rgba(255,255,255,.7)'; x.font=`600 34px ${F}`; x.fillText(`${top.c} reproducciones`,320,y+222); y+=310; }
+  x.fillStyle='#fff'; x.font=`800 50px ${F}`; x.fillText('Mis canciones más escuchadas',80,y+40); y+=90;
+  for(let i=0;i<r.songs.length;i++){ const s=r.songs[i];
+    x.fillStyle=A; x.font=`800 56px ${F}`; x.fillText(String(i+1),80,y+82);
+    await pic(s.it,160,y,120,false);
+    x.fillStyle='#fff'; x.font=`800 44px ${F}`; x.fillText(fit(s.it.title,W-400),310,y+54);
+    x.fillStyle='rgba(255,255,255,.65)'; x.font=`600 34px ${F}`; x.fillText(fit(s.it.artist||'',W-400),310,y+102);
+    y+=140; }
+  x.fillStyle='rgba(255,255,255,.85)'; x.font=`800 44px ${F}`; x.textAlign='center'; x.fillText('Nexora Pro',W/2,H-100);
+  x.fillStyle='rgba(255,255,255,.55)'; x.font=`600 30px ${F}`; x.fillText('Reproductor de música y video',W/2,H-56); x.textAlign='left';
+  return c.toDataURL('image/png');
+}
+async function shareRecap(){
+  toast('Creando tu imagen…');
+  let url; try{ url=await recapImage(true); }catch(e){ try{ url=await recapImage(false); }catch(e2){ toast('No se pudo crear la imagen'); return; } }
+  if(NATIVE) native('shareImage', url, 'Nexora-resumen-'+Date.now()+'.png');
+  else { const a=document.createElement('a'); a.href=url; a.download='Nexora-resumen.png'; a.click(); }
+}
+
+/* --- Poner como tono --- */
+const CAR_IC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M6 17l1.5-6.5A2 2 0 0 1 9.4 9h5.2a2 2 0 0 1 1.9 1.5L18 17"/><circle cx="8" cy="17" r="2"/><circle cx="16" cy="17" r="2"/></svg>';
+function toneSheet(it){
+  const r=msRef(it); if(!r||r.type!=='audio'){ toast('Solo funciona con canciones del teléfono'); return; }
+  const ic=(p)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  openSheet(`<h3>Usar como tono</h3><p style="margin:-4px 18px 10px;color:var(--muted);font-size:14px">${esc(it.title)}</p>
+    ${opt('ring','Tono de llamada',ic('<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>'))}
+    ${opt('alarm','Alarma',ic('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3 2 6M19 3l3 3"/>'))}
+    ${opt('notif','Sonido de notificación',IC_BELL)}`, v=>{ native('setRingtone', String(r.id), v); });
+}
+window.nxOnTone = (kind, ok) => {
+  if(kind==='perm'){ toast('Activa "Permitir modificar ajustes" y vuelve a Nexora'); return; }
+  const n={ring:'tono de llamada',alarm:'alarma',notif:'sonido de notificación'}[kind]||'tono';
+  toast(ok?`Listo, ahora es tu ${n}`:'No se pudo cambiar el tono');
+};
+
+/* --- Canciones repetidas --- */
+const normT = t => (t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+  .replace(/\((?:[^)]*?(?:official|oficial|video|audio|lyric|letra|visualizer|hd|4k|mp3)[^)]*)\)|\[[^\]]*\]/g,' ')
+  .replace(/\(\d+\)|\bcopy\b|\bcopia\b|-\s*\d+$/g,' ').replace(/[^a-z0-9]+/g,' ').trim();
+function findDups(){
+  const by=new Map();
+  live().filter(i=>i.type==='audio'&&i.duration>5).forEach(i=>{ const k=normT(i.title)+'|'+normT(mainArtist(i.artist)); if(k.length<3) return; if(!by.has(k)) by.set(k,[]); by.get(k).push(i); });
+  const groups=[];
+  by.forEach(arr=>{ if(arr.length<2) return; arr.sort((a,b)=>a.duration-b.duration);
+    let cur=[arr[0]]; for(let j=1;j<arr.length;j++){ if(Math.abs(arr[j].duration-cur[0].duration)<=3) cur.push(arr[j]); else { if(cur.length>1) groups.push(cur); cur=[arr[j]]; } } if(cur.length>1) groups.push(cur); });
+  groups.forEach(g=>g.sort((a,b)=>(b.size||0)-(a.size||0)));
+  return groups;
+}
+let dupSel=new Set();
+function dupSheet(){
+  const groups=findDups();
+  if(!groups.length){ openSheet(`<h3>Canciones repetidas</h3><div class="dup-ok">${IC_CHECK}<b>¡Todo en orden!</b><p>No encontramos canciones repetidas en tu teléfono.</p></div>`, ()=>{}); return; }
+  dupSel=new Set(); groups.forEach(g=>g.slice(1).forEach(i=>dupSel.add(i.key)));
+  const draw=()=>{
+    const n=dupSel.size, mb=groups.flat().filter(i=>dupSel.has(i.key)).reduce((s,i)=>s+(i.size||0),0)/1048576;
+    $('sheetBody').innerHTML=`<h3>Canciones repetidas</h3><p class="dup-sub">${groups.length} grupo${groups.length===1?'':'s'} · se conserva la copia de mejor calidad. Toca para cambiar.</p>
+      <div class="dup-box">${groups.map(g=>`<div class="dup-g">${g.map((it,j)=>`<button class="dup-r ${dupSel.has(it.key)?'on':''}" data-v="d:${esc(it.key)}"><span class="ck"></span>${artHTML(it)}<div class="m"><b>${esc(it.title)}</b><span>${esc(it.folder||'')} · ${it.size?(it.size/1048576).toFixed(1)+' MB':''} · ${fmt(it.duration)}</span></div>${j===0&&!dupSel.has(it.key)?'<em>Conservar</em>':''}</button>`).join('')}</div>`).join('')}</div>
+      <div class="dup-act"><button class="btn" data-v="del" ${n?'':'disabled'} style="background:var(--danger)">${I.trash}Borrar ${n} ${n===1?'copia':'copias'}${mb>=.1?` (${mb.toFixed(1)} MB)`:''}</button></div>`;
+  };
+  openSheet('', v=>{
+    if(v.startsWith('d:')){ const k=v.slice(2); dupSel.has(k)?dupSel.delete(k):dupSel.add(k); draw(); return false; }
+    if(v==='del'){ const arr=groups.flat().filter(i=>dupSel.has(i.key)); if(arr.length) setTimeout(()=>confirmDelete(arr),250); }
+  });
+  draw();
+}
+
+/* --- Modo carro --- */
+function carOpen(){
+  if(!current){ const a=live().filter(i=>i.type==='audio'); if(!a.length){ toast('No hay canciones para reproducir'); return; } }
+  $('carMode').classList.add('on'); native('keepScreenOn', true); carSync(); carTint(); carClock();
+}
+function carClose(){ $('carMode').classList.remove('on'); native('keepScreenOn', false); }
+function carClock(){ if(!$('carMode').classList.contains('on')) return; const d=new Date(); $('carTime').textContent=d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); clearTimeout(window.__carCk); window.__carCk=setTimeout(carClock, 15000); }
+function carTint(){ const cm=$('carMode'); if(!cm) return; if(tintNow){ cm.style.setProperty('--accent',`hsl(${tintNow.h} ${tintNow.s}% 60%)`); cm.style.setProperty('--accent2',`hsl(${(tintNow.h+32)%360} ${tintNow.s}% 52%)`); cm.style.background=`hsl(${tintNow.h} ${Math.min(55,tintNow.s)}% 8%)`; } else { ['--accent','--accent2'].forEach(p=>cm.style.removeProperty(p)); cm.style.removeProperty('background'); } }
+function carSync(){
+  const cm=$('carMode'); if(!cm||!cm.classList.contains('on')) return;
+  const it=current;
+  $('carT').textContent = it?it.title:'Toca ▶ para reproducir'; $('carA').textContent = it?(it.artist||''):'';
+  $('carArt').innerHTML = it ? `<div class="art" style="background:${grad(it.title)}"><span class="letter">${letterOf(it)}</span>${coverImg(it.art)}</div>` : `<div class="art" style="background:var(--surface2)"><span class="letter">♪</span></div>`;
+  $('carPlay').innerHTML = (it&&!audio.paused)?I.pause:I.play;
+  $('carFav').innerHTML = it&&favKeys.has(it.key)?I.heartF:I.heart; $('carFav').classList.toggle('on', !!(it&&favKeys.has(it.key)));
+  $('carShuf').classList.toggle('on', !!S.shuffle);
+}
+function carProg(p){ const b=$('carBar'); if(b && $('carMode').classList.contains('on')) b.style.width=p+'%'; }
+function carWire(){
+  $('carClose').onclick=carClose;
+  $('carPlay').onclick=()=>{ if(!current){ const a=live().filter(i=>i.type==='audio'); a.length&&playItem(a[0],a); return; } ensureAudioGraph(); audio.paused?audio.play():audio.pause(); };
+  $('carPrev').onclick=()=>current&&step(-1);
+  $('carNext').onclick=()=>current&&step(1);
+  $('carFav').onclick=()=>{ if(current){ toggleFav(current); fillPlayer(); carSync(); } };
+  $('carShuf').onclick=()=>{ $('bShuffle').click(); carSync(); };
+  let sx=null; const art=$('carArt');
+  art.addEventListener('touchstart',e=>{ sx=e.touches[0].clientX; },{passive:true});
+  art.addEventListener('touchend',e=>{ if(sx===null||!current) return; const dx=e.changedTouches[0].clientX-sx; sx=null; if(Math.abs(dx)>60) step(dx<0?1:-1); },{passive:true});
+}
+
+/* --- Artistas y álbumes --- */
+let openGroup=null;
+const albumOf = i => { const a=(i.album||'').trim(); return (!a||/^<?unknown>?$|^(download|downloads|descargas|music|musica|música|audio|audios|whatsapp audio|0)$/i.test(a)) ? '' : a; };
+function groupsOf(kind, arr){
+  const m=new Map();
+  arr.filter(i=>i.type==='audio').forEach(i=>{ const k=kind==='artistas'?mainArtist(i.artist):(albumOf(i)||'Sin álbum'); if(!m.has(k)) m.set(k,[]); m.get(k).push(i); });
+  return [...m.entries()].sort((a,b)=>{ const ua=/^(Artista desconocido|Sin álbum)$/.test(a[0]), ub=/^(Artista desconocido|Sin álbum)$/.test(b[0]); if(ua!==ub) return ua?1:-1; return a[0].localeCompare(b[0],undefined,{sensitivity:'base'}); });
+}
+function groupView(kind, all){
+  const label = kind==='artistas'?'Artistas':'Álbumes';
+  if(openGroup){
+    const g=groupsOf(kind, all).find(x=>x[0]===openGroup), arr=g?g[1].slice().sort((a,b)=>a.title.localeCompare(b.title)):[]; shown=arr;
+    const cov=arr.find(i=>i.art);
+    return `<div class="count"><button class="btn ghost" data-act="backgr" style="height:36px;padding:0 14px;font-size:13px">‹ ${label}</button>${arr.length?`<span style="display:flex;gap:8px"><button class="btn ghost soft" data-act="shuffleall" style="height:36px;padding:0 12px;font-size:13px" aria-label="Aleatorio">${I.shuffle}</button><button class="btn ghost" data-act="playall" style="height:36px;padding:0 14px;font-size:13px">${I.play.replace('<svg','<svg width="16" height="16"')}Reproducir todo</button></span>`:''}</div>
+      <div class="gr-head">${arr[0]?`<div class="gr-big ${kind==='artistas'?'circ':''}" style="background:${grad(openGroup)}"><span>${esc((openGroup.trim()[0]||'♪').toUpperCase())}</span>${cov?`<img src="${cov.art}" alt="" onerror="this.remove()">`:''}</div>`:''}<div><h2>${esc(openGroup)}</h2><small>${arr.length} ${arr.length===1?'canción':'canciones'}${kind==='albumes'&&arr[0]&&arr[0].artist?' · '+esc(mainArtist(arr[0].artist)):''}</small></div></div>
+      ${selAllHTML(arr)}${songList(arr)}`;
+  }
+  let gs=groupsOf(kind, all);
+  if(query){ const q=query.toLowerCase(); gs=gs.filter(([k])=>k.toLowerCase().includes(q)); }
+  if(!gs.length) return emptyState(query?'Sin resultados':`Sin ${label.toLowerCase()}`, query?'Prueba con otro nombre.':'Cuando tengas canciones en tu teléfono las verás agrupadas aquí.', false);
+  return `<div class="count"><span>${gs.length} ${kind==='artistas'?(gs.length===1?'artista':'artistas'):(gs.length===1?'álbum':'álbumes')}</span></div><div class="grgrid ${kind==='artistas'?'circ':''}">${gs.map(([k,arr])=>{ const cov=arr.find(i=>i.art);
+    return `<button data-opengr="${esc(k)}"><div class="gr-pic" style="background:${grad(k)}"><span>${esc((k.trim()[0]||'♪').toUpperCase())}</span>${cov?`<img src="${cov.art}" alt="" loading="lazy" onerror="this.remove()">`:''}</div><b>${esc(k)}</b><small>${arr.length} ${arr.length===1?'canción':'canciones'}</small></button>`; }).join('')}</div>`;
+}
+
+$('recap').addEventListener('click', e=>{
+  const b=e.target.closest('[data-rc],[data-rcplay]'); if(!b) return;
+  const v=b.dataset.rc;
+  if(v==='close') closeRecap(); else if(v==='share') shareRecap(); else if(v){ recapWhich=v; renderRecap(); }
+  if(b.dataset.rcplay){ const list=recapData(recapWhich).songs.map(x=>x.it), it=list.find(i=>i.key===b.dataset.rcplay); if(it){ playItem(it,list); toast('Reproduciendo tu top'); } }
+});
+carWire();
+
 /* ---------- settings ---------- */
 const IBC=['#7C5CFF','#FF5C8A','#12B5CB','#F59E0B','#16A34A','#EF4444','#3B82F6','#A855F7','#14B8A6','#64748B'];
 const setRow = (id,icon,name,val='',cls='',ci=0) => `<button class="set ${cls}" data-set="${id}"><span class="ib" style="--ibc:${IBC[ci%IBC.length]}">${icon}</span><span class="n">${name}</span><span class="v">${val}</span>${I.chev}</button>`;
@@ -2465,8 +2776,9 @@ function renderSettings(){
       ${qtile('lang', I.globe, 'Idioma', LANGS[S.lang]||'Español', 3)}
     </div>
     <div class="sec-t">Sonido y reproducción</div>
-    <div class="group">${setRow('playback',I.head,'Ajustes de reproducción','','',0)}${setRow('fx',I.music,'Mejoras de sonido', fxActive()?'Activadas':'Calidad original','',8)}${setRow('boost',IC_BOOST,'Amplificador de volumen',S.boost+'%','',5)}${setRow('speed',I.head,'Velocidad predeterminada',S.speed+'x','',6)}${setRow('sleep',I.moon,'Temporizador para dormir',sleepMode==='off'?'Apagado':sleepMode==='end'?'Al terminar':$('sleepLbl').textContent,'',7)}</div>
+    <div class="group">${setRow('playback',I.head,'Ajustes de reproducción','','',0)}${setRow('fx',I.music,'Mejoras de sonido', fxActive()?'Activadas':'Calidad original','',8)}${setRow('boost',IC_BOOST,'Amplificador de volumen',S.boost+'%','',5)}${setRow('speed',I.head,'Velocidad predeterminada',S.speed+'x','',6)}${setRow('sleep',I.moon,'Temporizador para dormir',sleepMode==='off'?'Apagado':sleepMode==='end'?'Al terminar':$('sleepLbl').textContent,'',7)}${setRow('car',CAR_IC,'Modo carro','','',3)}</div>
     <div class="sec-t">Biblioteca</div>
+    <div class="group">${setRow('recap',SORT_IC.plays,'Tu resumen musical','','',1)}${setRow('dups',I.music,'Canciones repetidas','','',5)}</div>
     <div class="group">${setRow('notif',IC_BELL,'Notificaciones',S.notifNew!==false?'Activadas':'Desactivadas','',3)}${setRow('backup',IC_CLOUD,'Copia de seguridad', store.get('lastBackup',null)?new Date(store.get('lastBackup')).toLocaleDateString():'','',0)}${setRow('hidden',I.eye,'Archivos ocultos',`${hid2} archivo${hid2!==1?'s':''}`,'',9)}${setRow('deleted',I.trash,'Eliminado recientemente','','',5)}${NATIVE?setRow('rescan',I.music,'Buscar música de nuevo', scanning?'Buscando…':'','',2)+setRow('perms',I.gem,'Permisos de la app','','',9):''}</div>
     <div class="donate"><span class="heart">♥</span><b>Apoya a Nexora Pro</b><p>Nexora es gratis y sin anuncios. Si te gusta, puedes invitarme un café con una donación por PayPal. ¡Gracias por tu apoyo!</p><button data-set="donate">${IC_HEARTS}Donar con PayPal</button></div>
     <div class="sec-t">Más</div>
@@ -2483,6 +2795,9 @@ $('settings').addEventListener('click', e=>{
   if(k==='sleep') sleepSheet();
   if(k==='rate') native('openUrl','https://play.google.com/store/apps/details?id=com.nexora.pro');
   if(k==='fixmeta') unknownSheet();
+  if(k==='recap') openRecap();
+  if(k==='dups') dupSheet();
+  if(k==='car'){ $('settings').classList.remove('on'); carOpen(); }
   if(k==='pro') toast('Todas las funciones Pro están activadas');
   if(k==='speed') speedSheet(v=>{ S.speed=v; save(); audio.playbackRate=v; renderSettings(); });
   if(k==='lang') openSub('lang');
@@ -2505,10 +2820,10 @@ $('bSettings').onclick = () => { save(); renderSettings(); $('settings').classLi
 $('setBack').onclick = () => $('settings').classList.remove('on');
 
 /* ---------- main events ---------- */
-$('tabs').onclick = e => { const b=e.target.closest('[data-tab]'); if(!b) return; tab=b.dataset.tab; openPlaylist=null; openFolder=null; render(); b.scrollIntoView({inline:'nearest',block:'nearest'}); };
+$('tabs').onclick = e => { const b=e.target.closest('[data-tab]'); if(!b) return; tab=b.dataset.tab; openPlaylist=null; openFolder=null; openGroup=null; render(); b.scrollIntoView({inline:'nearest',block:'nearest'}); };
 $('content').addEventListener('click', e=>{
   const rn=e.target.closest('[data-rename]'); if(rn && sel){ e.stopPropagation(); const it=items.find(i=>i.key===rn.dataset.rename); it&&renameSheet(it); return; }
-  const t=e.target.closest('[data-play],[data-more],[data-act],[data-openpl],[data-openfd],[data-plmenu]'); if(!t) return;
+  const t=e.target.closest('[data-play],[data-more],[data-act],[data-openpl],[data-openfd],[data-opengr],[data-plmenu]'); if(!t) return;
   const ds=t.dataset;
   if(ds.act==='selall'){ const allOn=shown.every(i=>sel.has(i.key)); if(allOn){ exitSel(); } else { shown.forEach(i=>sel.add(i.key)); render(); } return; }
   if(ds.play && sel){ toggleSel(ds.play); return; }
@@ -2517,6 +2832,7 @@ $('content').addEventListener('click', e=>{
     let list;
     if((tab==='playlists'||tab==='parati')&&openPlaylist){ const p=plById(openPlaylist); if(p) list=p.keys.map(k=>live().find(i=>i.key===k)).filter(i=>i&&i.type==='audio'); }
     else if(tab==='carpetas'&&openFolder) list=live().filter(i=>i.folder===openFolder&&i.type==='audio');
+    else if((tab==='artistas'||tab==='albumes')&&openGroup) list=shown.filter(i=>i.type==='audio');
     else if(tab==='favoritos') list=live().filter(i=>favKeys.has(i.key)&&i.type==='audio');
     else list=filt(sorted(live().filter(i=>i.type==='audio'),S.sortA));
     playItem(it,list);
@@ -2524,11 +2840,14 @@ $('content').addEventListener('click', e=>{
   if(ds.more){ const it=items.find(i=>i.key===ds.more); it&&itemMenu(it); }
   if(ds.act==='import') $('fileIn').click();
   if(ds.act==='folder') $('folderIn').click();
-  if(ds.act==='shuffleall'){ const a=((tab==='parati'&&openPlaylist)?shown.filter(i=>i.type==='audio').slice():filt(live().filter(i=>i.type==='audio'))).sort(()=>Math.random()-.5); if(a.length){ S.shuffle=true; save(); playItem(a[0],a); toast('Aleatorio activado'); } }
-  if(ds.act==='playall'){ const a=(tab==='parati'&&openPlaylist)?shown.filter(i=>i.type==='audio'):filt(sorted(live().filter(i=>i.type==='audio'),S.sortA)); a.length&&playItem(a[0],a); }
+  if(ds.act==='shuffleall'){ const a=(((tab==='parati'&&openPlaylist)||openGroup)?shown.filter(i=>i.type==='audio').slice():filt(live().filter(i=>i.type==='audio'))).sort(()=>Math.random()-.5); if(a.length){ S.shuffle=true; save(); playItem(a[0],a); toast('Aleatorio activado'); } }
+  if(ds.act==='playall'){ const a=((tab==='parati'&&openPlaylist)||openGroup)?shown.filter(i=>i.type==='audio'):filt(sorted(live().filter(i=>i.type==='audio'),S.sortA)); a.length&&playItem(a[0],a); }
   if(ds.act==='newpl') newPlaylist(null);
   if(ds.act==='backpl'){ openPlaylist=null; render(); }
   if(ds.act==='backfd'){ openFolder=null; render(); }
+  if(ds.act==='backgr'){ openGroup=null; render(); $('content').scrollTop=0; }
+  if(ds.act==='recap') openRecap();
+  if(ds.opengr){ openGroup=ds.opengr; render(); window.scrollTo(0,0); }
   if(ds.openpl){ openPlaylist=ds.openpl; render(); }
   if(ds.openfd){ openFolder=ds.openfd; render(); }
   if(ds.plmenu) plMenu(ds.plmenu);
@@ -2577,7 +2896,7 @@ window.nxOnScan = list => {
     if(m.type==='audio' && !artist){ const p=parseName(title); title=p.title; artist=p.artist; }
     const ov=metaOv[key]; if(ov){ if(ov.t) title=ov.t; if(ov.a) artist=ov.a; }
     const media = `${mbase}/media/${m.type}/${m.id}`, th = `${base}/thumb/${m.type}/${m.id}`;
-    return {key, name:m.name||title, title, artist: m.type==='audio'?artist:'', type:m.type, url:media, size:m.size||0,
+    return {key, name:m.name||title, title, artist: m.type==='audio'?artist:'', album: m.type==='audio'?(m.album||''):'', type:m.type, url:media, size:m.size||0,
       duration:(m.duration||0)/1000, height:Math.min(m.width||0,m.height||0)||m.height||0, folder:m.folder||'Almacenamiento interno',
       added:(m.added||0)*1000, thumb: m.type==='video'?th:null, art: m.type==='audio'?(covers[key]||th):null, deleted: old?old.deleted:false};
   });
@@ -3184,6 +3503,7 @@ function renderSub(){
         <div class="cz-row"><span class="n">Color principal</span><input type="color" id="czA" value="${hex2(ca)}" aria-label="Color principal"></div>
         <div class="cz-row"><span class="n">Color secundario</span>${S.accent2Custom?'<button class="alink" data-s="cz:auto">Automático</button>':'<span class="v">Automático</span>'}<input type="color" id="czB" value="${hex2(S.accent2Custom||(cb.startsWith('#')?cb:'#12B5CB'))}" aria-label="Color secundario"></div>
         ${tgRow('gradOn', I.palette, 'Usar degradado','Mezcla el color principal con el secundario en botones y pestañas.')}
+        ${tgRow('coverColor', IC_IMG, 'Colores según la portada','El reproductor toma el color de la portada de cada canción.')}
         <div class="cz-row"><span class="n">Color de fondo</span>${S.bgCustom?'<button class="alink" data-s="cz:nobg">Quitar</button>':'<span class="v">Del tema</span>'}<input type="color" id="czBg" value="${hex2(bgNow)}" aria-label="Color de fondo"></div>
       </div>
       <div class="sec-t">Forma de las esquinas</div>${seg('cz:rad',S.radius||'normal',[['sharp','Cuadradas'],['normal','Normales'],['round','Redondas']])}
@@ -3272,6 +3592,7 @@ $('sub').addEventListener('change', e=>{
   }
   if(k==='crossfade') renderSub();
   if(k==='gradOn') applyTheme();
+  if(k==='coverColor'){ const oi=$('orbImg'); coverTint(S.coverColor&&!oi.hidden?oi:null); }
   if(subKind==='hidden') renderSub();
 });
 $('sub').addEventListener('input', e=>{
@@ -3730,6 +4051,12 @@ Object.assign(I18N.fr,{"‹ Para ti": "‹ Pour vous", "Aquí aparecerán las ca
 Object.assign(I18N.it,{"‹ Para ti": "‹ Per te", "Aquí aparecerán las canciones que más escuches.": "Qui appariranno i brani che ascolti di più.", "Aquí aparecerán las canciones que escuches.": "Qui appariranno i brani che ascolti.", "Agrega canciones a tu teléfono para verlas aquí.": "Aggiungi brani al telefono per vederli qui."});
 Object.assign(I18N.de,{"‹ Para ti": "‹ Für dich", "Aquí aparecerán las canciones que más escuches.": "Hier erscheinen die Songs, die du am meisten hörst.", "Aquí aparecerán las canciones que escuches.": "Hier erscheinen die Songs, die du hörst.", "Agrega canciones a tu teléfono para verlas aquí.": "Füge Songs auf dem Handy hinzu, um sie hier zu sehen."});
 Object.assign(I18N.id,{"‹ Para ti": "‹ Untukmu", "Aquí aparecerán las canciones que más escuches.": "Lagu yang paling sering kamu putar akan muncul di sini.", "Aquí aparecerán las canciones que escuches.": "Lagu yang kamu putar akan muncul di sini.", "Agrega canciones a tu teléfono para verlas aquí.": "Tambahkan lagu ke ponsel untuk melihatnya di sini."});
+Object.assign(I18N.en,{"Artistas": "Artists", "Álbumes": "Albums", "‹ Artistas": "‹ Artists", "‹ Álbumes": "‹ Albums", "Tu resumen musical": "Your music recap", "Tus canciones y artistas más escuchados": "Your most played songs and artists", "Este mes": "This month", "Mes pasado": "Last month", "Siempre": "All time", "minutos escuchados": "minutes listened", "reproducciones": "plays", "canciones distintas": "different songs", "Tu artista n.º 1": "Your #1 artist", "Tus canciones más escuchadas": "Your most played songs", "Tus artistas": "Your artists", "Compartir mi resumen": "Share my recap", "Aún no hay datos": "No data yet", "Usar como tono": "Use as ringtone", "Tono de llamada": "Ringtone", "Alarma": "Alarm", "Sonido de notificación": "Notification sound", "Canciones repetidas": "Duplicate songs", "¡Todo en orden!": "All clear!", "No encontramos canciones repetidas en tu teléfono.": "We found no duplicate songs on your phone.", "Conservar": "Keep", "Modo carro": "Car mode", "Salir": "Exit", "Colores según la portada": "Colors from the cover", "El reproductor toma el color de la portada de cada canción.": "The player takes the color of each song’s cover.", "Sin álbum": "No album", "Desde que usas Nexora": "Since you started using Nexora", "Creando tu imagen…": "Creating your image…", "Reproduciendo tu top": "Playing your top songs", "Activa \"Permitir modificar ajustes\" y vuelve a Nexora": "Turn on \"Allow modifying system settings\" and come back to Nexora", "No se pudo cambiar el tono": "Could not change the ringtone", "No se pudo crear la imagen": "Could not create the image", "Solo funciona con canciones del teléfono": "Only works with songs on your phone", "No hay canciones para reproducir": "No songs to play", "Sin artistas": "No artists", "Sin álbumes": "No albums", "Cuando tengas canciones en tu teléfono las verás agrupadas aquí.": "When you have songs on your phone you’ll see them grouped here.", "Toca ▶ para reproducir": "Tap ▶ to play"});
+Object.assign(I18N.pt,{"Artistas": "Artistas", "Álbumes": "Álbuns", "‹ Artistas": "‹ Artistas", "‹ Álbumes": "‹ Álbuns", "Tu resumen musical": "Seu resumo musical", "Tus canciones y artistas más escuchados": "Suas músicas e artistas mais ouvidos", "Este mes": "Este mês", "Mes pasado": "Mês passado", "Siempre": "Sempre", "minutos escuchados": "minutos ouvidos", "reproducciones": "reproduções", "canciones distintas": "músicas diferentes", "Tu artista n.º 1": "Seu artista nº 1", "Tus canciones más escuchadas": "Suas músicas mais ouvidas", "Tus artistas": "Seus artistas", "Compartir mi resumen": "Compartilhar meu resumo", "Aún no hay datos": "Ainda não há dados", "Usar como tono": "Usar como toque", "Tono de llamada": "Toque de chamada", "Alarma": "Alarme", "Sonido de notificación": "Som de notificação", "Canciones repetidas": "Músicas repetidas", "¡Todo en orden!": "Tudo certo!", "No encontramos canciones repetidas en tu teléfono.": "Não encontramos músicas repetidas no seu celular.", "Conservar": "Manter", "Modo carro": "Modo carro", "Salir": "Sair", "Colores según la portada": "Cores da capa", "El reproductor toma el color de la portada de cada canción.": "O player usa a cor da capa de cada música.", "Sin álbum": "Sem álbum", "Desde que usas Nexora": "Desde que você usa o Nexora", "Creando tu imagen…": "Criando sua imagem…", "Reproduciendo tu top": "Tocando seu top", "Activa \"Permitir modificar ajustes\" y vuelve a Nexora": "Ative \"Permitir modificar configurações\" e volte ao Nexora", "No se pudo cambiar el tono": "Não foi possível mudar o toque", "No se pudo crear la imagen": "Não foi possível criar a imagem", "Solo funciona con canciones del teléfono": "Só funciona com músicas do celular", "No hay canciones para reproducir": "Não há músicas para tocar", "Sin artistas": "Sem artistas", "Sin álbumes": "Sem álbuns", "Cuando tengas canciones en tu teléfono las verás agrupadas aquí.": "Quando houver músicas no seu celular, você as verá agrupadas aqui.", "Toca ▶ para reproducir": "Toque ▶ para tocar"});
+Object.assign(I18N.fr,{"Artistas": "Artistes", "Álbumes": "Albums", "‹ Artistas": "‹ Artistes", "‹ Álbumes": "‹ Albums", "Tu resumen musical": "Ton récap musical", "Tus canciones y artistas más escuchados": "Tes chansons et artistes les plus écoutés", "Este mes": "Ce mois-ci", "Mes pasado": "Mois dernier", "Siempre": "Toujours", "minutos escuchados": "minutes écoutées", "reproducciones": "lectures", "canciones distintas": "chansons différentes", "Tu artista n.º 1": "Ton artiste nº 1", "Tus canciones más escuchadas": "Tes chansons les plus écoutées", "Tus artistas": "Tes artistes", "Compartir mi resumen": "Partager mon récap", "Aún no hay datos": "Pas encore de données", "Usar como tono": "Utiliser comme sonnerie", "Tono de llamada": "Sonnerie", "Alarma": "Alarme", "Sonido de notificación": "Son de notification", "Canciones repetidas": "Chansons en double", "¡Todo en orden!": "Tout est en ordre !", "No encontramos canciones repetidas en tu teléfono.": "Aucune chanson en double sur ton téléphone.", "Conservar": "Garder", "Modo carro": "Mode voiture", "Salir": "Quitter", "Colores según la portada": "Couleurs de la pochette", "El reproductor toma el color de la portada de cada canción.": "Le lecteur prend la couleur de la pochette de chaque chanson.", "Sin álbum": "Sans album", "Desde que usas Nexora": "Depuis que tu utilises Nexora", "Creando tu imagen…": "Création de ton image…", "Reproduciendo tu top": "Lecture de ton top", "Activa \"Permitir modificar ajustes\" y vuelve a Nexora": "Active « Autoriser la modification des paramètres » et reviens sur Nexora", "No se pudo cambiar el tono": "Impossible de changer la sonnerie", "No se pudo crear la imagen": "Impossible de créer l’image", "Solo funciona con canciones del teléfono": "Fonctionne uniquement avec les chansons du téléphone", "No hay canciones para reproducir": "Aucune chanson à lire", "Sin artistas": "Aucun artiste", "Sin álbumes": "Aucun album", "Cuando tengas canciones en tu teléfono las verás agrupadas aquí.": "Quand tu auras des chansons sur ton téléphone, tu les verras regroupées ici.", "Toca ▶ para reproducir": "Touche ▶ pour écouter"});
+Object.assign(I18N.it,{"Artistas": "Artisti", "Álbumes": "Album", "‹ Artistas": "‹ Artisti", "‹ Álbumes": "‹ Album", "Tu resumen musical": "Il tuo riepilogo musicale", "Tus canciones y artistas más escuchados": "I brani e gli artisti che ascolti di più", "Este mes": "Questo mese", "Mes pasado": "Mese scorso", "Siempre": "Sempre", "minutos escuchados": "minuti ascoltati", "reproducciones": "riproduzioni", "canciones distintas": "brani diversi", "Tu artista n.º 1": "Il tuo artista n. 1", "Tus canciones más escuchadas": "I brani più ascoltati", "Tus artistas": "I tuoi artisti", "Compartir mi resumen": "Condividi il mio riepilogo", "Aún no hay datos": "Ancora nessun dato", "Usar como tono": "Usa come suoneria", "Tono de llamada": "Suoneria", "Alarma": "Sveglia", "Sonido de notificación": "Suono di notifica", "Canciones repetidas": "Brani duplicati", "¡Todo en orden!": "Tutto a posto!", "No encontramos canciones repetidas en tu teléfono.": "Nessun brano duplicato nel telefono.", "Conservar": "Tieni", "Modo carro": "Modalità auto", "Salir": "Esci", "Colores según la portada": "Colori dalla copertina", "El reproductor toma el color de la portada de cada canción.": "Il lettore usa il colore della copertina di ogni brano.", "Sin álbum": "Senza album", "Desde que usas Nexora": "Da quando usi Nexora", "Creando tu imagen…": "Creazione dell’immagine…", "Reproduciendo tu top": "Riproduco la tua top", "Activa \"Permitir modificar ajustes\" y vuelve a Nexora": "Attiva \"Consenti modifica impostazioni\" e torna su Nexora", "No se pudo cambiar el tono": "Impossibile cambiare la suoneria", "No se pudo crear la imagen": "Impossibile creare l’immagine", "Solo funciona con canciones del teléfono": "Funziona solo con i brani del telefono", "No hay canciones para reproducir": "Nessun brano da riprodurre", "Sin artistas": "Nessun artista", "Sin álbumes": "Nessun album", "Cuando tengas canciones en tu teléfono las verás agrupadas aquí.": "Quando avrai brani nel telefono li vedrai raggruppati qui.", "Toca ▶ para reproducir": "Tocca ▶ per riprodurre"});
+Object.assign(I18N.de,{"Artistas": "Künstler", "Álbumes": "Alben", "‹ Artistas": "‹ Künstler", "‹ Álbumes": "‹ Alben", "Tu resumen musical": "Dein Musik-Rückblick", "Tus canciones y artistas más escuchados": "Deine meistgehörten Songs und Künstler", "Este mes": "Dieser Monat", "Mes pasado": "Letzter Monat", "Siempre": "Immer", "minutos escuchados": "Minuten gehört", "reproducciones": "Wiedergaben", "canciones distintas": "verschiedene Songs", "Tu artista n.º 1": "Dein Künstler Nr. 1", "Tus canciones más escuchadas": "Deine meistgehörten Songs", "Tus artistas": "Deine Künstler", "Compartir mi resumen": "Rückblick teilen", "Aún no hay datos": "Noch keine Daten", "Usar como tono": "Als Klingelton verwenden", "Tono de llamada": "Klingelton", "Alarma": "Wecker", "Sonido de notificación": "Benachrichtigungston", "Canciones repetidas": "Doppelte Songs", "¡Todo en orden!": "Alles in Ordnung!", "No encontramos canciones repetidas en tu teléfono.": "Keine doppelten Songs auf deinem Handy gefunden.", "Conservar": "Behalten", "Modo carro": "Automodus", "Salir": "Beenden", "Colores según la portada": "Farben vom Cover", "El reproductor toma el color de la portada de cada canción.": "Der Player übernimmt die Farbe des Covers jedes Songs.", "Sin álbum": "Kein Album", "Desde que usas Nexora": "Seit du Nexora nutzt", "Creando tu imagen…": "Bild wird erstellt…", "Reproduciendo tu top": "Deine Top-Songs werden abgespielt", "Activa \"Permitir modificar ajustes\" y vuelve a Nexora": "Aktiviere „Änderung von Systemeinstellungen zulassen“ und kehre zu Nexora zurück", "No se pudo cambiar el tono": "Klingelton konnte nicht geändert werden", "No se pudo crear la imagen": "Bild konnte nicht erstellt werden", "Solo funciona con canciones del teléfono": "Funktioniert nur mit Songs auf dem Handy", "No hay canciones para reproducir": "Keine Songs zum Abspielen", "Sin artistas": "Keine Künstler", "Sin álbumes": "Keine Alben", "Cuando tengas canciones en tu teléfono las verás agrupadas aquí.": "Sobald du Songs auf dem Handy hast, siehst du sie hier gruppiert.", "Toca ▶ para reproducir": "Tippe ▶ zum Abspielen"});
+Object.assign(I18N.id,{"Artistas": "Artis", "Álbumes": "Album", "‹ Artistas": "‹ Artis", "‹ Álbumes": "‹ Album", "Tu resumen musical": "Ringkasan musikmu", "Tus canciones y artistas más escuchados": "Lagu dan artis yang paling sering kamu putar", "Este mes": "Bulan ini", "Mes pasado": "Bulan lalu", "Siempre": "Sepanjang waktu", "minutos escuchados": "menit didengarkan", "reproducciones": "kali diputar", "canciones distintas": "lagu berbeda", "Tu artista n.º 1": "Artis no. 1 kamu", "Tus canciones más escuchadas": "Lagu yang paling sering diputar", "Tus artistas": "Artis kamu", "Compartir mi resumen": "Bagikan ringkasanku", "Aún no hay datos": "Belum ada data", "Usar como tono": "Jadikan nada dering", "Tono de llamada": "Nada dering", "Alarma": "Alarm", "Sonido de notificación": "Suara notifikasi", "Canciones repetidas": "Lagu duplikat", "¡Todo en orden!": "Semua beres!", "No encontramos canciones repetidas en tu teléfono.": "Tidak ada lagu duplikat di ponselmu.", "Conservar": "Simpan", "Modo carro": "Mode mobil", "Salir": "Keluar", "Colores según la portada": "Warna dari sampul", "El reproductor toma el color de la portada de cada canción.": "Pemutar mengambil warna dari sampul setiap lagu.", "Sin álbum": "Tanpa album", "Desde que usas Nexora": "Sejak kamu memakai Nexora", "Creando tu imagen…": "Membuat gambarmu…", "Reproduciendo tu top": "Memutar lagu teratasmu", "Activa \"Permitir modificar ajustes\" y vuelve a Nexora": "Aktifkan \"Izinkan ubah setelan sistem\" lalu kembali ke Nexora", "No se pudo cambiar el tono": "Gagal mengubah nada dering", "No se pudo crear la imagen": "Gagal membuat gambar", "Solo funciona con canciones del teléfono": "Hanya untuk lagu di ponsel", "No hay canciones para reproducir": "Tidak ada lagu untuk diputar", "Sin artistas": "Tidak ada artis", "Sin álbumes": "Tidak ada album", "Cuando tengas canciones en tu teléfono las verás agrupadas aquí.": "Saat ada lagu di ponselmu, kamu akan melihatnya dikelompokkan di sini.", "Toca ▶ para reproducir": "Ketuk ▶ untuk memutar"});
 const GREET = {en:['Good morning','Good afternoon','Good evening'], pt:['Bom dia','Boa tarde','Boa noite'], fr:['Bonjour','Bon après-midi','Bonsoir'], it:['Buongiorno','Buon pomeriggio','Buonasera'], de:['Guten Morgen','Guten Tag','Guten Abend'], id:['Selamat pagi','Selamat siang','Selamat malam']};
 ['en','pt','fr','it','de','id'].forEach(l=>{ const es=['Buenos días','Buenas tardes','Buenas noches']; es.forEach((g,i)=>{ I18N[l][g+' 👋']=GREET[l][i]+' 👋'; }); });
 function trText(src){
@@ -3893,6 +4220,8 @@ window.nxBack = () => {
   if($('upd').classList.contains('on')){ if($('upd').dataset.forced) return false; $('upd').classList.remove('on'); return true; }
   if($('privPage').classList.contains('on')){ closePriv(); return true; }
   if($('sheet').classList.contains('on')){ closeSheet(); return true; }
+  if($('carMode').classList.contains('on')){ carClose(); return true; }
+  if($('recap').classList.contains('on')){ closeRecap(); return true; }
   if(sel){ exitSel(); return true; }
   if($('sub').classList.contains('on')){ closeSub(); return true; }
   if($('vplayer').classList.contains('on')){
@@ -3902,7 +4231,7 @@ window.nxBack = () => {
   }
   if($('player').classList.contains('on')){ $('player').classList.remove('on'); return true; }
   if($('settings').classList.contains('on')){ $('settings').classList.remove('on'); return true; }
-  if(openPlaylist||openFolder){ openPlaylist=null; openFolder=null; render(); return true; }
+  if(openPlaylist||openFolder||openGroup){ openPlaylist=null; openFolder=null; openGroup=null; render(); return true; }
   if($('searchBox').classList.contains('on')){ $('bSearch').click(); return true; }
   save(); return false;
 };

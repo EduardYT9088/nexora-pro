@@ -1,8 +1,13 @@
 Versión: 1.8.8
-- Nueva pestaña "Para ti" con listas automáticas: Más escuchadas, Agregadas recientemente, Tus favoritas y Escuchadas hace poco
+- Nuevas pestañas de Artistas y Álbumes
+- Tu resumen musical: tus canciones y artistas más escuchados del mes, para compartir
+- Modo carro con botones grandes para usar mientras manejas
+- Pon cualquier canción como tono de llamada, alarma o notificación
+- Encuentra y borra canciones repetidas para liberar espacio
+- El reproductor toma los colores de la portada de cada canción
+- Nueva pestaña "Para ti" con listas automáticas
 - Widget en la pantalla de inicio para controlar tu música
 - Edita el título, artista y portada de tus canciones
 - Ecualizador que cambia solo según la salida: audífonos, Bluetooth o parlante
 - Temporizador de apagado que baja el volumen poco a poco
-- Botón para calificar Nexora en Google Play
 - Logo y encabezado mejor adaptados a cada pantalla
