@@ -131,6 +131,8 @@ jobs:
               <uses-permission android:name="android.permission.INTERNET" />
               <!-- Instalar las actualizaciones de Nexora Pro dentro de la app (Android siempre pide confirmar) -->
               <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+              <!-- Pasar a la versión de Google Play: quitar esta versión de GitHub -->
+              <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
 
               <application
                   android:allowBackup="true"
@@ -903,6 +905,20 @@ jobs:
                           js("window.nxOnTone && nxOnTone('perm', false)")
                           runCatching { startActivity(Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:" + packageName))) }
                       } else applyTone(n, kind)
+                  }
+
+                  /** Pasa a la versión oficial: abre Nexora en Play Store y pide quitar esta versión de GitHub (firma distinta). */
+                  @JavascriptInterface
+                  fun migratePlay() = runOnUiThread {
+                      val id = packageName
+                      runCatching {
+                          startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + id)).setPackage("com.android.vending").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                      }.onFailure {
+                          runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + id)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+                      }
+                      android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                          runCatching { startActivity(Intent(Intent.ACTION_DELETE, Uri.parse("package:" + id)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+                      }, 1200)
                   }
 
                   /** Desde dónde se instaló la app ("com.android.vending" = Google Play). */
@@ -2945,11 +2961,15 @@ jobs:
           sub('app/build.gradle.kts', 'targetSdk = 34', 'targetSdk = 36')
           # Permisos que Play no acepta en un reproductor: autoactualización, alarma exacta y servicio especial
           m = P / 'app/src/main/AndroidManifest.xml'; t = m.read_text(encoding='utf-8')
-          for perm in ['USE_EXACT_ALARM', 'SCHEDULE_EXACT_ALARM', 'REQUEST_INSTALL_PACKAGES', 'FOREGROUND_SERVICE_SPECIAL_USE']:
+          for perm in ['USE_EXACT_ALARM', 'SCHEDULE_EXACT_ALARM', 'REQUEST_INSTALL_PACKAGES', 'REQUEST_DELETE_PACKAGES', 'FOREGROUND_SERVICE_SPECIAL_USE']:
               t = re.sub(r'\s*<uses-permission android:name="android\.permission\.' + perm + r'"[^>]*/>', '', t)
           t = re.sub(r'\s*<service\s+android:name="\.NewMediaWatchService".*?</service>', '', t, flags=re.S)
+          # Android 15: nada se arranca desde BOOT_COMPLETED. Tras reiniciar, el trabajo periódico (persistente) reprograma los avisos.
+          t = t.replace('                <action android:name="android.intent.action.BOOT_COMPLETED" />\n', '')
+          assert 'BOOT_COMPLETED"' not in t.replace('permission.RECEIVE_BOOT_COMPLETED', '')
           m.write_text(t, encoding='utf-8')
           k = 'app/src/main/java/com/nexora/pro/'
+          sub(k + 'NewMedia.kt', '            NewMedia.schedule(applicationContext)\n', '            NewMedia.schedule(applicationContext)\n            runCatching { MusicTime.schedule(applicationContext) }\n')
           # En Play las actualizaciones las entrega la tienda
           sub(k + 'MainActivity.kt', 'fun checkUpdate(repo: String) {', 'fun checkUpdate(repo: String) {\n        if (repo.isNotEmpty()) return')
           # Sin vigilante fijo: los avisos de archivos nuevos usan los trabajos de Android

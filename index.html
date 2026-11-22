@@ -945,6 +945,28 @@ body.eco .ly-l,body.eco .sheet-full{transition-duration:.15s!important}
 .rate-btns button{height:54px;border-radius:18px;font-weight:800;font-size:16px;color:#fff}
 .rate-btns .no{background:rgba(255,255,255,.1)}
 .rate-btns .go{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+
+/* Pantalla "Ya estamos en Google Play" (solo en la versión de GitHub) */
+.pmove{position:fixed;inset:0;z-index:45;display:none;overflow-y:auto;color:#fff;background:radial-gradient(90% 60% at 10% 0%,rgba(124,92,255,.55),transparent 70%),radial-gradient(90% 60% at 100% 100%,rgba(18,181,203,.45),transparent 70%),#0b0a18;padding:calc(var(--sat,env(safe-area-inset-top)) + 28px) 20px calc(var(--sab,env(safe-area-inset-bottom)) + 22px)}
+.pmove.on{display:block;animation:rbIn .3s ease}
+.pm-in{max-width:440px;margin:0 auto;text-align:center}
+.pm-logo{position:relative;width:110px;height:110px;margin:6px auto 22px}
+.pm-logo img{width:110px;height:110px;border-radius:28px;box-shadow:0 20px 50px -14px #7C5CFF}
+.pm-gp{position:absolute;right:-18px;top:-14px;width:44px;height:44px;border-radius:16px;background:#fff;display:grid;place-items:center;box-shadow:0 8px 20px rgba(0,0,0,.4)}
+.pm-gp svg{width:26px;height:26px}
+.pmove h2{font-family:Sora,Manrope,sans-serif;font-size:clamp(1.5rem,7vw,1.9rem);margin:0 0 8px;line-height:1.2}
+.pm-sub{margin:0 auto 20px;color:rgba(255,255,255,.75);font-size:16px;line-height:1.45;max-width:340px}
+.pm-list{list-style:none;margin:0 0 20px;padding:14px 16px;text-align:left;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);border-radius:20px;display:flex;flex-direction:column;gap:12px}
+.pm-list li{display:flex;align-items:center;gap:12px;font-weight:600;font-size:15px}
+.pm-list svg{width:24px;height:24px;flex:none;color:#22C55E;background:rgba(34,197,94,.16);border-radius:50%;padding:4px}
+.pm-step{display:flex;align-items:center;gap:12px;text-align:left;background:rgba(255,255,255,.07);border-radius:18px;padding:12px 14px;margin-bottom:10px}
+.pm-step i{font-style:normal;width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,#7C5CFF,#12B5CB)}
+.pm-step div{flex:1;min-width:0}.pm-step b{display:block;font-size:15px}.pm-step small{color:rgba(255,255,255,.65);font-size:13px}
+.pm-step button{height:40px;padding:0 16px;border-radius:14px;background:rgba(255,255,255,.14);color:#fff;font-weight:800;font-size:14px;flex:none}
+.pm-step button.done{background:rgba(34,197,94,.2);color:#4ADE80}
+.pm-go{width:100%;height:64px;margin-top:10px;border-radius:22px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:18px;font-weight:800;color:#0b0a18;background:#fff;box-shadow:0 18px 40px -14px rgba(18,181,203,.7)}
+.pm-go svg{width:28px;height:28px}
+.pm-later{margin-top:12px;height:44px;padding:0 20px;color:rgba(255,255,255,.6);font-weight:700;font-size:15px;background:none}
 </style>
 </head>
 <body>
@@ -1077,6 +1099,16 @@ body.eco .ly-l,body.eco .sheet-full{transition-duration:.15s!important}
 <input class="hidden-input" type="file" id="restoreIn" accept=".json,application/json">
 <section class="recap" id="recap" aria-label="Tu resumen musical"><div class="recap-in" id="recapIn"></div></section>
 <div class="ratebox" id="rateBox" role="dialog" aria-modal="true" aria-label="Calificar Nexora"><div class="rate-card"><img id="rateLogo" alt=""><h3>¿Te gusta Nexora?</h3><p>Tu calificación nos ayuda a llegar a más personas</p><div class="rate-stars"><button data-rate="go" aria-label="Calificar"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z"/></svg></button><button data-rate="go" aria-label="Calificar"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z"/></svg></button><button data-rate="go" aria-label="Calificar"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z"/></svg></button><button data-rate="go" aria-label="Calificar"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z"/></svg></button><button data-rate="go" aria-label="Calificar"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z"/></svg></button></div><small>Se abrirá Google Play para calificar</small><div class="rate-btns"><button data-rate="no" class="no">Ahora no</button><button data-rate="go" class="go">Calificar</button></div></div></div>
+<section class="pmove" id="playMove" aria-label="Versión oficial en Google Play"><div class="pm-in">
+  <div class="pm-logo"><img id="pmLogo" alt=""><span class="pm-gp"><svg viewBox="0 0 24 24"><path fill="#00D7FE" d="M3.6 2.3 13.4 12l-9.8 9.7a1.6 1.6 0 0 1-.6-1.3V3.6c0-.5.2-1 .6-1.3z"/><path fill="#FFCE00" d="m16.8 8.6-3.4 3.4 3.4 3.4 3.8-2.2c1.1-.6 1.1-1.8 0-2.4z"/><path fill="#FF3A44" d="M13.4 12 3.6 21.7c.4.4 1.1.4 1.7.1l11.5-6.4z"/><path fill="#00F076" d="M3.6 2.3 13.4 12l3.4-3.4L5.3 2.2c-.6-.3-1.3-.3-1.7.1z"/></svg></span></div>
+  <h2>¡Ya estamos en Google Play!</h2>
+  <p class="pm-sub">Descarga la versión oficial de Nexora Pro: gratis y sin anuncios.</p>
+  <ul class="pm-list"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Gratis, sin anuncios y sin nada oculto</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Se actualiza sola desde Play Store</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Verificada y protegida por Google</span></li></ul>
+  <div class="pm-step"><i>1</i><div><b>Guarda tu copia</b><small id="pmBkTx">Tus playlists, favoritos y ajustes</small></div><button id="pmBk">Guardar</button></div>
+  <div class="pm-step"><i>2</i><div><b>Instala la versión oficial</b><small>Se quita esta versión y se abre Play Store</small></div></div>
+  <button class="pm-go" id="pmGo"><svg viewBox="0 0 24 24"><path fill="#00D7FE" d="M3.6 2.3 13.4 12l-9.8 9.7a1.6 1.6 0 0 1-.6-1.3V3.6c0-.5.2-1 .6-1.3z"/><path fill="#FFCE00" d="m16.8 8.6-3.4 3.4 3.4 3.4 3.8-2.2c1.1-.6 1.1-1.8 0-2.4z"/><path fill="#FF3A44" d="M13.4 12 3.6 21.7c.4.4 1.1.4 1.7.1l11.5-6.4z"/><path fill="#00F076" d="M3.6 2.3 13.4 12l3.4-3.4L5.3 2.2c-.6-.3-1.3-.3-1.7.1z"/></svg>Instalar desde Play Store</button>
+  <button class="pm-later" id="pmLater">Ahora no</button>
+</div></section>
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div id="sheetBody"></div></div>
 <div class="toast" id="toast" role="status"></div>
@@ -2903,6 +2935,29 @@ window.nxOnOutput = t => {
   if($('sheet').querySelector('#eqAutoLbl')) $('eqAutoLbl').textContent=trs('Ahora')+': '+trs(OUT_N[t]);
 };
 setTimeout(()=>{ if(NATIVE){ const o=nativeCall('outputType'); if(o) window.nxOnOutput(o); } },1200);
+
+/* ---------- Versión oficial en Google Play ----------
+   PLAY_OFICIAL = true solo cuando Nexora ya esté publicada para todos en Play Store (producción).
+   Entonces, quien tenga la versión de GitHub ve esta pantalla cada vez que abre la app. */
+const PLAY_OFICIAL = false;
+function playMoveOpen(){
+  const logo=document.querySelector('.brand img'); $('pmLogo').src=logo?logo.src:'';
+  $('pmBkTx').textContent = gacct ? 'Se guarda en tu Google Drive' : 'Tus playlists, favoritos y ajustes';
+  $('playMove').classList.add('on');
+}
+$('pmLater').onclick=()=>$('playMove').classList.remove('on');
+$('pmBk').onclick=async()=>{
+  const b=$('pmBk'); b.textContent='Espera…';
+  const t0=Date.now();
+  try{ if(gacct) await gAct('up'); if(!(store.get('lastCloud',0)>=t0)) doBackup(); }catch(e){}
+  const ok=store.get('lastCloud',0)>=t0 || store.get('lastBackup',0)>=t0;
+  b.textContent= ok?'Lista ✓':'Guardar'; b.classList.toggle('done', ok);
+};
+$('pmGo').onclick=()=>{
+  if(!$('pmBk').classList.contains('done')){ toast('Primero guarda tu copia (paso 1)'); $('pmBk').animate([{transform:'scale(1)'},{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:420}); return; }
+  native('migratePlay');
+};
+setTimeout(()=>{ if(PLAY_OFICIAL && NATIVE && nativeCall('installer')!=='com.android.vending') playMoveOpen(); }, 1500);
 function eqSheet(){
   const bands = EQ_F.map((f,i)=>`<div class="band"><span class="db" id="eqdb${i}"></span><div class="vtrack" data-band="${i}"><div class="mid"></div><div class="fill"></div><div class="knob"></div></div><span class="hz">${hzLbl(f)}</span></div>`).join('');
   const presets = Object.keys(EQ_PRESETS).map(n=>`<button data-v="${esc(n)}" class="${S.eq.preset===n?'sel':''}">${EQ_IC[n]||EQ_NOTE}<span>${esc(n)}</span></button>`).join('');
@@ -3996,6 +4051,12 @@ Object.assign(I18N.fr,{"¿Te gusta Nexora?": "Tu aimes Nexora ?", "Tu calificaci
 Object.assign(I18N.it,{"¿Te gusta Nexora?": "Ti piace Nexora?", "Tu calificación nos ayuda a llegar a más personas": "La tua valutazione ci aiuta a raggiungere più persone", "Se abrirá Google Play para calificar": "Si aprirà Google Play per valutare", "Ahora no": "Non ora", "Calificar": "Valuta"});
 Object.assign(I18N.de,{"¿Te gusta Nexora?": "Gefällt dir Nexora?", "Tu calificación nos ayuda a llegar a más personas": "Deine Bewertung hilft uns, mehr Menschen zu erreichen", "Se abrirá Google Play para calificar": "Google Play wird zum Bewerten geöffnet", "Ahora no": "Jetzt nicht", "Calificar": "Bewerten"});
 Object.assign(I18N.id,{"¿Te gusta Nexora?": "Suka Nexora?", "Tu calificación nos ayuda a llegar a más personas": "Penilaianmu membantu kami menjangkau lebih banyak orang", "Se abrirá Google Play para calificar": "Google Play akan terbuka untuk memberi nilai", "Ahora no": "Nanti saja", "Calificar": "Beri nilai"});
+Object.assign(I18N.en,{"¡Ya estamos en Google Play!": "We're on Google Play!", "Descarga la versión oficial de Nexora Pro: gratis y sin anuncios.": "Download the official Nexora Pro: free and without ads.", "Gratis, sin anuncios y sin nada oculto": "Free, no ads, nothing hidden", "Se actualiza sola desde Play Store": "Updates itself from Play Store", "Verificada y protegida por Google": "Verified and protected by Google", "Guarda tu copia": "Save your backup", "Tus playlists, favoritos y ajustes": "Your playlists, favorites and settings", "Se guarda en tu Google Drive": "Saved to your Google Drive", "Guardar": "Save", "Instala la versión oficial": "Install the official version", "Se quita esta versión y se abre Play Store": "This version is removed and Play Store opens", "Instalar desde Play Store": "Install from Play Store", "Primero guarda tu copia (paso 1)": "First save your backup (step 1)", "Espera…": "Wait…", "Lista ✓": "Done ✓"});
+Object.assign(I18N.pt,{"¡Ya estamos en Google Play!": "Já estamos no Google Play!", "Descarga la versión oficial de Nexora Pro: gratis y sin anuncios.": "Baixe a versão oficial do Nexora Pro: grátis e sem anúncios.", "Gratis, sin anuncios y sin nada oculto": "Grátis, sem anúncios e nada escondido", "Se actualiza sola desde Play Store": "Atualiza sozinho pela Play Store", "Verificada y protegida por Google": "Verificado e protegido pelo Google", "Guarda tu copia": "Salve sua cópia", "Tus playlists, favoritos y ajustes": "Suas playlists, favoritos e ajustes", "Se guarda en tu Google Drive": "Salva no seu Google Drive", "Guardar": "Salvar", "Instala la versión oficial": "Instale a versão oficial", "Se quita esta versión y se abre Play Store": "Esta versão é removida e a Play Store abre", "Instalar desde Play Store": "Instalar pela Play Store", "Primero guarda tu copia (paso 1)": "Primeiro salve sua cópia (passo 1)", "Espera…": "Espere…", "Lista ✓": "Pronto ✓"});
+Object.assign(I18N.fr,{"¡Ya estamos en Google Play!": "Nous sommes sur Google Play !", "Descarga la versión oficial de Nexora Pro: gratis y sin anuncios.": "Télécharge la version officielle de Nexora Pro : gratuite et sans pub.", "Gratis, sin anuncios y sin nada oculto": "Gratuit, sans pub, rien de caché", "Se actualiza sola desde Play Store": "Se met à jour tout seul via le Play Store", "Verificada y protegida por Google": "Vérifié et protégé par Google", "Guarda tu copia": "Sauvegarde tes données", "Tus playlists, favoritos y ajustes": "Tes playlists, favoris et réglages", "Se guarda en tu Google Drive": "Enregistré dans ton Google Drive", "Guardar": "Enregistrer", "Instala la versión oficial": "Installe la version officielle", "Se quita esta versión y se abre Play Store": "Cette version est supprimée et le Play Store s’ouvre", "Instalar desde Play Store": "Installer depuis le Play Store", "Primero guarda tu copia (paso 1)": "Sauvegarde d’abord (étape 1)", "Espera…": "Patiente…", "Lista ✓": "Prêt ✓"});
+Object.assign(I18N.it,{"¡Ya estamos en Google Play!": "Siamo su Google Play!", "Descarga la versión oficial de Nexora Pro: gratis y sin anuncios.": "Scarica la versione ufficiale di Nexora Pro: gratis e senza pubblicità.", "Gratis, sin anuncios y sin nada oculto": "Gratis, senza pubblicità e niente di nascosto", "Se actualiza sola desde Play Store": "Si aggiorna da sola dal Play Store", "Verificada y protegida por Google": "Verificata e protetta da Google", "Guarda tu copia": "Salva il backup", "Tus playlists, favoritos y ajustes": "Playlist, preferiti e impostazioni", "Se guarda en tu Google Drive": "Salvato nel tuo Google Drive", "Guardar": "Salva", "Instala la versión oficial": "Installa la versione ufficiale", "Se quita esta versión y se abre Play Store": "Questa versione viene rimossa e si apre il Play Store", "Instalar desde Play Store": "Installa dal Play Store", "Primero guarda tu copia (paso 1)": "Prima salva il backup (passo 1)", "Espera…": "Attendi…", "Lista ✓": "Fatto ✓"});
+Object.assign(I18N.de,{"¡Ya estamos en Google Play!": "Wir sind bei Google Play!", "Descarga la versión oficial de Nexora Pro: gratis y sin anuncios.": "Lade die offizielle Version von Nexora Pro: kostenlos und ohne Werbung.", "Gratis, sin anuncios y sin nada oculto": "Kostenlos, ohne Werbung, nichts versteckt", "Se actualiza sola desde Play Store": "Aktualisiert sich selbst über den Play Store", "Verificada y protegida por Google": "Von Google geprüft und geschützt", "Guarda tu copia": "Sicherung speichern", "Tus playlists, favoritos y ajustes": "Deine Playlists, Favoriten und Einstellungen", "Se guarda en tu Google Drive": "Wird in deinem Google Drive gespeichert", "Guardar": "Speichern", "Instala la versión oficial": "Offizielle Version installieren", "Se quita esta versión y se abre Play Store": "Diese Version wird entfernt und der Play Store öffnet sich", "Instalar desde Play Store": "Aus dem Play Store installieren", "Primero guarda tu copia (paso 1)": "Speichere zuerst deine Sicherung (Schritt 1)", "Espera…": "Warte…", "Lista ✓": "Fertig ✓"});
+Object.assign(I18N.id,{"¡Ya estamos en Google Play!": "Kami sudah ada di Google Play!", "Descarga la versión oficial de Nexora Pro: gratis y sin anuncios.": "Unduh versi resmi Nexora Pro: gratis dan tanpa iklan.", "Gratis, sin anuncios y sin nada oculto": "Gratis, tanpa iklan, tanpa ada yang disembunyikan", "Se actualiza sola desde Play Store": "Diperbarui otomatis dari Play Store", "Verificada y protegida por Google": "Diverifikasi dan dilindungi Google", "Guarda tu copia": "Simpan cadanganmu", "Tus playlists, favoritos y ajustes": "Playlist, favorit, dan setelanmu", "Se guarda en tu Google Drive": "Disimpan di Google Drive-mu", "Guardar": "Simpan", "Instala la versión oficial": "Pasang versi resmi", "Se quita esta versión y se abre Play Store": "Versi ini dihapus dan Play Store terbuka", "Instalar desde Play Store": "Pasang dari Play Store", "Primero guarda tu copia (paso 1)": "Simpan cadangan dulu (langkah 1)", "Espera…": "Tunggu…", "Lista ✓": "Selesai ✓"});
 const GREET = {en:['Good morning','Good afternoon','Good evening'], pt:['Bom dia','Boa tarde','Boa noite'], fr:['Bonjour','Bon après-midi','Bonsoir'], it:['Buongiorno','Buon pomeriggio','Buonasera'], de:['Guten Morgen','Guten Tag','Guten Abend'], id:['Selamat pagi','Selamat siang','Selamat malam']};
 ['en','pt','fr','it','de','id'].forEach(l=>{ const es=['Buenos días','Buenas tardes','Buenas noches']; es.forEach((g,i)=>{ I18N[l][g+' 👋']=GREET[l][i]+' 👋'; }); });
 function trText(src){
@@ -4158,6 +4219,7 @@ window.nxUpd = (st, pct) => {
 window.nxBack = () => {
   if($('upd').classList.contains('on')){ if($('upd').dataset.forced) return false; $('upd').classList.remove('on'); return true; }
   if($('privPage').classList.contains('on')){ closePriv(); return true; }
+  if($('playMove').classList.contains('on')){ $('playMove').classList.remove('on'); return true; }
   if($('rateBox').classList.contains('on')){ rateClose(); return true; }
   if($('sheet').classList.contains('on')){ closeSheet(); return true; }
   if($('recap').classList.contains('on')){ closeRecap(); return true; }
