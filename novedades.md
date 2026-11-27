@@ -1,5 +1,5 @@
 Versión: 1.8.8
-- Decoración de Navidad: luces, nieve, gorro de Santa y colores navideños (del 1 de diciembre al 6 de enero)
+- Decoración de Navidad: luces, nieve, gorro de Santa en el logo, árbol de Navidad en Ajustes y colores navideños (del 1 de diciembre al 6 de enero)
 - Ordena las pestañas como quieras desde Ajustes
 - Eliminado recientemente: selecciona varios, Seleccionar todo, Restaurar todo y Borrar todo
 - Arreglado: la música no volvía a sonar después de una pausa larga
