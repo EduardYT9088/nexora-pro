@@ -1,4 +1,9 @@
 Versión: 1.8.8
+- Decoración de Navidad: luces, nieve, gorro de Santa y colores navideños (del 1 de diciembre al 6 de enero)
+- Ordena las pestañas como quieras desde Ajustes
+- Eliminado recientemente: selecciona varios, Seleccionar todo, Restaurar todo y Borrar todo
+- Arreglado: la música no volvía a sonar después de una pausa larga
+- Arreglado: el video se ponía negro al ocultar los botones
 - Nueva pestaña de Álbumes
 - Tu resumen musical: tus canciones y artistas más escuchados del mes, para compartir
 - Pon cualquier canción como tono de llamada, alarma o notificación

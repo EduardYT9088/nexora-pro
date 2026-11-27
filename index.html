@@ -140,7 +140,10 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:0;border-radiu
 .vp-scrim{position:absolute;inset:0;background:rgba(0,0,0,.38);z-index:2;pointer-events:none;transition:opacity .25s}
 .vp-layer{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;pointer-events:none;transition:opacity .25s;padding:var(--sat,env(safe-area-inset-top,0px)) env(safe-area-inset-right,0px) var(--sab,env(safe-area-inset-bottom,0px)) env(safe-area-inset-left,0px)}
 .vp-layer > *{pointer-events:auto}
-.vplayer.hide-ui .vp-layer,.vplayer.hide-ui .vp-scrim{opacity:0}
+.vplayer.hide-ui .vp-layer{opacity:0}
+/* Nunca dejar el video sin nada encima: algunos Android lo pintan negro al quedar solo */
+.vplayer.hide-ui .vp-scrim{opacity:.02}
+.vp-guard{position:absolute;inset:0;z-index:2;pointer-events:none;background:rgba(0,0,0,.004);transform:translateZ(0)}
 .vplayer.hide-ui .vp-layer > *{pointer-events:none}
 .vp-top{position:relative;z-index:1;display:flex;align-items:center;gap:6px;padding:10px 10px 10px 6px;background:linear-gradient(rgba(0,0,0,.55),transparent)}
 .vp-top .t{flex:1;min-width:0;font-family:Sora,Manrope,sans-serif;font-weight:700;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:6px}
@@ -967,15 +970,74 @@ body.eco .ly-l,body.eco .sheet-full{transition-duration:.15s!important}
 .pm-go{width:100%;height:64px;margin-top:10px;border-radius:22px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:18px;font-weight:800;color:#0b0a18;background:#fff;box-shadow:0 18px 40px -14px rgba(18,181,203,.7)}
 .pm-go svg{width:28px;height:28px}
 .pm-later{margin-top:12px;height:44px;padding:0 20px;color:rgba(255,255,255,.6);font-weight:700;font-size:15px;background:none}
+
+/* ====== Navidad ====== */
+body{--xwire:rgba(30,40,30,.55)}
+:root[data-theme="dark"] body,body.xmas.dark{--xwire:rgba(210,220,200,.35)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body{--xwire:rgba(210,220,200,.35)}}
+.x-snow{position:fixed;inset:0;width:100%;height:100%;z-index:7;pointer-events:none;display:none}
+.x-lights,.x-hatw{display:none}
+.xmas .top{position:relative;padding-top:30px}
+.xmas .x-lights{display:block;position:absolute;left:0;right:0;top:0;height:34px;pointer-events:none;z-index:2}
+.x-lights svg{position:absolute;left:0;top:0;width:100%;height:24px;overflow:visible}
+.xb{position:absolute;width:9px;height:13px;margin-left:-4.5px;transform-origin:50% 0;border-radius:50% 50% 50% 50%/40% 40% 60% 60%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,var(--c) 45%);box-shadow:0 0 8px 2px var(--c),0 0 18px 2px color-mix(in srgb,var(--c) 45%,transparent);animation:xTw 2.4s ease-in-out infinite;margin-top:3px}
+.xb::before{content:"";position:absolute;left:2px;top:-4px;width:5px;height:5px;border-radius:1.5px;background:#5b6b58}
+@keyframes xTw{0%,100%{opacity:1;filter:brightness(1.1)}50%{opacity:.45;filter:brightness(.8);box-shadow:0 0 3px 1px var(--c)}}
+.eco .xb{animation:none}
+.xmas .brand{position:relative}
+.xmas .x-hatw{display:block;position:absolute;left:-9px;top:-15px;width:34px;height:25px;z-index:3;pointer-events:none;transform:rotate(-16deg);filter:drop-shadow(0 3px 4px rgba(0,0,0,.35))}
+.x-hatw svg{width:100%;height:100%;display:block}
+@media (max-width:380px){.xmas .x-hatw{left:-8px;top:-14px;width:30px;height:22px}}
+.xmas .mini{overflow:visible}
+.xmas .mini::before{content:"";position:absolute;left:14px;right:14px;top:-7px;height:14px;pointer-events:none;z-index:2;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 14' preserveAspectRatio='none'%3E%3Cpath d='M0 7C6 1 14 1 20 6s12 7 18 2 12-8 20-3 12 7 20 2 12-7 20-2 12 6 22 1V0H0z' fill='%23fff'/%3E%3Cpath d='M0 7C6 1 14 1 20 6s12 7 18 2 12-8 20-3 12 7 20 2 12-7 20-2 12 6 22 1' fill='none' stroke='%23d6e2f3' stroke-width='1'/%3E%3C/svg%3E") top/100% 100% no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.15));border-radius:8px 8px 0 0}
+.xmas .tab.on{position:relative}
+.xmas .tab.on::after{content:"";position:absolute;right:6px;top:4px;width:7px;height:7px;background:radial-gradient(circle,#fff 0 30%,#FFD86B 60%,transparent 70%);clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:xTw 2.8s ease-in-out infinite}
+.x-card{position:relative;overflow:hidden;border-radius:24px;margin:2px 0 16px;padding:20px 18px 18px;color:#fff;background:radial-gradient(120% 140% at 100% 0%,rgba(242,179,61,.35),transparent 55%),linear-gradient(135deg,#9E1028 0%,#D7263D 55%,#7A0C1F 100%);box-shadow:0 18px 40px -22px #D7263D}
+.x-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.55) 0 1.2px,transparent 1.6px) 0 0/22px 22px,radial-gradient(circle,rgba(255,255,255,.35) 0 .9px,transparent 1.3px) 11px 11px/22px 22px;opacity:.5;pointer-events:none}
+.x-orn{position:absolute;right:44px;top:0;width:36%;height:100%;pointer-events:none}
+.x-orn i{position:absolute;top:0;width:1.5px;height:var(--h);background:rgba(255,255,255,.55)}
+.x-orn i::after{content:"";position:absolute;left:50%;bottom:-24px;width:26px;height:26px;margin-left:-13px;border-radius:50%;background:radial-gradient(circle at 32% 30%,#fff 0 8%,var(--c) 40%,color-mix(in srgb,var(--c) 55%,#000) 100%);box-shadow:0 6px 14px -4px rgba(0,0,0,.45)}
+.x-orn i::before{content:"";position:absolute;left:50%;bottom:-1px;width:8px;height:6px;margin-left:-4px;border-radius:2px;background:linear-gradient(#f6d37a,#b88a2e);z-index:1}
+.x-tx{position:relative;max-width:62%}
+.x-tx small{display:block;font-weight:800;font-size:11px;letter-spacing:.14em;color:#FFD98A}
+.x-tx b{display:block;font-family:Sora,Manrope,sans-serif;font-size:1.55rem;line-height:1.15;margin:6px 0 4px}
+.x-tx span{display:block;font-size:14px;opacity:.9;line-height:1.35}
+.x-tx button{margin-top:14px;display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 16px;border-radius:999px;background:#fff;color:#A3122A;font-weight:800;font-size:14px;box-shadow:0 8px 18px -8px rgba(0,0,0,.5)}
+.x-tx button svg{width:18px;height:18px}
+.x-close{position:absolute;right:8px;top:8px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.22);color:#fff;font-size:22px;line-height:1;display:grid;place-items:center;z-index:2}
+/* Orden de pestañas */
+.sub-note{color:var(--muted);font-size:14px;line-height:1.5;margin:0 4px 14px}
+.to-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.to-row:last-child{border-bottom:0}
+.to-n{width:22px;text-align:center;font-weight:800;color:var(--accent);font-family:Sora,sans-serif}
+.to-ic{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--surface2);color:var(--accent);flex:none}
+.to-ic svg{width:20px;height:20px}
+.to-row b{flex:1;min-width:0;font-size:16px}
+.to-row button{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--surface2);color:var(--text)}
+.to-row button svg{width:20px;height:20px}
+.to-row button:disabled{opacity:.25}
+.to-row.first{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+/* Eliminado recientemente */
+.tr-bar{display:flex;align-items:center;gap:10px;margin:0 0 12px;flex-wrap:wrap}
+.tr-n{color:var(--muted);font-weight:700;font-size:14px}
+.tr-act{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 14px;border-radius:15px;background:var(--surface);border:1px solid var(--line);font-weight:800;font-size:14px;color:var(--text);min-width:0;white-space:nowrap}
+.tr-act svg{width:19px;height:19px;flex:none}
+.tr-act.danger{color:#fff;background:var(--danger,#E5484D);border-color:transparent}
+.tsel-btn{font-weight:800;font-size:15px;color:var(--accent);padding:8px 10px;margin-left:auto}
+.tr-row{width:100%;text-align:left;gap:12px}
+.tr-row.sel{background:color-mix(in srgb,var(--accent) 12%,transparent);border-radius:16px}
+.tr-foot{position:sticky;bottom:calc(var(--sab,env(safe-area-inset-bottom,0px)) + 10px);display:flex;gap:10px;padding:10px;margin-top:12px;border-radius:20px;background:var(--solid,var(--surface));border:1px solid var(--line);box-shadow:0 14px 30px -14px rgba(0,0,0,.5);z-index:3}
 </style>
 </head>
 <body>
 <div id="appBg"></div>
+<canvas id="xSnow" class="x-snow" aria-hidden="true"></canvas>
 <div class="app">
   <header class="top">
+    <div class="x-lights" id="xLights" aria-hidden="true"></div>
     <div class="brand">
       <img src="data:image/webp;base64,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" width="40" height="40" alt="" style="border-radius:11px;display:block;flex:none">
-      <div class="bt"><span class="hi" id="hello">Hola 👋</span><h1>Nexora<small>PRO</small></h1></div>
+      <span class="x-hatw" aria-hidden="true"><svg class="x-hat" viewBox="0 0 64 46" aria-hidden="true"><defs><linearGradient id="xhR" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF4A5C"/><stop offset="1" stop-color="#B3122A"/></linearGradient></defs><path d="M7 35C12 17 27 5 44 8c8 1.5 12 8 12 17-3-5-8-8-14-6.5C32 21 27 28 25 37z" fill="url(#xhR)"/><path d="M44 8c8 1.5 12 8 12 17-1.6-2.6-3.8-4.6-6.4-5.6C49 14 47.4 10.4 44 8z" fill="#000" opacity=".14"/><rect x="2" y="31" width="34" height="11" rx="5.5" fill="#fff" transform="rotate(-13 19 36.5)"/><rect x="2" y="31" width="34" height="4" rx="2" fill="#E6ECF5" transform="rotate(-13 19 36.5) translate(0 7)"/><circle cx="56" cy="27" r="6.5" fill="#fff"/><circle cx="54.5" cy="25.5" r="2.4" fill="#fff" opacity=".7"/></svg></span><div class="bt"><span class="hi" id="hello">Hola 👋</span><h1>Nexora<small>PRO</small></h1></div>
     </div>
     <button class="icon-btn" id="bSearch" aria-label="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
     <button class="icon-btn" id="bSort" aria-label="Ordenar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h10M4 12h7M4 18h5M18 5v14m0 0-3-3m3 3 3-3"/></svg></button>
@@ -1053,6 +1115,7 @@ body.eco .ly-l,body.eco .sheet-full{transition-duration:.15s!important}
   <video id="video" playsinline preload="metadata"></video>
   <div class="vp-tap" id="vpTap"></div>
   <div class="vp-scrim"></div>
+  <div class="vp-guard"></div>
   <div class="vp-layer">
     <div class="vp-top">
       <button class="icon-btn" id="vpBack" aria-label="Volver"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg></button>
@@ -1159,7 +1222,7 @@ class AudioFacade extends EventTarget{
   get paused(){ return this.e.paused }
   get playbackRate(){ return this.e.playbackRate } set playbackRate(v){ this.e.playbackRate=v }
   get volume(){ return this.e.volume } set volume(v){ this.e.volume=v }
-  play(){ return this.e.play() } pause(){ return this.e.pause() }
+  play(){ if(!useNat) audioWake(); return this.e.play() } pause(){ return this.e.pause() }
   getAttribute(a){ return this.e.getAttribute(a) } removeAttribute(a){ return this.e.removeAttribute(a) } load(){ return this.e.load() }
 }
 const audio = new AudioFacade();
@@ -1178,7 +1241,7 @@ const wantNative = (url, force) => !!(window.Nexora && (S.mixAudio || force) && 
 const NATIVE = typeof window.Nexora !== 'undefined';
 if(NATIVE){ audioEl.crossOrigin = 'anonymous'; video.crossOrigin = 'anonymous'; }
 const native = (fn,...a) => { try{ if(NATIVE && Nexora[fn]) return Nexora[fn](...a); }catch(e){} };
-const DEF = {vmode:'all', vscale:'fit', venh:0, covers:null, fx:{bass:0,surround:0,clarity:0,norm:false}, boost:100, boostKeys:true, mixAudio:false, gapless:false, crossfade:false, cfSec:5, hideVoice:true, lang:'es', autoLy:true, plView:'cover', vzStyle:'bars', eco:false, ecoAuto:false, notifNew:true, notifTime:true, notifWatch:true, notifNames:true, resumeLast:true};
+const DEF = {xmas:'auto', xmasSnow:true, xmasColors:true, vmode:'all', vscale:'fit', venh:0, covers:null, fx:{bass:0,surround:0,clarity:0,norm:false}, boost:100, boostKeys:true, mixAudio:false, gapless:false, crossfade:false, cfSec:5, hideVoice:true, lang:'es', autoLy:true, plView:'cover', vzStyle:'bars', eco:false, ecoAuto:false, notifNew:true, notifTime:true, notifWatch:true, notifNames:true, resumeLast:true};
 
 /* ---------- icons ---------- */
 const I = {
@@ -1256,6 +1319,7 @@ const THEME_VARS=['--bg','--surface','--surface2','--text','--muted','--line','-
 function applyTheme(){
   const root=document.documentElement;
   let [a,b] = accentPair(); if(S.gradOn===false) b=a;
+  if(typeof xmasOn==='function' && xmasOn() && S.xmasColors!==false){ a='#E5384B'; b='#F2B33D'; }
   root.style.setProperty('--accent',a);
   root.style.setProperty('--accent2',b);
   if(S.theme==='auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme',S.theme);
@@ -1341,8 +1405,9 @@ function probe(it){
 const IC_FORYOU='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15.5l-1.9-4.6L5.5 9l4.6-1.4z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>';
 const STAB_IC={artist:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>',album:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/></svg>'};
 const TABS = [['videos','Videos',I.video],['canciones','Canciones',I.music],['favoritos','Favoritos',I.star],['playlists','Playlists',I.list],['parati','Para ti',IC_FORYOU],['albumes','Álbumes',STAB_IC.album],['carpetas','Carpetas',I.folder]];
+tab = (Array.isArray(S.tabOrder)&&S.tabOrder[0]) || tab;
 function renderTabs(){
-  $('tabs').innerHTML = TABS.map(([k,l,ic])=>`<button class="tab ${tab===k?'on':''}" data-tab="${k}">${ic||''}${l}</button>`).join('');
+  $('tabs').innerHTML = tabList().map(([k,l,ic])=>`<button class="tab ${tab===k?'on':''}" data-tab="${k}">${ic||''}${l}</button>`).join('');
 }
 const isVoice = it => it.type==='audio' && (/^PTT-\d/i.test(it.name||'') || /voice ?notes?|notas? de voz/i.test(it.folder||''));
 const isRecording = it => it.type==='audio' && !isVoice(it) && /record|grabaci|grabador|recorder|call/i.test((it.folder||'')+' '+(it.name||''));
@@ -1388,7 +1453,7 @@ function songList(arr, ctx){
 }
 
 let shown=[];
-function greet(){ const h=new Date().getHours(); const g = h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches'; const el=$('hello'); if(el && el.dataset.g!==g){ el.dataset.g=g; el.textContent=g+' 👋'; } }
+function greet(){ const h=new Date().getHours(); const x=typeof xmasOn==='function'&&xmasOn(); const g = x?xmasGreet():h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches'; const el=$('hello'); if(el && el.dataset.g!==g){ el.dataset.g=g; el.textContent=x?g:g+' 👋'; } }
 function render(){
   greet();
   shown=[];
@@ -1441,6 +1506,7 @@ function render(){
         : emptyState('Sin carpetas','Elige una carpeta de tu teléfono y Nexora la organizará por ti.', false) + `<div style="text-align:center"><button class="btn" data-act="folder">${I.folder}Elegir carpeta</button></div>`;
     }
   }
+  if(tab==='canciones' && !query && !sel) h = xmasCard() + h;
   c.innerHTML = h;
   updateSelUI();
   updateMini();
@@ -1514,12 +1580,48 @@ const EQ_PRESETS={
   'Aumento de agudos':[0,0,0,0,0,1,3,5,6,7]
 };
 if(!S.eq) S.eq={on:false, preset:'Normal', gains:EQ_PRESETS['Normal'].slice()};
+/* ---------- Sonido que no vuelve tras una pausa larga ----------
+   Android suelta el sonido del WebView cuando la música queda en pausa varios minutos.
+   Al volver a reproducir: se despierta el motor de sonido y, si la pausa fue larga, se recarga
+   la canción en el mismo segundo. Si a los 2,5 s sigue sin sonar, se reintenta solo. */
+let pausedAt=0, awT=null;
+audioEl.addEventListener('pause',()=>{ pausedAt=Date.now(); });
+function audioReload(play){
+  const s=audioEl.getAttribute('src'); if(!s) return;
+  const t=audioEl.currentTime;
+  audioEl.src=s; try{ audioEl.currentTime=t; }catch(e){}
+  audioEl.playbackRate=S.speed||1;
+  if(play) audioEl.play().catch(()=>{});
+}
+function ctxWake(){ try{ if(ctx && ctx.state!=='running' && ctx.state!=='closed') ctx.resume().catch(()=>{}); }catch(e){} }
+function audioWake(){
+  ctxWake();
+  if(pausedAt && Date.now()-pausedAt>40000) audioReload(false);
+  pausedAt=0;
+  clearTimeout(awT); let tries=0;
+  const watch=()=>{
+    const t0=audioEl.currentTime, c0=ctx?ctx.currentTime:0;
+    awT=setTimeout(()=>{
+      if(useNat || audioEl.paused) return;
+      const elStuck = audioEl.currentTime - t0 < .3;
+      const ctxStuck = !!ctx && (ctx.state!=='running' || ctx.currentTime - c0 < .3);
+      if(!elStuck && !ctxStuck) return;
+      tries++;
+      if(ctxStuck){ try{ ctx.state==='running' ? ctx.suspend().then(()=>ctx.resume()).catch(()=>{}) : ctx.resume().catch(()=>{}); }catch(e){} }
+      if(elStuck) audioReload(true);
+      if(tries<3) watch();
+    }, 2500);
+  };
+  watch();
+}
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden && !useNat && !audioEl.paused) ctxWake(); });
 function ensureAudioGraph(force){
   if(ctx){ if(ctx.state==='suspended') ctx.resume(); return; }
   // En la app de Android solo se activa con el ecualizador, para no afectar la música en segundo plano.
   if(NATIVE && !force && !S.eq.on && S.boost<=100 && !fxActive()) return;
   try{
     ctx = new (window.AudioContext||window.webkitAudioContext)({latencyHint:'playback'});
+    ctx.onstatechange = () => { if(ctx.state!=='running' && ctx.state!=='closed' && !useNat && !audioEl.paused) ctx.resume().catch(()=>{}); };
     srcNode = ctx.createMediaElementSource(audioEl);
     preamp = ctx.createGain();
     let n = srcNode; n.connect(preamp); n = preamp;
@@ -2710,6 +2812,99 @@ $('recap').addEventListener('click', e=>{
   if(b.dataset.rcplay){ const list=recapData(recapWhich).songs.map(x=>x.it), it=list.find(i=>i.key===b.dataset.rcplay); if(it){ playItem(it,list); toast('Reproduciendo tu top'); } }
 });
 
+/* ====== Navidad: decoración automática del 1 de diciembre al 6 de enero ====== */
+function xmasSeason(d=new Date()){ return d.getMonth()===11 || (d.getMonth()===0 && d.getDate()<=6); }
+function xmasOn(){ return S.xmas==='on' || (S.xmas!=='off' && xmasSeason()); }
+const XMAS_HAT = '<svg class="x-hat" viewBox="0 0 64 46" aria-hidden="true"><defs><linearGradient id="xhR" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF4A5C"/><stop offset="1" stop-color="#B3122A"/></linearGradient></defs><path d="M7 35C12 17 27 5 44 8c8 1.5 12 8 12 17-3-5-8-8-14-6.5C32 21 27 28 25 37z" fill="url(#xhR)"/><path d="M44 8c8 1.5 12 8 12 17-1.6-2.6-3.8-4.6-6.4-5.6C49 14 47.4 10.4 44 8z" fill="#000" opacity=".14"/><rect x="2" y="31" width="34" height="11" rx="5.5" fill="#fff" transform="rotate(-13 19 36.5)"/><rect x="2" y="31" width="34" height="4" rx="2" fill="#E6ECF5" transform="rotate(-13 19 36.5) translate(0 7)"/><circle cx="56" cy="27" r="6.5" fill="#fff"/><circle cx="54.5" cy="25.5" r="2.4" fill="#fff" opacity=".7"/></svg>';
+const XMAS_TREE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l1.1 2.2 2.4.3-1.8 1.6.5 2.4-2.2-1.2-2.2 1.2.5-2.4L8.5 5l2.4-.3z" fill="currentColor" stroke="none"/><path d="M12 8.5 7 14h3l-4 5h12l-4-5h3z"/><path d="M12 19v2.5"/></svg>';
+const XB_COL = ['#FF4D5E','#FFC43D','#3DDC84','#4DA3FF','#FF7AD9'];
+function xmasLights(){
+  const box=$('xLights'); if(!box) return;
+  const seg=window.innerWidth<480?4:window.innerWidth<900?6:9, sag=9, per=3;
+  let d='', bulbs='', n=0;
+  for(let i=0;i<seg;i++){
+    const x0=i/seg*1000, x1=(i+1)/seg*1000, xm=(x0+x1)/2;
+    d+=`${i?'':`M${x0} 2`} Q${xm} ${2+sag*2} ${x1} 2 `;
+    for(let j=1;j<=per;j++){
+      const t=j/(per+1), y=2+2*t*(1-t)*sag*2, x=(x0+t*(x1-x0))/10;
+      const c=XB_COL[n%XB_COL.length];
+      bulbs+=`<i class="xb" style="left:${x.toFixed(2)}%;top:${(y-1).toFixed(1)}px;--c:${c};animation-delay:${((n*0.37)%2.4).toFixed(2)}s;transform:rotate(${(t-.5)*-40}deg)"></i>`; n++;
+    }
+  }
+  box.innerHTML=`<svg viewBox="0 0 1000 24" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="none" stroke="var(--xwire)" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>${bulbs}`;
+}
+const snow={c:null,x:null,f:[],raf:0,last:0,col:'#fff'};
+function mkFlake(any){ return {x:Math.random()*innerWidth, y:any?Math.random()*innerHeight:-8, r:.7+Math.random()*2.3, v:.22+Math.random()*.55, w:Math.random()*6.28, a:.3+Math.random()*.55}; }
+function snowSize(){ const d=Math.min(2,devicePixelRatio||1); snow.c.width=innerWidth*d; snow.c.height=innerHeight*d; snow.x.setTransform(d,0,0,d,0,0); }
+function snowTick(t){
+  snow.raf=requestAnimationFrame(snowTick);
+  if(t-snow.last<33) return;
+  const dt=Math.min(3,(t-snow.last)/16.7); snow.last=t;
+  if(document.hidden || (typeof VP!=='undefined' && VP.classList.contains('on'))) return;
+  const x=snow.x; x.clearRect(0,0,innerWidth,innerHeight); x.fillStyle=snow.col;
+  for(const f of snow.f){
+    f.y+=f.v*dt; f.w+=.012*dt; f.x+=Math.sin(f.w)*.32*dt;
+    if(f.y>innerHeight+6) Object.assign(f,mkFlake(false));
+    x.globalAlpha=f.a; x.beginPath(); x.arc(f.x,f.y,f.r,0,6.283); x.fill();
+  }
+  x.globalAlpha=1;
+}
+function snowStart(){
+  if(snow.raf) return;
+  snow.c=$('xSnow'); snow.x=snow.c.getContext('2d'); snowSize();
+  snow.f=Array.from({length:Math.round(Math.min(46, innerWidth/9))},()=>mkFlake(true));
+  snow.c.style.display='block'; snow.last=0; snow.raf=requestAnimationFrame(snowTick);
+}
+function snowStop(){ if(snow.raf) cancelAnimationFrame(snow.raf); snow.raf=0; const c=$('xSnow'); if(c){ c.style.display='none'; } }
+function applyXmas(){
+  const on=xmasOn();
+  document.body.classList.toggle('xmas', on);
+  document.body.classList.toggle('xmas-col', on && S.xmasColors!==false);
+  if(on){ xmasLights(); const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(); snow.col = /^#(?:[ef]|d[89a-f])/i.test(bg)||document.documentElement.dataset.theme==='light' ? '#9DB4DA' : '#FFFFFF'; }
+  if(on && S.xmasSnow!==false && !S.eco) snowStart(); else snowStop();
+  const el=$('hello'); if(el) el.dataset.g='';
+  greet();
+}
+function xmasGreet(){
+  const d=new Date(), m=d.getMonth(), day=d.getDate();
+  if(m===11 && (day===24||day===25)) return '¡Feliz Navidad! 🎄';
+  if((m===11 && day===31) || (m===0 && day===1)) return '¡Feliz Año Nuevo! 🎆';
+  return 'Felices fiestas ✨';
+}
+const xmasCardKey = () => { const d=new Date(); return 'x'+(d.getMonth()===0?d.getFullYear()-1:d.getFullYear()); };
+function xmasCard(){
+  if(!xmasOn() || store.get('xcard','')===xmasCardKey()) return '';
+  const y=new Date().getMonth()===0?new Date().getFullYear()-1:new Date().getFullYear();
+  return `<div class="x-card"><div class="x-orn" aria-hidden="true"><i style="--c:#FF4D5E;left:14%;--h:34px"></i><i style="--c:#FFC43D;left:46%;--h:52px"></i><i style="--c:#3DDC84;left:78%;--h:26px"></i></div>
+    <div class="x-tx"><small>NEXORA · NAVIDAD ${y}</small><b>${xmasGreet().replace(/ [^ ]+$/,'')}</b><span>Tu música favorita para estas fiestas</span>
+    <button data-act="xmasplay">${I.shuffle}Mezclar mi música</button></div>
+    <button class="x-close" data-act="xmashide" aria-label="Cerrar">×</button></div>`;
+}
+addEventListener('resize',()=>{ if(document.body.classList.contains('xmas')) xmasLights(); if(snow.raf) snowSize(); });
+applyXmas();
+
+/* ====== Orden de las pestañas ====== */
+const IC_TABS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11M4 12h11M4 17h11M18 9l2.5-2.5L23 9M18 15l2.5 2.5L23 15"/></svg>';
+function tabList(){
+  const by=new Map(TABS.map(t=>[t[0],t]));
+  const out=(Array.isArray(S.tabOrder)?S.tabOrder:[]).filter(k=>by.has(k)).map(k=>by.get(k));
+  TABS.forEach((t,i)=>{ if(!out.includes(t)) out.splice(Math.min(i,out.length),0,t); });
+  return out;
+}
+function moveTab(k,dir){
+  const L=tabList().map(t=>t[0]), i=L.indexOf(k), j=i+dir;
+  if(i<0||j<0||j>=L.length) return;
+  [L[i],L[j]]=[L[j],L[i]]; S.tabOrder=L; save(); renderTabs(); renderSub();
+}
+
+/* ====== Eliminado recientemente: selección ====== */
+let trashSel=null;
+function trashConfirm(rows){
+  const n=rows.length;
+  openSheet(`<h3>¿Borrar para siempre?</h3><p style="margin:0 18px 14px;color:var(--muted);line-height:1.5">Se ${n===1?'borrará 1 archivo':`borrarán ${n} archivos`} de tu teléfono. Esto no se puede deshacer.</p>${opt('yes',n===1?'Borrar para siempre':`Borrar ${n} para siempre`,I.trash,false,'danger')}${opt('no','Cancelar',IC_BACK)}`,
+    v=>{ if(v==='yes'){ trashSel=null; trashAct('forever',rows); } });
+}
+
 /* ---------- settings ---------- */
 const IBC=['#7C5CFF','#FF5C8A','#12B5CB','#F59E0B','#16A34A','#EF4444','#3B82F6','#A855F7','#14B8A6','#64748B'];
 const setRow = (id,icon,name,val='',cls='',ci=0) => `<button class="set ${cls}" data-set="${id}"><span class="ib" style="--ibc:${IBC[ci%IBC.length]}">${icon}</span><span class="n">${name}</span><span class="v">${val}</span>${I.chev}</button>`;
@@ -2735,6 +2930,7 @@ function renderSettings(){
       ${qtile('bg', IC_IMG, 'Fondo', localStorage.getItem('nx_bg')?'Personal':'Ninguno', 2)}
       ${qtile('lang', I.globe, 'Idioma', LANGS[S.lang]||'Español', 3)}
     </div>
+    <div class="group">${setRow('tabs',IC_TABS,'Orden de las pestañas',tabList()[0][1]+' primero','',4)}${setRow('xmas',XMAS_TREE,'Decoración navideña',{auto:'Automática',on:'Siempre',off:'Desactivada'}[S.xmas||'auto'],'',1)}</div>
     <div class="sec-t">Sonido y reproducción</div>
     <div class="group">${setRow('playback',I.head,'Ajustes de reproducción','','',0)}${setRow('fx',I.music,'Mejoras de sonido', fxActive()?'Activadas':'Calidad original','',8)}${setRow('boost',IC_BOOST,'Amplificador de volumen',S.boost+'%','',5)}${setRow('speed',I.head,'Velocidad predeterminada',S.speed+'x','',6)}${setRow('sleep',I.moon,'Temporizador para dormir',sleepMode==='off'?'Apagado':sleepMode==='end'?'Al terminar':$('sleepLbl').textContent,'',7)}</div>
     <div class="sec-t">Biblioteca</div>
@@ -2766,6 +2962,8 @@ $('settings').addEventListener('click', e=>{
   if(k==='fx') fxSheet();
   if(k==='hidden') openSub('hidden');
   if(k==='deleted') openSub('deleted');
+  if(k==='tabs') openSub('tabs');
+  if(k==='xmas') openSub('xmas');
   if(k==='reset') openSheet(`<h3>¿Restablecer estadísticas?</h3><p style="margin:0 18px 16px;color:var(--muted);line-height:1.5">Se borrará tu tiempo total de reproducción y el conteo de canciones más reproducidas. Esta acción no se puede deshacer.</p><div style="padding:0 18px;display:flex;gap:10px;justify-content:flex-end"><button class="btn ghost" data-v="no">Cancelar</button><button class="btn" data-v="yes" style="background:var(--danger)">Aceptar</button></div>`, v=>{
     if(v!=='yes') return;
     S.playMs=0; save(); for(const x in plays) delete plays[x]; store.set('plays',plays); renderSettings(); toast('Estadísticas restablecidas');
@@ -2798,6 +2996,8 @@ $('content').addEventListener('click', e=>{
   if(ds.more){ const it=items.find(i=>i.key===ds.more); it&&itemMenu(it); }
   if(ds.act==='import') $('fileIn').click();
   if(ds.act==='folder') $('folderIn').click();
+  if(ds.act==='xmashide'){ store.set('xcard', xmasCardKey()); render(); return; }
+  if(ds.act==='xmasplay'){ const a=live().filter(i=>i.type==='audio').sort(()=>Math.random()-.5); if(a.length){ S.shuffle=true; save(); playItem(a[0],a); toast('🎄 Felices fiestas'); } else toast('No hay canciones para reproducir'); return; }
   if(ds.act==='shuffleall'){ const a=(((tab==='parati'&&openPlaylist)||openGroup)?shown.filter(i=>i.type==='audio').slice():filt(live().filter(i=>i.type==='audio'))).sort(()=>Math.random()-.5); if(a.length){ S.shuffle=true; save(); playItem(a[0],a); toast('Aleatorio activado'); } }
   if(ds.act==='playall'){ const a=((tab==='parati'&&openPlaylist)||openGroup)?shown.filter(i=>i.type==='audio'):filt(sorted(live().filter(i=>i.type==='audio'),S.sortA)); a.length&&playItem(a[0],a); }
   if(ds.act==='newpl') newPlaylist(null);
@@ -3415,7 +3615,7 @@ const IC_KEYS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const IC_CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>';
 const EYEOFF='<svg class="eyeoff" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M3 3l18 18M10.6 6.1A9.5 9.5 0 0 1 12 6c5 0 9 6 9 6a15 15 0 0 1-2.6 3.2M6.6 6.6C4.3 8.1 3 12 3 12s4 6 9 6a8.6 8.6 0 0 0 4.4-1.2"/></svg>';
 let subKind=null, subTab='audio', subChip='all', trashList=[], trashLoading=false;
-function openSub(kind){ subKind=kind; subTab='audio'; subChip='all'; $('sub').classList.add('on'); if(kind==='deleted') loadTrash(); renderSub(); $('sub').scrollTop=0; }
+function openSub(kind){ subKind=kind; subTab='audio'; subChip='all'; trashSel=null; $('sub').classList.add('on'); if(kind==='deleted') loadTrash(); renderSub(); $('sub').scrollTop=0; }
 function closeSub(){ $('sub').classList.remove('on'); subKind=null; renderSettings(); }
 const subHead = (title, extra='') => `<div class="sub-head"><button class="icon-btn" data-s="back" aria-label="Volver">${IC_BACK}</button><h2>${title}</h2>${extra}</div>`;
 const segHTML = () => `<div class="seg"><button data-s="tab:audio" class="${subTab==='audio'?'on':''}">${IC_HEAD}Audio</button><button data-s="tab:video" class="${subTab==='video'?'on':''}">${IC_VID}Video</button></div>`;
@@ -3440,9 +3640,18 @@ function renderSub(){
     const sys = trashList.filter(t=>t.type===subTab).map(t=>({key:`trash:${t.type}:${t.id}`, ref:{type:t.type,id:t.id}, title:(t.name||t.title).replace(/\.[^.]+$/,''), folder:t.folder, days:daysLeft(t.expires), type:t.type}));
     const app = items.filter(i=>i.deleted && i.type===subTab).map(i=>({key:'app:'+i.key, item:i, title:i.title, folder:'Quitado de la biblioteca', days:null, type:i.type}));
     const arr=[...sys,...app]; window._trashRows=arr;
-    h = subHead('Eliminado recientemente', arr.length?`<button class="icon-btn" data-s="trashall" aria-label="Más opciones">${I.more}</button>`:'') + segHTML() +
-      (trashLoading ? `<div class="sub-empty"><div class="spin"></div></div>` : arr.length ? arr.map((r,ix)=>`<div class="row"><button class="row" style="padding:0;flex:1;min-width:0" data-s="tmenu:${ix}"><div class="art ghost"><span class="letter">${r.type==='video'?'▶':'♪'}</span>${r.days!==null?`<span class="badge">${r.days} día${r.days===1?'':'s'}</span>`:''}</div><div class="meta"><div class="t">${esc(r.title)}</div><div class="s">${esc(r.folder||'')}</div></div></button><button class="more" data-s="tmenu:${ix}" aria-label="Opciones">${I.more}</button></div>`).join('')
+    if(trashSel) for(const k of [...trashSel]) if(!arr.some(r=>r.key===k)) trashSel.delete(k);
+    const selOn=!!trashSel, nSel=selOn?trashSel.size:0, allSel=selOn&&nSel===arr.length&&nSel>0, ready=arr.length&&!trashLoading;
+    const artT = r => `<div class="art ghost"><span class="letter">${r.type==='video'?'▶':'♪'}</span>${r.days!==null?`<span class="badge">${r.days} día${r.days===1?'':'s'}</span>`:''}</div><div class="meta"><div class="t">${esc(r.title)}</div><div class="s">${esc(r.folder||'')}</div></div>`;
+    h = subHead('Eliminado recientemente', ready?`<button class="tsel-btn" data-s="tsel">${selOn?'Listo':'Seleccionar'}</button>`:'') + segHTML() +
+      (ready ? (selOn
+        ? `<div class="tr-bar"><button class="selchip ${allSel?'on':''}" data-s="tselall"><span class="ck"></span>${allSel?'Quitar selección':'Seleccionar todo'}</button><span class="tr-n">${nSel} seleccionado${nSel===1?'':'s'}</span></div>`
+        : `<div class="tr-bar"><button class="tr-act" data-s="tall:restore">${I.restore}Restaurar todo</button><button class="tr-act danger" data-s="tall:forever">${I.trash}Borrar todo</button></div>`) : '') +
+      (trashLoading ? `<div class="sub-empty"><div class="spin"></div></div>` : arr.length ? arr.map((r,ix)=> selOn
+          ? `<button class="row tr-row ${trashSel.has(r.key)?'sel':''}" data-s="tpick:${ix}"><span class="ck ${trashSel.has(r.key)?'on':''}"></span>${artT(r)}</button>`
+          : `<div class="row"><button class="row" style="padding:0;flex:1;min-width:0" data-s="tmenu:${ix}">${artT(r)}</button><button class="more" data-s="tmenu:${ix}" aria-label="Opciones">${I.more}</button></div>`).join('')
         : `<div class="sub-empty">No hay archivos eliminados</div>`) +
+      (selOn && nSel ? `<div class="tr-foot"><button class="tr-act" data-s="tdo:restore">${I.restore}Restaurar (${nSel})</button><button class="tr-act danger" data-s="tdo:forever">${I.trash}Borrar (${nSel})</button></div>` : '') +
       (NATIVE ? `<p style="color:var(--muted);font-size:13px;line-height:1.5;margin:18px 4px">Los archivos borrados se guardan en la papelera del teléfono durante 30 días antes de eliminarse para siempre.</p>` : '');
   }
   else if(subKind==='playback'){
@@ -3499,6 +3708,18 @@ function renderSub(){
       <button class="bk-share cz-reset" data-s="cz:reset">Restablecer todo</button>
       <p style="color:var(--muted);font-size:13px;line-height:1.5;margin:0 4px 18px">El fondo y los temas también se pueden cambiar en Ajustes → Tema y Fondo.</p>`;
   }
+  else if(subKind==='tabs'){
+    const L=tabList();
+    h = subHead('Orden de las pestañas') + `<p class="sub-note">Usa las flechas para subir o bajar cada pestaña. La primera es la que se abre al iniciar la app.</p>
+      <div class="group">${L.map(([k,l,ic],i)=>`<div class="to-row ${i===0?'first':''}"><span class="to-n">${i+1}</span><span class="to-ic">${ic}</span><b>${l}</b><button data-s="tmv:${k}:-1" ${i===0?'disabled':''} aria-label="Subir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg></button><button data-s="tmv:${k}:1" ${i===L.length-1?'disabled':''} aria-label="Bajar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button></div>`).join('')}</div>
+      <button class="bk-share cz-reset" data-s="tord:reset">Restablecer orden</button>`;
+  }
+  else if(subKind==='xmas'){
+    const m=S.xmas||'auto';
+    h = subHead('Decoración navideña') + `<p class="sub-note">Luces, nieve, gorro de Santa y colores de Navidad en toda la app.</p>
+      <div class="group">${[['auto','Automática','Del 1 de diciembre al 6 de enero'],['on','Siempre activada','Se ve todo el año'],['off','Desactivada','Diseño normal']].map(([v,t,d])=>`<button class="set" data-s="xm:${v}"><span class="ck ${m===v?'on':''}"></span><span class="n">${t}<small style="display:block;color:var(--muted);font-weight:500;font-size:13px">${d}</small></span></button>`).join('')}</div>
+      <div class="group">${tgRow('xmasSnow', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7M9 4l3 2 3-2M9 20l3-2 3 2"/></svg>', 'Nieve cayendo', 'Copos suaves en la pantalla. Se apaga sola con el ahorro de energía.')}${tgRow('xmasColors', I.palette, 'Colores navideños', 'Rojo y dorado mientras esté la decoración.')}</div>`;
+  }
   else if(subKind==='lang'){
     const FL={es:'🇪🇸',en:'🇺🇸',pt:'🇧🇷',fr:'🇫🇷',it:'🇮🇹',de:'🇩🇪',id:'🇮🇩'};
     h = subHead('Idioma') + `<div class="lg-hero"><div class="ico">${I.globe}</div><div><b>Elige tu idioma</b><small>La app cambia al instante</small></div></div>
@@ -3511,7 +3732,15 @@ $('sub').addEventListener('click', e=>{
   const b=e.target.closest('[data-s]'); if(!b) return;
   const [cmd, ...rest]=b.dataset.s.split(':'), arg=rest.join(':');
   if(cmd==='back') closeSub();
-  if(cmd==='tab'){ subTab=arg; subChip='all'; renderSub(); }
+  if(cmd==='tab'){ subTab=arg; subChip='all'; trashSel=null; renderSub(); }
+  if(cmd==='tmv'){ const [k,d]=arg.split(':'); moveTab(k,+d); }
+  if(cmd==='tord'){ S.tabOrder=null; save(); renderTabs(); renderSub(); toast('Orden restablecido'); }
+  if(cmd==='xm'){ S.xmas=arg; save(); applyTheme(); applyXmas(); render(); renderSub(); }
+  if(cmd==='tsel'){ trashSel = trashSel ? null : new Set(); renderSub(); }
+  if(cmd==='tselall'){ const rows=window._trashRows||[]; trashSel = (trashSel&&trashSel.size===rows.length) ? new Set() : new Set(rows.map(r=>r.key)); renderSub(); }
+  if(cmd==='tpick'){ const r=(window._trashRows||[])[+arg]; if(r&&trashSel){ trashSel.has(r.key)?trashSel.delete(r.key):trashSel.add(r.key); renderSub(); } }
+  if(cmd==='tall'){ const rows=window._trashRows||[]; if(!rows.length) return; if(arg==='forever') trashConfirm(rows); else { trashSel=null; trashAct('restore',rows); } }
+  if(cmd==='tdo'){ const rows=(window._trashRows||[]).filter(r=>trashSel&&trashSel.has(r.key)); if(!rows.length) return; if(arg==='forever') trashConfirm(rows); else { trashSel=null; trashAct('restore',rows); } }
   if(cmd==='chip'){ subChip=arg; renderSub(); }
   if(cmd==='lang'){ setLang(arg); renderSub(); }
   if(cmd==='g') gAct(arg);
@@ -3580,6 +3809,7 @@ $('sub').addEventListener('change', e=>{
   }
   if(k==='crossfade') renderSub();
   if(k==='gradOn') applyTheme();
+  if(k==='xmasSnow'||k==='xmasColors'){ applyTheme(); applyXmas(); }
   if(k==='coverColor'){ const oi=$('orbImg'); coverTint(S.coverColor&&!oi.hidden?oi:null); }
   if(subKind==='hidden') renderSub();
 });
@@ -4057,6 +4287,12 @@ Object.assign(I18N.fr,{"¡Ya estamos en Google Play!": "Nous sommes sur Google P
 Object.assign(I18N.it,{"¡Ya estamos en Google Play!": "Siamo su Google Play!", "Descarga la versión oficial de Nexora Pro: gratis y sin anuncios.": "Scarica la versione ufficiale di Nexora Pro: gratis e senza pubblicità.", "Gratis, sin anuncios y sin nada oculto": "Gratis, senza pubblicità e niente di nascosto", "Se actualiza sola desde Play Store": "Si aggiorna da sola dal Play Store", "Verificada y protegida por Google": "Verificata e protetta da Google", "Guarda tu copia": "Salva il backup", "Tus playlists, favoritos y ajustes": "Playlist, preferiti e impostazioni", "Se guarda en tu Google Drive": "Salvato nel tuo Google Drive", "Guardar": "Salva", "Instala la versión oficial": "Installa la versione ufficiale", "Se quita esta versión y se abre Play Store": "Questa versione viene rimossa e si apre il Play Store", "Instalar desde Play Store": "Installa dal Play Store", "Primero guarda tu copia (paso 1)": "Prima salva il backup (passo 1)", "Espera…": "Attendi…", "Lista ✓": "Fatto ✓"});
 Object.assign(I18N.de,{"¡Ya estamos en Google Play!": "Wir sind bei Google Play!", "Descarga la versión oficial de Nexora Pro: gratis y sin anuncios.": "Lade die offizielle Version von Nexora Pro: kostenlos und ohne Werbung.", "Gratis, sin anuncios y sin nada oculto": "Kostenlos, ohne Werbung, nichts versteckt", "Se actualiza sola desde Play Store": "Aktualisiert sich selbst über den Play Store", "Verificada y protegida por Google": "Von Google geprüft und geschützt", "Guarda tu copia": "Sicherung speichern", "Tus playlists, favoritos y ajustes": "Deine Playlists, Favoriten und Einstellungen", "Se guarda en tu Google Drive": "Wird in deinem Google Drive gespeichert", "Guardar": "Speichern", "Instala la versión oficial": "Offizielle Version installieren", "Se quita esta versión y se abre Play Store": "Diese Version wird entfernt und der Play Store öffnet sich", "Instalar desde Play Store": "Aus dem Play Store installieren", "Primero guarda tu copia (paso 1)": "Speichere zuerst deine Sicherung (Schritt 1)", "Espera…": "Warte…", "Lista ✓": "Fertig ✓"});
 Object.assign(I18N.id,{"¡Ya estamos en Google Play!": "Kami sudah ada di Google Play!", "Descarga la versión oficial de Nexora Pro: gratis y sin anuncios.": "Unduh versi resmi Nexora Pro: gratis dan tanpa iklan.", "Gratis, sin anuncios y sin nada oculto": "Gratis, tanpa iklan, tanpa ada yang disembunyikan", "Se actualiza sola desde Play Store": "Diperbarui otomatis dari Play Store", "Verificada y protegida por Google": "Diverifikasi dan dilindungi Google", "Guarda tu copia": "Simpan cadanganmu", "Tus playlists, favoritos y ajustes": "Playlist, favorit, dan setelanmu", "Se guarda en tu Google Drive": "Disimpan di Google Drive-mu", "Guardar": "Simpan", "Instala la versión oficial": "Pasang versi resmi", "Se quita esta versión y se abre Play Store": "Versi ini dihapus dan Play Store terbuka", "Instalar desde Play Store": "Pasang dari Play Store", "Primero guarda tu copia (paso 1)": "Simpan cadangan dulu (langkah 1)", "Espera…": "Tunggu…", "Lista ✓": "Selesai ✓"});
+Object.assign(I18N.en,{"Felices fiestas ✨": "Happy holidays ✨", "¡Feliz Navidad! 🎄": "Merry Christmas! 🎄", "¡Feliz Año Nuevo! 🎆": "Happy New Year! 🎆", "Felices fiestas": "Happy holidays", "¡Feliz Navidad!": "Merry Christmas!", "¡Feliz Año Nuevo!": "Happy New Year!", "Tu música favorita para estas fiestas": "Your favorite music for the holidays", "Mezclar mi música": "Shuffle my music", "Orden de las pestañas": "Tab order", "Decoración navideña": "Christmas decoration", "Automática": "Automatic", "Siempre": "Always", "Desactivada": "Off", "Usa las flechas para subir o bajar cada pestaña. La primera es la que se abre al iniciar la app.": "Use the arrows to move each tab up or down. The first one opens when the app starts.", "Restablecer orden": "Reset order", "Orden restablecido": "Order reset", "Luces, nieve, gorro de Santa y colores de Navidad en toda la app.": "Lights, snow, Santa hat and Christmas colors across the app.", "Del 1 de diciembre al 6 de enero": "From December 1 to January 6", "Siempre activada": "Always on", "Se ve todo el año": "Shown all year", "Diseño normal": "Normal design", "Nieve cayendo": "Falling snow", "Copos suaves en la pantalla. Se apaga sola con el ahorro de energía.": "Soft snowflakes on the screen. Turns off with battery saver.", "Colores navideños": "Christmas colors", "Rojo y dorado mientras esté la decoración.": "Red and gold while the decoration is on.", "Seleccionar": "Select", "Listo": "Done", "Seleccionar todo": "Select all", "Quitar selección": "Clear selection", "Restaurar todo": "Restore all", "Borrar todo": "Delete all", "¿Borrar para siempre?": "Delete forever?", "🎄 Felices fiestas": "🎄 Happy holidays"});
+Object.assign(I18N.pt,{"Felices fiestas ✨": "Boas festas ✨", "¡Feliz Navidad! 🎄": "Feliz Natal! 🎄", "¡Feliz Año Nuevo! 🎆": "Feliz Ano Novo! 🎆", "Felices fiestas": "Boas festas", "¡Feliz Navidad!": "Feliz Natal!", "¡Feliz Año Nuevo!": "Feliz Ano Novo!", "Tu música favorita para estas fiestas": "Sua música favorita para as festas", "Mezclar mi música": "Misturar minhas músicas", "Orden de las pestañas": "Ordem das abas", "Decoración navideña": "Decoração de Natal", "Automática": "Automática", "Siempre": "Sempre", "Desactivada": "Desativada", "Usa las flechas para subir o bajar cada pestaña. La primera es la que se abre al iniciar la app.": "Use as setas para subir ou descer cada aba. A primeira abre ao iniciar o app.", "Restablecer orden": "Restaurar ordem", "Orden restablecido": "Ordem restaurada", "Luces, nieve, gorro de Santa y colores de Navidad en toda la app.": "Luzes, neve, gorro de Papai Noel e cores de Natal em todo o app.", "Del 1 de diciembre al 6 de enero": "De 1º de dezembro a 6 de janeiro", "Siempre activada": "Sempre ativada", "Se ve todo el año": "Aparece o ano todo", "Diseño normal": "Design normal", "Nieve cayendo": "Neve caindo", "Copos suaves en la pantalla. Se apaga sola con el ahorro de energía.": "Flocos suaves na tela. Desliga com a economia de energia.", "Colores navideños": "Cores de Natal", "Rojo y dorado mientras esté la decoración.": "Vermelho e dourado enquanto a decoração estiver ativa.", "Seleccionar": "Selecionar", "Listo": "Pronto", "Seleccionar todo": "Selecionar tudo", "Quitar selección": "Limpar seleção", "Restaurar todo": "Restaurar tudo", "Borrar todo": "Apagar tudo", "¿Borrar para siempre?": "Apagar para sempre?", "🎄 Felices fiestas": "🎄 Boas festas"});
+Object.assign(I18N.fr,{"Felices fiestas ✨": "Joyeuses fêtes ✨", "¡Feliz Navidad! 🎄": "Joyeux Noël ! 🎄", "¡Feliz Año Nuevo! 🎆": "Bonne année ! 🎆", "Felices fiestas": "Joyeuses fêtes", "¡Feliz Navidad!": "Joyeux Noël !", "¡Feliz Año Nuevo!": "Bonne année !", "Tu música favorita para estas fiestas": "Ta musique préférée pour les fêtes", "Mezclar mi música": "Mélanger ma musique", "Orden de las pestañas": "Ordre des onglets", "Decoración navideña": "Décoration de Noël", "Automática": "Automatique", "Siempre": "Toujours", "Desactivada": "Désactivée", "Usa las flechas para subir o bajar cada pestaña. La primera es la que se abre al iniciar la app.": "Utilise les flèches pour monter ou descendre chaque onglet. Le premier s’ouvre au démarrage.", "Restablecer orden": "Réinitialiser l’ordre", "Orden restablecido": "Ordre réinitialisé", "Luces, nieve, gorro de Santa y colores de Navidad en toda la app.": "Guirlandes, neige, bonnet de Père Noël et couleurs de Noël dans toute l’app.", "Del 1 de diciembre al 6 de enero": "Du 1er décembre au 6 janvier", "Siempre activada": "Toujours activée", "Se ve todo el año": "Visible toute l’année", "Diseño normal": "Design normal", "Nieve cayendo": "Neige qui tombe", "Copos suaves en la pantalla. Se apaga sola con el ahorro de energía.": "Flocons doux à l’écran. S’éteint avec l’économiseur de batterie.", "Colores navideños": "Couleurs de Noël", "Rojo y dorado mientras esté la decoración.": "Rouge et or pendant la décoration.", "Seleccionar": "Sélectionner", "Listo": "OK", "Seleccionar todo": "Tout sélectionner", "Quitar selección": "Effacer la sélection", "Restaurar todo": "Tout restaurer", "Borrar todo": "Tout supprimer", "¿Borrar para siempre?": "Supprimer définitivement ?", "🎄 Felices fiestas": "🎄 Joyeuses fêtes"});
+Object.assign(I18N.it,{"Felices fiestas ✨": "Buone feste ✨", "¡Feliz Navidad! 🎄": "Buon Natale! 🎄", "¡Feliz Año Nuevo! 🎆": "Felice anno nuovo! 🎆", "Felices fiestas": "Buone feste", "¡Feliz Navidad!": "Buon Natale!", "¡Feliz Año Nuevo!": "Felice anno nuovo!", "Tu música favorita para estas fiestas": "La tua musica preferita per le feste", "Mezclar mi música": "Mescola la mia musica", "Orden de las pestañas": "Ordine delle schede", "Decoración navideña": "Decorazione natalizia", "Automática": "Automatica", "Siempre": "Sempre", "Desactivada": "Disattivata", "Usa las flechas para subir o bajar cada pestaña. La primera es la que se abre al iniciar la app.": "Usa le frecce per spostare ogni scheda. La prima si apre all’avvio.", "Restablecer orden": "Ripristina ordine", "Orden restablecido": "Ordine ripristinato", "Luces, nieve, gorro de Santa y colores de Navidad en toda la app.": "Luci, neve, cappello di Babbo Natale e colori natalizi in tutta l’app.", "Del 1 de diciembre al 6 de enero": "Dal 1° dicembre al 6 gennaio", "Siempre activada": "Sempre attiva", "Se ve todo el año": "Visibile tutto l’anno", "Diseño normal": "Design normale", "Nieve cayendo": "Neve che cade", "Copos suaves en la pantalla. Se apaga sola con el ahorro de energía.": "Fiocchi leggeri sullo schermo. Si spegne con il risparmio energetico.", "Colores navideños": "Colori natalizi", "Rojo y dorado mientras esté la decoración.": "Rosso e oro finché c’è la decorazione.", "Seleccionar": "Seleziona", "Listo": "Fatto", "Seleccionar todo": "Seleziona tutto", "Quitar selección": "Annulla selezione", "Restaurar todo": "Ripristina tutto", "Borrar todo": "Elimina tutto", "¿Borrar para siempre?": "Eliminare per sempre?", "🎄 Felices fiestas": "🎄 Buone feste"});
+Object.assign(I18N.de,{"Felices fiestas ✨": "Frohe Feiertage ✨", "¡Feliz Navidad! 🎄": "Frohe Weihnachten! 🎄", "¡Feliz Año Nuevo! 🎆": "Frohes neues Jahr! 🎆", "Felices fiestas": "Frohe Feiertage", "¡Feliz Navidad!": "Frohe Weihnachten!", "¡Feliz Año Nuevo!": "Frohes neues Jahr!", "Tu música favorita para estas fiestas": "Deine Lieblingsmusik für die Feiertage", "Mezclar mi música": "Meine Musik mischen", "Orden de las pestañas": "Reihenfolge der Tabs", "Decoración navideña": "Weihnachtsdeko", "Automática": "Automatisch", "Siempre": "Immer", "Desactivada": "Aus", "Usa las flechas para subir o bajar cada pestaña. La primera es la que se abre al iniciar la app.": "Verschiebe jeden Tab mit den Pfeilen. Der erste öffnet sich beim Start.", "Restablecer orden": "Reihenfolge zurücksetzen", "Orden restablecido": "Reihenfolge zurückgesetzt", "Luces, nieve, gorro de Santa y colores de Navidad en toda la app.": "Lichter, Schnee, Weihnachtsmütze und Weihnachtsfarben in der ganzen App.", "Del 1 de diciembre al 6 de enero": "Vom 1. Dezember bis 6. Januar", "Siempre activada": "Immer an", "Se ve todo el año": "Das ganze Jahr sichtbar", "Diseño normal": "Normales Design", "Nieve cayendo": "Fallender Schnee", "Copos suaves en la pantalla. Se apaga sola con el ahorro de energía.": "Sanfte Schneeflocken auf dem Bildschirm. Aus im Energiesparmodus.", "Colores navideños": "Weihnachtsfarben", "Rojo y dorado mientras esté la decoración.": "Rot und Gold, solange die Deko aktiv ist.", "Seleccionar": "Auswählen", "Listo": "Fertig", "Seleccionar todo": "Alle auswählen", "Quitar selección": "Auswahl aufheben", "Restaurar todo": "Alle wiederherstellen", "Borrar todo": "Alle löschen", "¿Borrar para siempre?": "Endgültig löschen?", "🎄 Felices fiestas": "🎄 Frohe Feiertage"});
+Object.assign(I18N.id,{"Felices fiestas ✨": "Selamat hari raya ✨", "¡Feliz Navidad! 🎄": "Selamat Natal! 🎄", "¡Feliz Año Nuevo! 🎆": "Selamat Tahun Baru! 🎆", "Felices fiestas": "Selamat hari raya", "¡Feliz Navidad!": "Selamat Natal!", "¡Feliz Año Nuevo!": "Selamat Tahun Baru!", "Tu música favorita para estas fiestas": "Musik favoritmu untuk liburan", "Mezclar mi música": "Acak musikku", "Orden de las pestañas": "Urutan tab", "Decoración navideña": "Dekorasi Natal", "Automática": "Otomatis", "Siempre": "Selalu", "Desactivada": "Nonaktif", "Usa las flechas para subir o bajar cada pestaña. La primera es la que se abre al iniciar la app.": "Gunakan panah untuk menggeser tiap tab. Yang pertama terbuka saat aplikasi dimulai.", "Restablecer orden": "Atur ulang urutan", "Orden restablecido": "Urutan diatur ulang", "Luces, nieve, gorro de Santa y colores de Navidad en toda la app.": "Lampu, salju, topi Sinterklas, dan warna Natal di seluruh aplikasi.", "Del 1 de diciembre al 6 de enero": "1 Desember sampai 6 Januari", "Siempre activada": "Selalu aktif", "Se ve todo el año": "Tampil sepanjang tahun", "Diseño normal": "Desain normal", "Nieve cayendo": "Salju turun", "Copos suaves en la pantalla. Se apaga sola con el ahorro de energía.": "Kepingan salju lembut di layar. Mati saat hemat baterai.", "Colores navideños": "Warna Natal", "Rojo y dorado mientras esté la decoración.": "Merah dan emas selama dekorasi aktif.", "Seleccionar": "Pilih", "Listo": "Selesai", "Seleccionar todo": "Pilih semua", "Quitar selección": "Hapus pilihan", "Restaurar todo": "Pulihkan semua", "Borrar todo": "Hapus semua", "¿Borrar para siempre?": "Hapus selamanya?", "🎄 Felices fiestas": "🎄 Selamat hari raya"});
 const GREET = {en:['Good morning','Good afternoon','Good evening'], pt:['Bom dia','Boa tarde','Boa noite'], fr:['Bonjour','Bon après-midi','Bonsoir'], it:['Buongiorno','Buon pomeriggio','Buonasera'], de:['Guten Morgen','Guten Tag','Guten Abend'], id:['Selamat pagi','Selamat siang','Selamat malam']};
 ['en','pt','fr','it','de','id'].forEach(l=>{ const es=['Buenos días','Buenas tardes','Buenas noches']; es.forEach((g,i)=>{ I18N[l][g+' 👋']=GREET[l][i]+' 👋'; }); });
 function trText(src){
