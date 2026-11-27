@@ -1,4 +1,6 @@
 Versión: 1.8.8
+- Ícono de la app con gorro de Santa en Navidad
+- La app ya no se agranda por accidente con dos dedos (se puede activar en Ajustes → Más)
 - Decoración de Navidad: luces, nieve, gorro de Santa en el logo, árbol de Navidad en Ajustes y colores navideños (del 1 de diciembre al 6 de enero)
 - Ordena las pestañas como quieras desde Ajustes
 - Eliminado recientemente: selecciona varios, Seleccionar todo, Restaurar todo y Borrar todo
